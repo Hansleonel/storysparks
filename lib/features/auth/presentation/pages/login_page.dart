@@ -33,7 +33,6 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
             Text(
               'Welcome back 👋',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -51,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
                     fontWeight: FontWeight.w400,
                   ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 60),
             _buildEmailField(),
             const SizedBox(height: 20),
             _buildPasswordField(),
@@ -71,9 +70,16 @@ class _LoginPageState extends State<LoginPage> {
     return TextField(
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
-      style: const TextStyle(fontFamily: 'Urbanist'),
+      style: const TextStyle(
+        fontFamily: 'Urbanist',
+        fontWeight: FontWeight.w500,
+      ),
       decoration: InputDecoration(
         labelText: 'Email',
+        labelStyle: const TextStyle(
+          fontFamily: 'Urbanist',
+          fontWeight: FontWeight.w400,
+        ),
         prefixIcon: const Icon(Icons.email_outlined),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -90,9 +96,16 @@ class _LoginPageState extends State<LoginPage> {
     return TextField(
       controller: _passwordController,
       obscureText: true,
-      style: const TextStyle(fontFamily: 'Urbanist'),
+      style: const TextStyle(
+        fontFamily: 'Urbanist',
+        fontWeight: FontWeight.w500,
+      ),
       decoration: InputDecoration(
         labelText: 'Password',
+        labelStyle: const TextStyle(
+          fontFamily: 'Urbanist',
+          fontWeight: FontWeight.w400,
+        ),
         prefixIcon: const Icon(Icons.lock_outline),
         suffixIcon: const Icon(Icons.visibility_off_outlined),
         border: OutlineInputBorder(
