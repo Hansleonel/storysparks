@@ -94,6 +94,15 @@ class _LoginPageState extends State<LoginPage> {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.border),
         ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        ),
+        floatingLabelStyle: const TextStyle(
+          color: AppColors.primary,
+          fontFamily: 'Urbanist',
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
@@ -125,6 +134,15 @@ class _LoginPageState extends State<LoginPage> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        ),
+        floatingLabelStyle: const TextStyle(
+          color: AppColors.primary,
+          fontFamily: 'Urbanist',
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
