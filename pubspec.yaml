@@ -112,6 +112,7 @@ flutter:
     - assets/icons/
     - assets/audio/
     - assets/fonts/
+    - assets/images/
 
   fonts:
     - family: Playfair
