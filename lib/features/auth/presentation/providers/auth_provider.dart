@@ -17,7 +17,12 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final user = await _authRepository.login(email, password);
+      // final user = await _authRepository.login(email, password);
+      const user = UserModel(
+        id: '1',
+        email: 'test@test.com',
+        name: 'Test',
+      );
       _isAuthenticated = true;
       return user;
     } catch (e) {

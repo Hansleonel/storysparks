@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:storysparks/core/dependency_injection/service_locator.dart';
+import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
 import 'package:storysparks/features/auth/presentation/pages/login_page.dart';
 import 'package:storysparks/features/auth/presentation/providers/auth_provider.dart';
@@ -28,6 +29,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      onGenerateRoute: AppRoutes.onGenerateRoute,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,

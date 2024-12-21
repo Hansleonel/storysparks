@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:storysparks/core/routes/app_routes.dart';
 import '../providers/auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -169,11 +170,11 @@ class _LoginPageState extends State<LoginPage> {
                     );
                     if (user != null && mounted) {
                       // Navigate to home page
-                      Navigator.pushReplacementNamed(context, '/home');
+                      Navigator.pushReplacementNamed(context, AppRoutes.main);
                     }
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.teal[700],
+              backgroundColor: Color(0xFF504FF6),
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -214,7 +215,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Text(
             'Sign up',
             style: TextStyle(
-              color: Colors.teal[700],
+              color: Color(0xFF1F2937),
               fontFamily: 'Urbanist',
               fontWeight: FontWeight.w600,
             ),
