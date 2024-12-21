@@ -94,7 +94,7 @@ lib/
 2. **Instalación**:
 
    ```bash
-   git clone [URL_DEL_REPOSITORIO]
+   git clone https://github.com/Hansleonel/storysparks
    cd storysparks
    flutter pub get
    ```
