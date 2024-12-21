@@ -10,6 +10,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _memoryController = TextEditingController();
+  final _focusNode = FocusNode();
   String _selectedGenre = '';
   bool _isGenerateEnabled = false;
 
@@ -22,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _memoryController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -33,25 +35,30 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                const SizedBox(height: 32),
-                _buildMemoryInput(),
-                const SizedBox(height: 32),
-                _buildGenreSection(),
-                const SizedBox(height: 32),
-                _buildProtagonistSection(),
-                const SizedBox(height: 40),
-                _buildGenerateButton(),
-              ],
+    return GestureDetector(
+      onTap: () {
+        _focusNode.unfocus();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 32),
+                  _buildMemoryInput(),
+                  const SizedBox(height: 32),
+                  _buildGenreSection(),
+                  const SizedBox(height: 32),
+                  _buildProtagonistSection(),
+                  const SizedBox(height: 40),
+                  _buildGenerateButton(),
+                ],
+              ),
             ),
           ),
         ),
@@ -62,6 +69,8 @@ class _HomePageState extends State<HomePage> {
   Widget _buildMemoryInput() {
     return TextField(
       controller: _memoryController,
+      focusNode: _focusNode,
+      autofocus: false,
       maxLines: 5,
       style: const TextStyle(
         fontFamily: 'Urbanist',
