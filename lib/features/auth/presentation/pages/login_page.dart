@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
+import 'package:storysparks/core/theme/app_colors.dart';
 import '../providers/auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -26,9 +27,9 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -47,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
               'Please enter your email & password to sign in.',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontFamily: 'Urbanist',
-                    color: Colors.grey[600],
+                    color: AppColors.textSecondary,
                     fontWeight: FontWeight.w400,
                   ),
             ),
@@ -74,20 +75,24 @@ class _LoginPageState extends State<LoginPage> {
       style: const TextStyle(
         fontFamily: 'Urbanist',
         fontWeight: FontWeight.w500,
+        color: AppColors.textPrimary,
       ),
       decoration: InputDecoration(
         labelText: 'Email',
         labelStyle: const TextStyle(
           fontFamily: 'Urbanist',
           fontWeight: FontWeight.w400,
+          color: AppColors.textSecondary,
         ),
-        prefixIcon: const Icon(Icons.email_outlined),
+        prefixIcon:
+            const Icon(Icons.email_outlined, color: AppColors.textSecondary),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
       ),
     );
@@ -100,21 +105,26 @@ class _LoginPageState extends State<LoginPage> {
       style: const TextStyle(
         fontFamily: 'Urbanist',
         fontWeight: FontWeight.w500,
+        color: AppColors.textPrimary,
       ),
       decoration: InputDecoration(
         labelText: 'Password',
         labelStyle: const TextStyle(
           fontFamily: 'Urbanist',
           fontWeight: FontWeight.w400,
+          color: AppColors.textSecondary,
         ),
-        prefixIcon: const Icon(Icons.lock_outline),
-        suffixIcon: const Icon(Icons.visibility_off_outlined),
+        prefixIcon:
+            const Icon(Icons.lock_outline, color: AppColors.textSecondary),
+        suffixIcon: const Icon(Icons.visibility_off_outlined,
+            color: AppColors.textSecondary),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderSide: const BorderSide(color: AppColors.border),
         ),
       ),
     );
@@ -145,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Text(
             'Forgot password?',
             style: TextStyle(
-              color: Colors.teal[700],
+              color: AppColors.primary,
               fontFamily: 'Urbanist',
               fontWeight: FontWeight.w600,
             ),
@@ -174,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                     }
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF504FF6),
+              backgroundColor: AppColors.primary,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -185,7 +195,7 @@ class _LoginPageState extends State<LoginPage> {
                 : const Text(
                     'Sign in',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.white,
                       fontSize: 16,
                       fontFamily: 'Urbanist',
                       fontWeight: FontWeight.w600,
@@ -215,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
           child: Text(
             'Sign up',
             style: TextStyle(
-              color: Color(0xFF1F2937),
+              color: AppColors.primary,
               fontFamily: 'Urbanist',
               fontWeight: FontWeight.w600,
             ),

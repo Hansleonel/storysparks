@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/features/home/presentation/pages/home_page.dart';
 import 'package:storysparks/features/library/presentation/pages/library_page.dart';
 import 'package:storysparks/features/profile/presentation/pages/profile_page.dart';
@@ -33,12 +34,11 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: IndexedStack(
         index: _selectedIndex,
         children: _screens,
       ),
-      // floatingActionButton: ScanButton(),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
@@ -70,9 +70,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
         ],
       ),
       child: BottomNavigationBar(
-        selectedItemColor: const Color(0xFF504FF6),
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.textSecondary,
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         currentIndex: currentIndex,
         onTap: onTap,
         type: BottomNavigationBarType.fixed,
