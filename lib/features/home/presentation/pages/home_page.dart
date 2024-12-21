@@ -1,44 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
+import '../providers/home_provider.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => HomeProvider(),
+      child: const _HomePageContent(),
+    );
+  }
 }
 
-class _HomePageState extends State<HomePage> {
-  final _memoryController = TextEditingController();
-  final _focusNode = FocusNode();
-  String _selectedGenre = '';
-  bool _isGenerateEnabled = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _memoryController.addListener(_updateGenerateButton);
-  }
-
-  @override
-  void dispose() {
-    _memoryController.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  void _updateGenerateButton() {
-    setState(() {
-      _isGenerateEnabled = _memoryController.text.isNotEmpty;
-    });
-  }
+class _HomePageContent extends StatelessWidget {
+  const _HomePageContent();
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        _focusNode.unfocus();
-      },
+      onTap: () => context.read<HomeProvider>().unfocusMemoryInput(),
       child: Scaffold(
         backgroundColor: AppColors.background,
         body: SafeArea(
@@ -47,16 +30,16 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(),
-                  const SizedBox(height: 32),
-                  _buildMemoryInput(),
-                  const SizedBox(height: 32),
-                  _buildGenreSection(),
-                  const SizedBox(height: 32),
-                  _buildProtagonistSection(),
-                  const SizedBox(height: 40),
-                  _buildGenerateButton(),
+                children: const [
+                  _Header(),
+                  SizedBox(height: 32),
+                  _MemoryInput(),
+                  SizedBox(height: 32),
+                  _GenreSection(),
+                  SizedBox(height: 32),
+                  _ProtagonistSection(),
+                  SizedBox(height: 40),
+                  _GenerateButton(),
                 ],
               ),
             ),
@@ -65,11 +48,17 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
 
-  Widget _buildMemoryInput() {
+class _MemoryInput extends StatelessWidget {
+  const _MemoryInput();
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.read<HomeProvider>();
     return TextField(
-      controller: _memoryController,
-      focusNode: _focusNode,
+      controller: provider.memoryController,
+      focusNode: provider.memoryFocusNode,
       autofocus: false,
       maxLines: 5,
       style: const TextStyle(
@@ -103,12 +92,17 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
 
-  Widget _buildGenreSection() {
+class _GenreSection extends StatelessWidget {
+  const _GenreSection();
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
+      children: const [
+        Text(
           'El recuerdo es...',
           style: TextStyle(
             fontFamily: 'Urbanist',
@@ -117,66 +111,94 @@ class _HomePageState extends State<HomePage> {
             color: AppColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 16),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _buildGenreChip('Feliz', Icons.sentiment_very_satisfied),
-              _buildGenreChip('Nostálgico', Icons.favorite),
-              _buildGenreChip('Aventura', Icons.explore),
-              _buildGenreChip('Familiar', Icons.family_restroom),
-              _buildGenreChip('Divertido', Icons.celebration),
-            ],
-          ),
-        ),
+        SizedBox(height: 16),
+        _GenreChips(),
       ],
     );
   }
+}
 
-  Widget _buildGenreChip(String label, IconData icon) {
-    final isSelected = _selectedGenre == label;
-    return Padding(
-      padding: const EdgeInsets.only(right: 12),
-      child: FilterChip(
-        selected: isSelected,
-        showCheckmark: false,
-        label: Row(
-          children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isSelected ? AppColors.white : AppColors.textSecondary,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Urbanist',
-                color: isSelected ? AppColors.white : AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: AppColors.white,
-        selectedColor: AppColors.primary,
-        onSelected: (bool selected) {
-          setState(() {
-            _selectedGenre = selected ? label : '';
-          });
-        },
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-          side: BorderSide(
-            color: isSelected ? AppColors.primary : AppColors.border,
-          ),
-        ),
+class _GenreChips extends StatelessWidget {
+  const _GenreChips();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _GenreChip(label: 'Feliz', icon: Icons.sentiment_very_satisfied),
+          _GenreChip(label: 'Nostálgico', icon: Icons.favorite),
+          _GenreChip(label: 'Aventura', icon: Icons.explore),
+          _GenreChip(label: 'Familiar', icon: Icons.family_restroom),
+          _GenreChip(label: 'Divertido', icon: Icons.celebration),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildProtagonistSection() {
+class _GenreChip extends StatelessWidget {
+  final String label;
+  final IconData icon;
+
+  const _GenreChip({
+    required this.label,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: Consumer<HomeProvider>(
+        builder: (context, provider, _) {
+          final isSelected = provider.selectedGenre == label;
+          return FilterChip(
+            selected: isSelected,
+            showCheckmark: false,
+            label: Row(
+              children: [
+                Icon(
+                  icon,
+                  size: 18,
+                  color: isSelected ? AppColors.white : AppColors.textSecondary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontFamily: 'Urbanist',
+                    color:
+                        isSelected ? AppColors.white : AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.white,
+            selectedColor: AppColors.primary,
+            onSelected: (bool selected) {
+              provider.setSelectedGenre(selected ? label : '');
+            },
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+              side: BorderSide(
+                color: isSelected ? AppColors.primary : AppColors.border,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ProtagonistSection extends StatelessWidget {
+  const _ProtagonistSection();
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -241,38 +263,52 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
+}
 
-  Widget _buildGenerateButton() {
+class _GenerateButton extends StatelessWidget {
+  const _GenerateButton();
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: _isGenerateEnabled
-            ? () {
-                // TODO: Implementar la generación de la historia
-              }
-            : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
-        ),
-        child: const Text(
-          'Generar historia',
-          style: TextStyle(
-            fontFamily: 'Urbanist',
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.white,
-          ),
-        ),
+      child: Consumer<HomeProvider>(
+        builder: (context, provider, _) {
+          return ElevatedButton(
+            onPressed: provider.isGenerateEnabled
+                ? () {
+                    // TODO: Implementar la generación de la historia
+                  }
+                : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
+            ),
+            child: const Text(
+              'Generar historia',
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.white,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
+}
 
-  Widget _buildHeader() {
+class _Header extends StatelessWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
