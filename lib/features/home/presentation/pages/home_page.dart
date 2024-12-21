@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import '../providers/home_provider.dart';
 
@@ -56,39 +58,127 @@ class _MemoryInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.read<HomeProvider>();
-    return TextField(
-      controller: provider.memoryController,
-      focusNode: provider.memoryFocusNode,
-      autofocus: false,
-      maxLines: 5,
-      style: const TextStyle(
-        fontFamily: 'Urbanist',
-        fontSize: 16,
-        color: AppColors.textPrimary,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: provider.memoryController,
+          focusNode: provider.memoryFocusNode,
+          autofocus: false,
+          maxLines: 5,
+          style: const TextStyle(
+            fontFamily: 'Urbanist',
+            fontSize: 16,
+            color: AppColors.textPrimary,
+          ),
+          decoration: InputDecoration(
+            hintText:
+                'Comparte un recuerdo especial, como tu primera bicicleta o ese viaje inolvidable con la familia...',
+            hintStyle: TextStyle(
+              fontFamily: 'Urbanist',
+              fontSize: 16,
+              color: AppColors.textSecondary.withOpacity(0.7),
+            ),
+            filled: true,
+            fillColor: AppColors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: AppColors.border),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: AppColors.border),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+            ),
+            contentPadding: const EdgeInsets.all(16),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            _ImagePickerButton(),
+            const SizedBox(width: 12),
+            if (context.select((HomeProvider p) => p.selectedImagePath != null))
+              Expanded(
+                child: Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.horizontal(
+                          left: Radius.circular(11),
+                        ),
+                        child: Image.file(
+                          File(context.select(
+                              (HomeProvider p) => p.selectedImagePath!)),
+                          fit: BoxFit.cover,
+                          width: 56,
+                          height: 56,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Imagen del recuerdo',
+                          style: TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 20),
+                        onPressed: () =>
+                            context.read<HomeProvider>().removeSelectedImage(),
+                        color: AppColors.textSecondary,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _ImagePickerButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
       ),
-      decoration: InputDecoration(
-        hintText:
-            'Comparte un recuerdo especial, como tu primera bicicleta o ese viaje inolvidable con la familia...',
-        hintStyle: TextStyle(
-          fontFamily: 'Urbanist',
-          fontSize: 16,
-          color: AppColors.textSecondary.withOpacity(0.7),
-        ),
-        filled: true,
-        fillColor: AppColors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
-        ),
-        contentPadding: const EdgeInsets.all(16),
+      child: IconButton(
+        icon: const Icon(Icons.add_photo_alternate_outlined),
+        color: AppColors.primary,
+        onPressed: () async {
+          final ImagePicker picker = ImagePicker();
+          final XFile? image = await picker.pickImage(
+            source: ImageSource.gallery,
+            maxWidth: 1080,
+            maxHeight: 1080,
+            imageQuality: 85,
+          );
+
+          if (image != null && context.mounted) {
+            context.read<HomeProvider>().setSelectedImage(image.path);
+          }
+        },
       ),
     );
   }

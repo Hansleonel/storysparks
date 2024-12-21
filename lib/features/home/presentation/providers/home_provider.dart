@@ -5,6 +5,7 @@ class HomeProvider extends ChangeNotifier {
   final FocusNode memoryFocusNode = FocusNode();
   String selectedGenre = '';
   bool isGenerateEnabled = false;
+  String? selectedImagePath;
 
   HomeProvider() {
     memoryController.addListener(_updateGenerateButton);
@@ -20,6 +21,16 @@ class HomeProvider extends ChangeNotifier {
 
   void setSelectedGenre(String genre) {
     selectedGenre = genre;
+    notifyListeners();
+  }
+
+  void setSelectedImage(String? path) {
+    selectedImagePath = path;
+    notifyListeners();
+  }
+
+  void removeSelectedImage() {
+    selectedImagePath = null;
     notifyListeners();
   }
 
