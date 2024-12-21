@@ -97,55 +97,78 @@ class _MemoryInput extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            _ImagePickerButton(),
-            const SizedBox(width: 12),
-            if (context.select((HomeProvider p) => p.selectedImagePath != null))
-              Expanded(
-                child: Container(
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.horizontal(
-                          left: Radius.circular(11),
-                        ),
-                        child: Image.file(
-                          File(context.select(
-                              (HomeProvider p) => p.selectedImagePath!)),
-                          fit: BoxFit.cover,
-                          width: 56,
-                          height: 56,
-                        ),
+        Consumer<HomeProvider>(
+          builder: (context, provider, child) {
+            return Row(
+              children: [
+                _ImagePickerButton(),
+                const SizedBox(width: 12),
+                if (provider.selectedImagePath?.isNotEmpty ?? false) ...[
+                  Expanded(
+                    child: Container(
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.border),
                       ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Text(
-                          'Imagen del recuerdo',
-                          style: TextStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 14,
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.horizontal(
+                              left: Radius.circular(11),
+                            ),
+                            child: Builder(
+                              builder: (context) {
+                                final file = File(provider.selectedImagePath!);
+                                debugPrint(
+                                    'Loading image from path: ${file.path}');
+                                debugPrint('File exists: ${file.existsSync()}');
+                                return Image.file(
+                                  file,
+                                  fit: BoxFit.cover,
+                                  width: 56,
+                                  height: 56,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    debugPrint('Error loading image: $error');
+                                    return Container(
+                                      width: 56,
+                                      height: 56,
+                                      color: AppColors.border,
+                                      child: const Icon(
+                                        Icons.error_outline,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Text(
+                              'Imagen del recuerdo',
+                              style: TextStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 14,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, size: 20),
+                            onPressed: () => provider.removeSelectedImage(),
                             color: AppColors.textSecondary,
                           ),
-                        ),
+                        ],
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.close, size: 20),
-                        onPressed: () =>
-                            context.read<HomeProvider>().removeSelectedImage(),
-                        color: AppColors.textSecondary,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-          ],
+                ],
+              ],
+            );
+          },
         ),
       ],
     );
@@ -166,18 +189,90 @@ class _ImagePickerButton extends StatelessWidget {
       child: IconButton(
         icon: const Icon(Icons.add_photo_alternate_outlined),
         color: AppColors.primary,
-        onPressed: () async {
-          final ImagePicker picker = ImagePicker();
-          final XFile? image = await picker.pickImage(
-            source: ImageSource.gallery,
-            maxWidth: 1080,
-            maxHeight: 1080,
-            imageQuality: 85,
-          );
+        onPressed: () {
+          final provider = context.read<HomeProvider>();
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.transparent,
+            builder: (_) => Container(
+              decoration: const BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
+              ),
+              child: SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.border,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    ListTile(
+                      leading: const Icon(Icons.photo_library_outlined),
+                      title: const Text(
+                        'Seleccionar de la galería',
+                        style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        final ImagePicker picker = ImagePicker();
+                        final XFile? image = await picker.pickImage(
+                          source: ImageSource.gallery,
+                          maxWidth: 1080,
+                          maxHeight: 1080,
+                          imageQuality: 85,
+                        );
 
-          if (image != null && context.mounted) {
-            context.read<HomeProvider>().setSelectedImage(image.path);
-          }
+                        if (image != null) {
+                          provider.setSelectedImage(image.path);
+                        } else {
+                          debugPrint('No image selected');
+                        }
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.camera_alt_outlined),
+                      title: const Text(
+                        'Tomar una foto',
+                        style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        final ImagePicker picker = ImagePicker();
+                        final XFile? photo = await picker.pickImage(
+                          source: ImageSource.camera,
+                          maxWidth: 1080,
+                          maxHeight: 1080,
+                          imageQuality: 85,
+                        );
+
+                        if (photo != null) {
+                          provider.setSelectedImage(photo.path);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            ),
+          );
         },
       ),
     );

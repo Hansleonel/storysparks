@@ -24,7 +24,7 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setSelectedImage(String? path) {
+  void setSelectedImage(String path) {
     selectedImagePath = path;
     notifyListeners();
   }
