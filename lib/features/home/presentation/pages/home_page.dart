@@ -313,10 +313,11 @@ class _GenreChips extends StatelessWidget {
       child: Row(
         children: [
           _GenreChip(label: 'Feliz', icon: Icons.sentiment_very_satisfied),
-          _GenreChip(label: 'Nostálgico', icon: Icons.favorite),
+          _GenreChip(label: 'Romántico', icon: Icons.favorite),
+          _GenreChip(label: 'Nostálgico', icon: Icons.hourglass_empty),
           _GenreChip(label: 'Aventura', icon: Icons.explore),
           _GenreChip(label: 'Familiar', icon: Icons.family_restroom),
-          _GenreChip(label: 'Divertido', icon: Icons.celebration),
+          _GenreChip(label: 'Triste ', icon: Icons.sentiment_very_dissatisfied),
         ],
       ),
     );
