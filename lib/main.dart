@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
@@ -7,6 +8,7 @@ import 'package:storysparks/features/auth/presentation/pages/login_page.dart';
 import 'package:storysparks/features/auth/presentation/providers/auth_provider.dart';
 
 void main() async {
+  await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   setupServiceLocator();
 

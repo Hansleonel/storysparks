@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
+import '../../../story/presentation/pages/generated_story_page.dart';
 import '../providers/home_provider.dart';
 
 class HomePage extends StatelessWidget {
@@ -460,10 +461,38 @@ class _GenerateButton extends StatelessWidget {
       width: double.infinity,
       child: Consumer<HomeProvider>(
         builder: (context, provider, _) {
+          if (provider.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primary,
+              ),
+            );
+          }
+
           return ElevatedButton(
             onPressed: provider.isGenerateEnabled
-                ? () {
-                    // TODO: Implementar la generación de la historia
+                ? () async {
+                    try {
+                      final story = await provider.generateStory();
+                      if (context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                GeneratedStoryPage(story: story),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(e.toString()),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
                   }
                 : null,
             style: ElevatedButton.styleFrom(
