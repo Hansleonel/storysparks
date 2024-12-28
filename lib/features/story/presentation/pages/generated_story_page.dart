@@ -1,16 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/story.dart';
 import '../providers/story_provider.dart';
 
-class GeneratedStoryPage extends StatelessWidget {
+class GeneratedStoryPage extends StatefulWidget {
   final Story story;
 
   const GeneratedStoryPage({
     super.key,
     required this.story,
   });
+
+  @override
+  State<GeneratedStoryPage> createState() => _GeneratedStoryPageState();
+}
+
+class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _storyKey = GlobalKey();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToStory() {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final context = _storyKey.currentContext;
+      if (context != null) {
+        final box = context.findRenderObject() as RenderBox;
+        final offset = box.localToGlobal(Offset.zero);
+
+        _scrollController.animateTo(
+          offset.dy - MediaQuery.of(context).size.height * 0.1,
+          duration: const Duration(milliseconds: 800),
+          curve: Curves.easeOutCubic,
+        );
+      }
+    });
+  }
 
   String _getHeaderImage(String genre) {
     switch (genre.toLowerCase()) {
@@ -34,99 +67,111 @@ class GeneratedStoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => StoryProvider()..setStory(story),
+      create: (_) => StoryProvider()..setStory(widget.story),
       child: Builder(
-        builder: (context) => Scaffold(
-          backgroundColor: AppColors.background,
-          appBar: AppBar(
+        builder: (context) {
+          final provider = context.watch<StoryProvider>();
+
+          if (provider.isExpanded) {
+            _scrollToStory();
+          }
+
+          return Scaffold(
             backgroundColor: AppColors.background,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-              onPressed: () => Navigator.pop(context),
+            appBar: AppBar(
+              backgroundColor: AppColors.background,
+              elevation: 0,
+              leading: IconButton(
+                icon:
+                    const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+                onPressed: () => Navigator.pop(context),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.share_outlined,
+                      color: AppColors.textPrimary),
+                  onPressed: () {
+                    // TODO: Implementar compartir
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.bookmark_outline,
+                      color: AppColors.textPrimary),
+                  onPressed: () {
+                    // TODO: Implementar guardar
+                  },
+                ),
+                const SizedBox(width: 8),
+              ],
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.share_outlined,
-                    color: AppColors.textPrimary),
-                onPressed: () {
-                  // TODO: Implementar compartir
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.bookmark_outline,
-                    color: AppColors.textPrimary),
-                onPressed: () {
-                  // TODO: Implementar guardar
-                },
-              ),
-              const SizedBox(width: 8),
-            ],
-          ),
-          body: SafeArea(
-            bottom: true,
-            child: SingleChildScrollView(
-              controller: context.read<StoryProvider>().scrollController,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 32),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 24),
-                          Center(
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.6,
-                              child: AspectRatio(
-                                aspectRatio: 2 / 3,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 5),
+            body: SafeArea(
+              bottom: true,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 32),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 24),
+                            Center(
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                child: AspectRatio(
+                                  aspectRatio: 2 / 3,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.1),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 5),
+                                        ),
+                                      ],
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Image.asset(
+                                        _getHeaderImage(widget.story.genre),
+                                        fit: BoxFit.cover,
                                       ),
-                                    ],
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: Image.asset(
-                                      _getHeaderImage(story.genre),
-                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                          const _StoryDetails(),
-                          const SizedBox(height: 16),
-                          const _StoryContent(),
-                        ],
+                            const SizedBox(height: 24),
+                            _StoryDetails(genre: widget.story.genre),
+                            const SizedBox(height: 16),
+                            _StoryContent(storyKey: _storyKey),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 }
 
 class _StoryDetails extends StatelessWidget {
-  const _StoryDetails();
+  final String genre;
+
+  const _StoryDetails({
+    required this.genre,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final story = context.watch<StoryProvider>().story!;
     final rating = context.watch<StoryProvider>().rating;
 
     return Column(
@@ -168,7 +213,7 @@ class _StoryDetails extends StatelessWidget {
           alignment: WrapAlignment.center,
           spacing: 8,
           children: [
-            _GenreChip(genre: story.genre),
+            _GenreChip(genre: genre),
             _GenreChip(genre: 'historia'),
             _GenreChip(genre: 'recuerdo'),
           ],
@@ -179,7 +224,11 @@ class _StoryDetails extends StatelessWidget {
 }
 
 class _StoryContent extends StatelessWidget {
-  const _StoryContent();
+  final GlobalKey storyKey;
+
+  const _StoryContent({
+    required this.storyKey,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -290,7 +339,7 @@ class _StoryContent extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Container(
-              key: provider.storyKey,
+              key: storyKey,
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
