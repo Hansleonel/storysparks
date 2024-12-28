@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
-import '../../../story/presentation/pages/generated_story_page.dart';
 import '../providers/home_provider.dart';
 
 class HomePage extends StatelessWidget {
@@ -475,12 +475,10 @@ class _GenerateButton extends StatelessWidget {
                     try {
                       final story = await provider.generateStory();
                       if (context.mounted) {
-                        Navigator.push(
+                        Navigator.pushNamed(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                GeneratedStoryPage(story: story),
-                          ),
+                          AppRoutes.generatedStory,
+                          arguments: story,
                         );
                       }
                     } catch (e) {

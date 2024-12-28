@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class AppColors {
   // Primary color
   static const Color primary = Color(0xFF504FF6);
+  static const Color accent =
+      Color(0xFFA69365); // Color dorado para elementos de acción
 
   // Background color
   static const Color background = Color(0xFFF9FAFB);
