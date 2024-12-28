@@ -218,6 +218,8 @@ class _StoryContent extends StatelessWidget {
                     fontSize: 16,
                     color: AppColors.textPrimary,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
