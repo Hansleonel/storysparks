@@ -72,10 +72,6 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
         builder: (context) {
           final provider = context.watch<StoryProvider>();
 
-          if (provider.isExpanded) {
-            _scrollToStory();
-          }
-
           return Scaffold(
             backgroundColor: AppColors.background,
             appBar: AppBar(
@@ -84,7 +80,55 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
               leading: IconButton(
                 icon:
                     const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  if (!provider.isSaved) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text(
+                          '¿Salir sin guardar?',
+                          style: TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        content: const Text(
+                          'Esta historia es única y se perderá si sales sin guardarla. ¿Estás seguro de que quieres salir?',
+                          style: TextStyle(
+                            fontFamily: 'Urbanist',
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text(
+                              'Cancelar',
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context); // Cierra el diálogo
+                              Navigator.pop(
+                                  context); // Regresa a la página anterior
+                            },
+                            child: const Text(
+                              'Salir',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    Navigator.pop(context);
+                  }
+                },
               ),
               actions: [
                 IconButton(
@@ -95,11 +139,102 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                   },
                 ),
                 IconButton(
-                  icon: const Icon(Icons.bookmark_outline,
-                      color: AppColors.textPrimary),
-                  onPressed: () {
-                    // TODO: Implementar guardar
-                  },
+                  icon: Icon(
+                    provider.isSaving
+                        ? Icons.sync
+                        : (provider.isSaved
+                            ? Icons.bookmark
+                            : Icons.bookmark_outline),
+                    color: provider.isSaved
+                        ? AppColors.primary
+                        : AppColors.textPrimary,
+                  ),
+                  onPressed: provider.isSaving
+                      ? null
+                      : () async {
+                          if (provider.isSaved) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text(
+                                  'Eliminar de guardados',
+                                  style: TextStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                content: const Text(
+                                  '¿Estás seguro de que quieres eliminar esta historia de tus guardados?',
+                                  style: TextStyle(
+                                    fontFamily: 'Urbanist',
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text(
+                                      'Cancelar',
+                                      style: TextStyle(
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      provider.unsaveStory();
+                                      Navigator.pop(context);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Historia eliminada de guardados',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    },
+                                    child: const Text(
+                                      'Eliminar',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            final success = await provider.saveStory();
+                            if (success && mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Historia guardada correctamente',
+                                    style: TextStyle(
+                                      color: AppColors.white,
+                                      fontFamily: 'Urbanist',
+                                    ),
+                                  ),
+                                  backgroundColor: AppColors.success,
+                                ),
+                              );
+                            } else if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Error al guardar la historia',
+                                    style: TextStyle(color: AppColors.white),
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        },
                 ),
                 const SizedBox(width: 8),
               ],
@@ -223,7 +358,7 @@ class _StoryDetails extends StatelessWidget {
   }
 }
 
-class _StoryContent extends StatelessWidget {
+class _StoryContent extends StatefulWidget {
   final GlobalKey storyKey;
 
   const _StoryContent({
@@ -231,9 +366,36 @@ class _StoryContent extends StatelessWidget {
   });
 
   @override
+  State<_StoryContent> createState() => _StoryContentState();
+}
+
+class _StoryContentState extends State<_StoryContent> {
+  bool _hasScrolled = false;
+
+  void _handleExpand(bool isExpanded) {
+    if (isExpanded && !_hasScrolled) {
+      _hasScrolled = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (widget.storyKey.currentContext != null) {
+          Scrollable.ensureVisible(
+            widget.storyKey.currentContext!,
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeOutCubic,
+            alignment: 0.1,
+          );
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final provider = context.watch<StoryProvider>();
-    final story = provider.story!;
+    final isExpanded = context.select((StoryProvider p) => p.isExpanded);
+    final story = context.select((StoryProvider p) => p.story!);
+
+    // Solo ejecutamos el scroll cuando cambia isExpanded a true
+    _handleExpand(isExpanded);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -274,11 +436,11 @@ class _StoryContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          if (!provider.isExpanded)
+          if (!isExpanded)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => provider.toggleExpanded(),
+                onPressed: () => context.read<StoryProvider>().toggleExpanded(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -297,7 +459,7 @@ class _StoryContent extends StatelessWidget {
                 ),
               ),
             ),
-          if (provider.isExpanded) ...[
+          if (isExpanded) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -339,7 +501,7 @@ class _StoryContent extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Container(
-              key: storyKey,
+              key: widget.storyKey,
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
