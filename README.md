@@ -2,14 +2,22 @@
 
 StorySparks es una aplicación móvil desarrollada en Flutter que transforma recuerdos personales en historias cautivadoras. La aplicación permite a los usuarios compartir sus memorias y convertirlas en narrativas únicas, enriquecidas con elementos visuales y diferentes géneros narrativos.
 
-## 🚀 Características
+## 🚀 Características Implementadas
 
-- **Autenticación de Usuarios**: Sistema de login seguro para mantener las historias personalizadas.
-- **Navegación Intuitiva**: Barra de navegación con tres secciones principales:
+- ✅ **Autenticación de Usuarios**: Sistema de login seguro implementado con AuthProvider y AuthRepository.
+- ✅ **Navegación Intuitiva**: Barra de navegación implementada con MainNavigation:
 
   - 🏠 Home: Creación de nuevas historias
-  - 📚 Biblioteca: Colección de historias generadas
+  - 📚 Biblioteca: Colección de historias guardadas
   - 👤 Perfil: Gestión de cuenta y preferencias
+
+- ✅ **Gestión de Historias**:
+
+  - Generación de historias con StoryProvider
+  - Guardado local de historias
+  - Visualización de historias generadas
+  - Eliminación de historias
+  - Biblioteca personal de historias
 
 - **Creación de Historias**:
   - Campo de texto para compartir recuerdos
@@ -22,59 +30,51 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
     - Divertido
   - Personalización del protagonista
 
-## 🛠️ Tecnologías Utilizadas
+## 🛠️ Tecnologías Implementadas
 
 - **Framework**: Flutter
 - **Lenguaje**: Dart
 - **Gestión de Estado**: Provider
-- **Arquitectura**: Clean Architecture
-  - Features
-  - Presentation Layer
-  - Domain Layer
-  - Data Layer
+- **Arquitectura**: Clean Architecture implementada con:
+  - Presentation Layer (providers, pages)
+  - Domain Layer (usecases, repositories)
+  - Data Layer (datasources, repositories implementations)
+- **Almacenamiento Local**: Implementado para historias
 
-## 📱 Compatibilidad
-
-- **iOS**: 11.0 o superior
-- **Android**: API 21 (Android 5.0) o superior
-
-## 🎨 Diseño
-
-- **Tema Principal**:
-
-  - Color Primario: `#504FF6`
-  - Color de Fondo: `#F9FAFB`
-  - Color de Bordes: `#D1D5DB`
-  - Texto Primario: `#1F2937`
-  - Texto Secundario: `#6B7280`
-
-- **Tipografía**:
-  - Principal: Urbanist
-  - Títulos Especiales: Playfair
-
-## 📂 Estructura del Proyecto
+## 📂 Estructura del Proyecto Actual
 
 ```
 lib/
 ├── core/
 │   ├── theme/
 │   │   └── app_colors.dart
-│   └── ...
+│   ├── dependency_injection/
+│   │   └── service_locator.dart
+│   └── routes/
+│       └── app_routes.dart
 ├── features/
 │   ├── auth/
-│   │   ├── presentation/
-│   │   │   ├── pages/
-│   │   │   └── providers/
-│   │   └── ...
-│   ├── home/
-│   │   ├── presentation/
-│   │   │   ├── pages/
-│   │   │   └── providers/
-│   │   └── ...
-│   ├── library/
+│   │   ├── data/
+│   │   │   ├── datasources/
+│   │   │   └── repositories/
 │   │   └── presentation/
+│   │       ├── providers/
 │   │       └── pages/
-│   ├── profile/
+│   ├── story/
+│   │   ├── data/
+│   │   │   ├── datasources/
+│   │   │   └── repositories/
+│   │   ├── domain/
+│   │   │   ├── repositories/
+│   │   │   └── usecases/
+│   │   └── presentation/
+│   │       ├── providers/
+│   │       └── pages/
+│   ├── home/
+│   │   └── presentation/
+│   │       ├── providers/
+│   │       └── pages/
+│   ├── library/
 │   │   └── presentation/
 │   │       └── pages/
 │   └── navigation/
@@ -112,38 +112,40 @@ dependencies:
     sdk: flutter
   provider: ^6.0.0
   image_picker: ^1.0.4
+  # Inyección de dependencias
+  get_it: ^7.6.4
 ```
 
-## 🔄 Flujo de la Aplicación
+## 🔄 Flujo de la Aplicación Implementado
 
 1. **Inicio de Sesión**:
 
-   - Pantalla de login con validación de campos
-   - Redirección a la navegación principal tras autenticación exitosa
+   - ✅ Autenticación implementada con AuthProvider y AuthRepository
+   - ✅ Redirección a la navegación principal tras autenticación exitosa
 
 2. **Navegación Principal**:
 
-   - Bottom Navigation Bar con tres destinos
-   - Gestión de estado para la navegación entre páginas
+   - ✅ Bottom Navigation Bar implementado con MainNavigation
+   - ✅ Gestión de estado para la navegación entre páginas
 
-3. **Creación de Historia**:
-   - Campo de texto para ingresar el recuerdo
-   - Opción para adjuntar imagen
-   - Selección de género narrativo
-   - Configuración del protagonista
-   - Botón de generación (habilitado cuando hay texto)
+3. **Gestión de Historias**:
+
+   - ✅ Generación de historias con StoryProvider
+   - ✅ Almacenamiento local de historias
+   - ✅ Visualización de historias en la biblioteca
+   - ✅ Eliminación de historias guardadas
 
 ## 🛡️ Seguridad
 
-- Manejo seguro de datos del usuario
-- Validación de entradas
-- Gestión segura de archivos multimedia
+- ✅ Implementación de autenticación segura
+- ✅ Almacenamiento local seguro de historias
+- ✅ Validación de entradas de usuario
 
 ## 🔜 Próximas Características
 
-- [ ] Integración con IA para generación de historias
+- [x] Integración con IA para generación de historias
 - [ ] Compartir historias en redes sociales
-- [ ] Modo offline
+- [x] Modo offline con almacenamiento local
 - [ ] Temas personalizables
 - [ ] Múltiples idiomas
 
