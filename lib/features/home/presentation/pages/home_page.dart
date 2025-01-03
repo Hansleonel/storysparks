@@ -478,7 +478,10 @@ class _GenerateButton extends StatelessWidget {
                         Navigator.pushNamed(
                           context,
                           AppRoutes.generatedStory,
-                          arguments: story,
+                          arguments: {
+                            'story': story,
+                            'isFromLibrary': false,
+                          },
                         );
                       }
                     } catch (e) {

@@ -16,8 +16,9 @@ class StoryProvider extends ChangeNotifier {
   bool get isSaving => _isSaving;
   bool get isSaved => _isSaved;
 
-  void setStory(Story story) {
+  void setStory(Story story, {bool isFromLibrary = false}) {
     _story = story;
+    _isSaved = isFromLibrary;
     notifyListeners();
   }
 

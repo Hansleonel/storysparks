@@ -23,11 +23,18 @@ class StoryLocalDatasource {
             content TEXT NOT NULL,
             genre TEXT NOT NULL,
             memory TEXT NOT NULL,
-            createdAt TEXT NOT NULL
+            createdAt TEXT NOT NULL,
+            readCount INTEGER DEFAULT 0
           )
         ''');
       },
-      version: 1,
+      version: 2,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute(
+              'ALTER TABLE $tableName ADD COLUMN readCount INTEGER DEFAULT 0');
+        }
+      },
     );
   }
 
@@ -40,6 +47,7 @@ class StoryLocalDatasource {
         'genre': story.genre,
         'memory': story.memory,
         'createdAt': story.createdAt.toIso8601String(),
+        'readCount': story.readCount,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -51,12 +59,63 @@ class StoryLocalDatasource {
 
     return List.generate(maps.length, (i) {
       return Story(
+        id: maps[i]['id'],
         content: maps[i]['content'],
         genre: maps[i]['genre'],
         memory: maps[i]['memory'],
         createdAt: DateTime.parse(maps[i]['createdAt']),
+        readCount: maps[i]['readCount'] ?? 0,
       );
     });
+  }
+
+  Future<List<Story>> getPopularStories() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      orderBy: 'readCount DESC',
+      limit: 10,
+    );
+
+    return List.generate(maps.length, (i) {
+      return Story(
+        id: maps[i]['id'],
+        content: maps[i]['content'],
+        genre: maps[i]['genre'],
+        memory: maps[i]['memory'],
+        createdAt: DateTime.parse(maps[i]['createdAt']),
+        readCount: maps[i]['readCount'] ?? 0,
+      );
+    });
+  }
+
+  Future<List<Story>> getRecentStories() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      orderBy: 'createdAt DESC',
+      limit: 10,
+    );
+
+    return List.generate(maps.length, (i) {
+      return Story(
+        id: maps[i]['id'],
+        content: maps[i]['content'],
+        genre: maps[i]['genre'],
+        memory: maps[i]['memory'],
+        createdAt: DateTime.parse(maps[i]['createdAt']),
+        readCount: maps[i]['readCount'] ?? 0,
+      );
+    });
+  }
+
+  Future<void> incrementReadCount(int id) async {
+    final db = await database;
+    await db.rawUpdate('''
+      UPDATE $tableName 
+      SET readCount = readCount + 1 
+      WHERE id = ?
+    ''', [id]);
   }
 
   Future<void> deleteStory(int id) async {

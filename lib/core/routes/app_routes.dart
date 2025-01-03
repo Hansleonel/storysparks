@@ -20,9 +20,23 @@ class AppRoutes {
           builder: (_) => const MainNavigation(),
         );
       case generatedStory:
+        if (settings.arguments is! Map<String, dynamic>) {
+          throw ArgumentError('Arguments must be a Map<String, dynamic>');
+        }
+        final args = settings.arguments as Map<String, dynamic>;
+        final story = args['story'] as Story;
+        final isFromLibrary = args['isFromLibrary'] as bool?;
+        final onIncrementReadCount =
+            args['onIncrementReadCount'] as VoidCallback?;
+        final onStoryStateChanged =
+            args['onStoryStateChanged'] as VoidCallback?;
+
         return MaterialPageRoute(
           builder: (_) => GeneratedStoryPage(
-            story: settings.arguments as Story,
+            story: story,
+            isFromLibrary: isFromLibrary ?? false,
+            onIncrementReadCount: onIncrementReadCount,
+            onStoryStateChanged: onStoryStateChanged,
           ),
         );
       default:

@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'package:storysparks/core/theme/app_colors.dart';
 import '../../domain/entities/story.dart';
 import '../providers/story_provider.dart';
 
 class GeneratedStoryPage extends StatefulWidget {
   final Story story;
+  final bool isFromLibrary;
+  final VoidCallback? onIncrementReadCount;
+  final VoidCallback? onStoryStateChanged;
 
   const GeneratedStoryPage({
     super.key,
     required this.story,
+    this.isFromLibrary = false,
+    this.onIncrementReadCount,
+    this.onStoryStateChanged,
   });
 
   @override
@@ -20,6 +26,7 @@ class GeneratedStoryPage extends StatefulWidget {
 class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _storyKey = GlobalKey();
+  bool _hasIncrementedReadCount = false;
 
   @override
   void dispose() {
@@ -45,29 +52,11 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
     });
   }
 
-  String _getHeaderImage(String genre) {
-    switch (genre.toLowerCase()) {
-      case 'feliz':
-        return 'assets/images/happiness.png';
-      case 'romántico':
-        return 'assets/images/romantic.png';
-      case 'nostálgico':
-        return 'assets/images/nostalgic.png';
-      case 'aventura':
-        return 'assets/images/adventure.png';
-      case 'familiar':
-        return 'assets/images/familiar.png';
-      case 'triste':
-        return 'assets/images/sadness.png';
-      default:
-        return 'assets/images/nostalgic.png';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => StoryProvider()..setStory(widget.story),
+      create: (_) => StoryProvider()
+        ..setStory(widget.story, isFromLibrary: widget.isFromLibrary),
       child: Builder(
         builder: (context) {
           final provider = context.watch<StoryProvider>();
@@ -81,7 +70,7 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                 icon:
                     const Icon(Icons.arrow_back, color: AppColors.textPrimary),
                 onPressed: () {
-                  if (!provider.isSaved) {
+                  if (!provider.isSaved && !widget.isFromLibrary) {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
@@ -101,25 +90,16 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: const Text(
-                              'Cancelar',
-                              style: TextStyle(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
+                            child: const Text('Cancelar'),
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.pop(context); // Cierra el diálogo
-                              Navigator.pop(
-                                  context); // Regresa a la página anterior
+                              Navigator.pop(context); // Cerrar diálogo
+                              Navigator.pop(context); // Volver atrás
                             },
                             child: const Text(
                               'Salir',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: TextStyle(color: Colors.red),
                             ),
                           ),
                         ],
@@ -172,12 +152,7 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(context),
-                                    child: const Text(
-                                      'Cancelar',
-                                      style: TextStyle(
-                                        color: AppColors.textSecondary,
-                                      ),
-                                    ),
+                                    child: const Text('Cancelar'),
                                   ),
                                   TextButton(
                                     onPressed: () {
@@ -210,6 +185,7 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                           } else {
                             final success = await provider.saveStory();
                             if (success && mounted) {
+                              widget.onStoryStateChanged?.call();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
@@ -224,7 +200,7 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                               );
                             } else if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                                const SnackBar(
                                   content: Text(
                                     'Error al guardar la historia',
                                     style: TextStyle(color: AppColors.white),
@@ -282,7 +258,16 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                             const SizedBox(height: 24),
                             _StoryDetails(genre: widget.story.genre),
                             const SizedBox(height: 16),
-                            _StoryContent(storyKey: _storyKey),
+                            _StoryContent(
+                              storyKey: _storyKey,
+                              onStartReading: () async {
+                                if (!_hasIncrementedReadCount &&
+                                    widget.onIncrementReadCount != null) {
+                                  _hasIncrementedReadCount = true;
+                                  widget.onIncrementReadCount!();
+                                }
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -295,6 +280,25 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
         },
       ),
     );
+  }
+
+  String _getHeaderImage(String genre) {
+    switch (genre.toLowerCase()) {
+      case 'feliz':
+        return 'assets/images/happiness.png';
+      case 'romántico':
+        return 'assets/images/romantic.png';
+      case 'nostálgico':
+        return 'assets/images/nostalgic.png';
+      case 'aventura':
+        return 'assets/images/adventure.png';
+      case 'familiar':
+        return 'assets/images/familiar.png';
+      case 'triste':
+        return 'assets/images/sadness.png';
+      default:
+        return 'assets/images/nostalgic.png';
+    }
   }
 }
 
@@ -360,9 +364,11 @@ class _StoryDetails extends StatelessWidget {
 
 class _StoryContent extends StatefulWidget {
   final GlobalKey storyKey;
+  final VoidCallback onStartReading;
 
   const _StoryContent({
     required this.storyKey,
+    required this.onStartReading,
   });
 
   @override
@@ -375,6 +381,7 @@ class _StoryContentState extends State<_StoryContent> {
   void _handleExpand(bool isExpanded) {
     if (isExpanded && !_hasScrolled) {
       _hasScrolled = true;
+      widget.onStartReading();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         if (widget.storyKey.currentContext != null) {
