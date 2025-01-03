@@ -6,6 +6,7 @@ import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
 import 'package:storysparks/features/auth/presentation/pages/login_page.dart';
 import 'package:storysparks/features/auth/presentation/providers/auth_provider.dart';
+import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -17,6 +18,9 @@ void main() async {
       providers: [
         ChangeNotifierProvider(
           create: (_) => AuthProvider(getIt<AuthRepository>()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => LibraryProvider(),
         ),
       ],
       child: const MyApp(),

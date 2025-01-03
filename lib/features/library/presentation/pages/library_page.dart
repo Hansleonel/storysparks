@@ -4,53 +4,12 @@ import 'package:storysparks/core/theme/app_colors.dart';
 import '../providers/library_provider.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
 
-class LibraryPage extends StatefulWidget {
+class LibraryPage extends StatelessWidget {
   const LibraryPage({super.key});
 
   @override
-  State<LibraryPage> createState() => _LibraryPageState();
-}
-
-class _LibraryPageState extends State<LibraryPage>
-    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
-  late LibraryProvider _provider;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _provider.loadStories();
-    }
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
   Widget build(BuildContext context) {
-    super.build(context);
-    return ChangeNotifierProvider(
-      create: (context) {
-        _provider = LibraryProvider()..loadStories();
-        return _provider;
-      },
-      child: Builder(
-        builder: (context) {
-          return const _LibraryPageContent();
-        },
-      ),
-    );
+    return const _LibraryPageContent();
   }
 }
 
@@ -59,52 +18,45 @@ class _LibraryPageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-      onFocusChange: (hasFocus) {
-        if (hasFocus) {
-          context.read<LibraryProvider>().loadStories();
-        }
-      },
-      child: Scaffold(
-        backgroundColor: AppColors.background,
-        body: SafeArea(
-          child: Consumer<LibraryProvider>(
-            builder: (context, provider, child) {
-              if (provider.isLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Consumer<LibraryProvider>(
+          builder: (context, provider, child) {
+            if (provider.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-              return CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Mi Biblioteca',
-                            style: TextStyle(
-                              fontFamily: 'Playfair',
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Mi Biblioteca',
+                          style: TextStyle(
+                            fontFamily: 'Playfair',
+                            fontSize: 32,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textPrimary,
                           ),
-                          const SizedBox(height: 24),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
                     ),
                   ),
-                  if (provider.popularStories.isNotEmpty)
-                    const _PopularStoriesSection(),
-                  const SliverToBoxAdapter(child: SizedBox(height: 32)),
-                  if (provider.recentStories.isNotEmpty)
-                    const _NewStoriesSection(),
-                ],
-              );
-            },
-          ),
+                ),
+                if (provider.popularStories.isNotEmpty)
+                  const _PopularStoriesSection(),
+                const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                if (provider.recentStories.isNotEmpty)
+                  const _NewStoriesSection(),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -127,11 +79,11 @@ class _PopularStoriesSection extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Historias Populares',
+                  'Historias Populares 🔥',
                   style: TextStyle(
-                    fontFamily: 'Urbanist',
+                    fontFamily: 'Playfair',
                     fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -234,11 +186,11 @@ class _NewStoriesSection extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Nuevas Historias',
+                  'Nuevas Historias 🎁',
                   style: TextStyle(
-                    fontFamily: 'Urbanist',
+                    fontFamily: 'Playfair',
                     fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
                     color: AppColors.textPrimary,
                   ),
                 ),

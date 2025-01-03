@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/features/home/presentation/pages/home_page.dart';
 import 'package:storysparks/features/library/presentation/pages/library_page.dart';
+import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
 import 'package:storysparks/features/profile/presentation/pages/profile_page.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -25,14 +27,19 @@ class _MainNavigationState extends State<MainNavigation> {
     ];
   }
 
-  void _onItemTapped(int index) {
+  void _onItemTapped(LibraryProvider provider, int index) {
     setState(() {
+      if (index == 1 && _selectedIndex != index) {
+        provider.loadStories();
+      }
       _selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final libraryProvider =
+        Provider.of<LibraryProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: IndexedStack(
@@ -41,7 +48,7 @@ class _MainNavigationState extends State<MainNavigation> {
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        onTap: (index) => _onItemTapped(libraryProvider, index),
       ),
     );
   }
