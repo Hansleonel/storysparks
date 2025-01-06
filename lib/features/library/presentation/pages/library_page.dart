@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/core/utils/cover_image_helper.dart';
+import 'package:storysparks/features/story/domain/entities/story.dart';
 import '../providers/library_provider.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
 
@@ -117,10 +118,7 @@ class _PopularStoriesSection extends StatelessWidget {
                     return Padding(
                       padding: const EdgeInsets.only(right: 16),
                       child: _StoryCard(
-                        title: story.memory,
-                        author: story.genre,
-                        coverImage: _getCoverImage(story.genre),
-                        readCount: story.readCount,
+                        story: story,
                         onTap: () {
                           Navigator.pushNamed(
                             context,
@@ -149,10 +147,6 @@ class _PopularStoriesSection extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _getCoverImage(String genre) {
-    return CoverImageHelper.getCoverImage(genre);
   }
 }
 
@@ -209,10 +203,7 @@ class _NewStoriesSection extends StatelessWidget {
                     return Padding(
                       padding: const EdgeInsets.only(right: 16),
                       child: _StoryCard(
-                        title: story.memory,
-                        author: story.genre,
-                        coverImage: _getCoverImage(story.genre),
-                        readCount: story.readCount,
+                        story: story,
                         onTap: () {
                           Navigator.pushNamed(
                             context,
@@ -242,117 +233,114 @@ class _NewStoriesSection extends StatelessWidget {
       ),
     );
   }
-
-  String _getCoverImage(String genre) {
-    return CoverImageHelper.getCoverImage(genre);
-  }
 }
 
 class _StoryCard extends StatelessWidget {
-  final String title;
-  final String author;
-  final String coverImage;
-  final int readCount;
+  final Story story;
   final VoidCallback onTap;
 
   const _StoryCard({
-    required this.title,
-    required this.author,
-    required this.coverImage,
+    required this.story,
     required this.onTap,
-    this.readCount = 0,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: SizedBox(
-        width: 160,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.4,
+        constraints: const BoxConstraints(maxHeight: 280),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                Container(
-                  height: 160,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+            Expanded(
+              flex: 3,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      coverImage,
-                      fit: BoxFit.cover,
-                    ),
+                  image: DecorationImage(
+                    image:
+                        AssetImage(CoverImageHelper.getCoverImage(story.genre)),
+                    fit: BoxFit.cover,
                   ),
                 ),
-                if (readCount > 0)
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        story.memory,
+                        style: const TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.remove_red_eye,
-                            color: Colors.white,
-                            size: 16,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '$readCount',
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            story.genre,
                             style: const TextStyle(
-                              color: Colors.white,
+                              fontFamily: 'Urbanist',
                               fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                        const Spacer(),
+                        const Icon(
+                          Icons.remove_red_eye_outlined,
+                          size: 16,
+                          color: AppColors.textSecondary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${story.readCount}',
+                          style: const TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Flexible(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontFamily: 'Urbanist',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  ],
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              author,
-              style: const TextStyle(
-                fontFamily: 'Urbanist',
-                fontSize: 12,
-                color: AppColors.textSecondary,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
