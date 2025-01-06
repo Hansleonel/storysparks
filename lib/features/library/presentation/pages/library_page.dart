@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
+import 'package:storysparks/core/utils/cover_image_helper.dart';
 import '../providers/library_provider.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
 
@@ -151,22 +152,7 @@ class _PopularStoriesSection extends StatelessWidget {
   }
 
   String _getCoverImage(String genre) {
-    switch (genre.toLowerCase()) {
-      case 'feliz':
-        return 'assets/images/happiness.png';
-      case 'romántico':
-        return 'assets/images/romantic.png';
-      case 'nostálgico':
-        return 'assets/images/nostalgic.png';
-      case 'aventura':
-        return 'assets/images/adventure.png';
-      case 'familiar':
-        return 'assets/images/familiar.png';
-      case 'triste':
-        return 'assets/images/sadness.png';
-      default:
-        return 'assets/images/nostalgic.png';
-    }
+    return CoverImageHelper.getCoverImage(genre);
   }
 }
 
@@ -258,22 +244,7 @@ class _NewStoriesSection extends StatelessWidget {
   }
 
   String _getCoverImage(String genre) {
-    switch (genre.toLowerCase()) {
-      case 'feliz':
-        return 'assets/images/happiness.png';
-      case 'romántico':
-        return 'assets/images/romantic.png';
-      case 'nostálgico':
-        return 'assets/images/nostalgic.png';
-      case 'aventura':
-        return 'assets/images/adventure.png';
-      case 'familiar':
-        return 'assets/images/familiar.png';
-      case 'triste':
-        return 'assets/images/sadness.png';
-      default:
-        return 'assets/images/nostalgic.png';
-    }
+    return CoverImageHelper.getCoverImage(genre);
   }
 }
 

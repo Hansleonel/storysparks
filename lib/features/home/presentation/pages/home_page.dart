@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import '../providers/home_provider.dart';
+import 'package:storysparks/core/constants/genre_constants.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -313,12 +314,17 @@ class _GenreChips extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _GenreChip(label: 'Feliz', icon: Icons.sentiment_very_satisfied),
-          _GenreChip(label: 'Romántico', icon: Icons.favorite),
-          _GenreChip(label: 'Nostálgico', icon: Icons.hourglass_empty),
-          _GenreChip(label: 'Aventura', icon: Icons.explore),
-          _GenreChip(label: 'Familiar', icon: Icons.family_restroom),
-          _GenreChip(label: 'Triste ', icon: Icons.sentiment_very_dissatisfied),
+          _GenreChip(
+              label: GenreConstants.HAPPY,
+              icon: Icons.sentiment_very_satisfied),
+          _GenreChip(
+              label: GenreConstants.SAD,
+              icon: Icons.sentiment_very_dissatisfied),
+          _GenreChip(label: GenreConstants.ROMANTIC, icon: Icons.favorite),
+          _GenreChip(
+              label: GenreConstants.NOSTALGIC, icon: Icons.hourglass_empty),
+          _GenreChip(label: GenreConstants.ADVENTURE, icon: Icons.explore),
+          _GenreChip(label: GenreConstants.FAMILY, icon: Icons.family_restroom),
         ],
       ),
     );

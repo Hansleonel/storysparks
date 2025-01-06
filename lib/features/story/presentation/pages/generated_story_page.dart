@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
+import 'package:storysparks/core/utils/cover_image_helper.dart';
 import '../../domain/entities/story.dart';
 import '../providers/story_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -301,22 +302,7 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
   }
 
   String _getHeaderImage(String genre) {
-    switch (genre.toLowerCase()) {
-      case 'feliz':
-        return 'assets/images/happiness.png';
-      case 'romántico':
-        return 'assets/images/romantic.png';
-      case 'nostálgico':
-        return 'assets/images/nostalgic.png';
-      case 'aventura':
-        return 'assets/images/adventure.png';
-      case 'familiar':
-        return 'assets/images/familiar.png';
-      case 'triste':
-        return 'assets/images/sadness.png';
-      default:
-        return 'assets/images/nostalgic.png';
-    }
+    return CoverImageHelper.getCoverImage(genre);
   }
 }
 
