@@ -56,6 +56,7 @@ class _LibraryPageContent extends StatelessWidget {
                 const SliverToBoxAdapter(child: SizedBox(height: 32)),
                 if (provider.recentStories.isNotEmpty)
                   const _NewStoriesSection(),
+                const SliverToBoxAdapter(child: SizedBox(height: 32)),
               ],
             );
           },
@@ -106,7 +107,7 @@ class _PopularStoriesSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           SizedBox(
-            height: 220,
+            height: MediaQuery.of(context).size.height * 0.28,
             child: Consumer<LibraryProvider>(
               builder: (context, provider, child) {
                 return ListView.builder(
@@ -191,7 +192,7 @@ class _NewStoriesSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           SizedBox(
-            height: 220,
+            height: MediaQuery.of(context).size.height * 0.28,
             child: Consumer<LibraryProvider>(
               builder: (context, provider, child) {
                 return ListView.builder(
@@ -249,8 +250,12 @@ class _StoryCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.4,
-        constraints: const BoxConstraints(maxHeight: 300),
+        width: MediaQuery.of(context).size.width * 0.38,
+        constraints: BoxConstraints(
+          maxWidth: 180,
+          minWidth: 140,
+          maxHeight: MediaQuery.of(context).size.height * 0.3,
+        ),
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
