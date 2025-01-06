@@ -279,6 +279,7 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                             const SizedBox(height: 16),
                             _StoryContent(
                               storyKey: _storyKey,
+                              scrollController: _scrollController,
                               onStartReading: () async {
                                 if (!_hasIncrementedReadCount &&
                                     widget.onIncrementReadCount != null) {
@@ -387,10 +388,12 @@ class _StoryDetails extends StatelessWidget {
 class _StoryContent extends StatefulWidget {
   final GlobalKey storyKey;
   final VoidCallback onStartReading;
+  final ScrollController scrollController;
 
   const _StoryContent({
     required this.storyKey,
     required this.onStartReading,
+    required this.scrollController,
   });
 
   @override
@@ -407,11 +410,27 @@ class _StoryContentState extends State<_StoryContent> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         if (widget.storyKey.currentContext != null) {
-          Scrollable.ensureVisible(
-            widget.storyKey.currentContext!,
-            duration: const Duration(milliseconds: 800),
-            curve: Curves.easeOutCubic,
-            alignment: 0.1,
+          final context = widget.storyKey.currentContext!;
+          final box = context.findRenderObject() as RenderBox;
+          final offset = box.localToGlobal(Offset.zero);
+
+          // Calculamos la posición actual del scroll
+          final currentOffset = widget.scrollController.offset;
+          // Calculamos la posición objetivo teniendo en cuenta el padding y la altura de la pantalla
+          final targetOffset =
+              offset.dy - MediaQuery.of(context).size.height * 0.3;
+          // Calculamos la distancia total del scroll
+          final scrollDistance = (targetOffset - currentOffset).abs();
+
+          // Ajustamos la duración basada en la distancia para que sea más natural
+          final duration = Duration(
+            milliseconds: (scrollDistance * 0.5).clamp(800, 1200).toInt(),
+          );
+
+          widget.scrollController.animateTo(
+            targetOffset,
+            duration: duration,
+            curve: Curves.easeInOutCubic,
           );
         }
       });
@@ -422,6 +441,8 @@ class _StoryContentState extends State<_StoryContent> {
   Widget build(BuildContext context) {
     final isExpanded = context.select((StoryProvider p) => p.isExpanded);
     final story = context.select((StoryProvider p) => p.story!);
+    final isMemoryExpanded =
+        context.select((StoryProvider p) => p.isMemoryExpanded);
 
     // Solo ejecutamos el scroll cuando cambia isExpanded a true
     _handleExpand(isExpanded);
@@ -451,15 +472,57 @@ class _StoryContentState extends State<_StoryContent> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  story.memory,
-                  style: const TextStyle(
-                    fontFamily: 'Urbanist',
-                    fontSize: 16,
-                    color: AppColors.textPrimary,
+                GestureDetector(
+                  onTap: () =>
+                      context.read<StoryProvider>().toggleMemoryExpanded(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AnimatedSize(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        child: Text(
+                          story.memory,
+                          style: const TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 16,
+                            color: AppColors.textPrimary,
+                          ),
+                          maxLines: isMemoryExpanded ? null : 1,
+                          overflow:
+                              isMemoryExpanded ? null : TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (story.memory.length > 50)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: AnimatedCrossFade(
+                            firstChild: const Text(
+                              'Ver más',
+                              style: TextStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 14,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            secondChild: const Text(
+                              'Ver menos',
+                              style: TextStyle(
+                                fontFamily: 'Urbanist',
+                                fontSize: 14,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            crossFadeState: isMemoryExpanded
+                                ? CrossFadeState.showSecond
+                                : CrossFadeState.showFirst,
+                            duration: const Duration(milliseconds: 200),
+                          ),
+                        ),
+                    ],
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

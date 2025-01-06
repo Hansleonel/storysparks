@@ -10,6 +10,7 @@ class StoryProvider extends ChangeNotifier {
   final StoryRepository _repository;
 
   bool _isExpanded = false;
+  bool _isMemoryExpanded = false;
   double _rating = 4.0;
   Story? _story;
   bool _isSaving = false;
@@ -24,6 +25,7 @@ class StoryProvider extends ChangeNotifier {
         _repository = repository;
 
   bool get isExpanded => _isExpanded;
+  bool get isMemoryExpanded => _isMemoryExpanded;
   double get rating => _rating;
   Story? get story => _story;
   bool get isSaving => _isSaving;
@@ -85,6 +87,11 @@ class StoryProvider extends ChangeNotifier {
 
   void unsaveStory() {
     _isSaved = false;
+    notifyListeners();
+  }
+
+  void toggleMemoryExpanded() {
+    _isMemoryExpanded = !_isMemoryExpanded;
     notifyListeners();
   }
 }
