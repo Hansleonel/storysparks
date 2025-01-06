@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/story.dart';
-import '../../data/datasources/story_local_datasource.dart';
+import '../../domain/usecases/delete_story_usecase.dart';
+import '../../domain/usecases/update_story_rating_usecase.dart';
+import '../../domain/repositories/story_repository.dart';
 
 class StoryProvider extends ChangeNotifier {
+  final UpdateStoryRatingUseCase _updateRatingUseCase;
+  final DeleteStoryUseCase _deleteStoryUseCase;
+  final StoryRepository _repository;
+
   bool _isExpanded = false;
   double _rating = 4.0;
   Story? _story;
-  final _localDatasource = StoryLocalDatasource();
   bool _isSaving = false;
   bool _isSaved = false;
+
+  StoryProvider({
+    required UpdateStoryRatingUseCase updateRatingUseCase,
+    required DeleteStoryUseCase deleteStoryUseCase,
+    required StoryRepository repository,
+  })  : _updateRatingUseCase = updateRatingUseCase,
+        _deleteStoryUseCase = deleteStoryUseCase,
+        _repository = repository;
 
   bool get isExpanded => _isExpanded;
   double get rating => _rating;
@@ -19,6 +32,9 @@ class StoryProvider extends ChangeNotifier {
   void setStory(Story story, {bool isFromLibrary = false}) {
     _story = story;
     _isSaved = isFromLibrary;
+    if (isFromLibrary) {
+      _rating = story.rating;
+    }
     notifyListeners();
   }
 
@@ -33,22 +49,37 @@ class StoryProvider extends ChangeNotifier {
   }
 
   Future<bool> saveStory() async {
-    if (_story == null) return false;
+    if (_story != null) {
+      try {
+        final storyToSave = _story!.copyWith(rating: _rating);
+        final id = await _repository.saveStory(storyToSave);
+        _story = storyToSave.copyWith(id: id);
+        _isSaved = true;
+        notifyListeners();
+        return true;
+      } catch (e) {
+        _isSaving = false;
+        notifyListeners();
+        return false;
+      }
+    }
+    return false;
+  }
 
-    try {
-      _isSaving = true;
+  Future<void> updateRating(double rating) async {
+    if (_story != null && _story!.id != null) {
+      await _updateRatingUseCase(_story!.id!, rating);
+      _story = _story!.copyWith(rating: rating);
+      _rating = rating;
       notifyListeners();
+    }
+  }
 
-      await _localDatasource.saveStory(_story!);
-
-      _isSaving = false;
-      _isSaved = true;
+  Future<void> deleteStory() async {
+    if (_story != null && _story!.id != null) {
+      await _deleteStoryUseCase(_story!.id!);
+      _isSaved = false;
       notifyListeners();
-      return true;
-    } catch (e) {
-      _isSaving = false;
-      notifyListeners();
-      return false;
     }
   }
 

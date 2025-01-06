@@ -5,6 +5,7 @@ class Story {
   final DateTime createdAt;
   final String memory;
   final int readCount;
+  final double rating;
 
   Story({
     this.id,
@@ -13,6 +14,7 @@ class Story {
     required this.createdAt,
     required this.memory,
     this.readCount = 0,
+    this.rating = 0.0,
   });
 
   Story copyWith({
@@ -22,6 +24,7 @@ class Story {
     DateTime? createdAt,
     String? memory,
     int? readCount,
+    double? rating,
   }) {
     return Story(
       id: id ?? this.id,
@@ -30,6 +33,7 @@ class Story {
       createdAt: createdAt ?? this.createdAt,
       memory: memory ?? this.memory,
       readCount: readCount ?? this.readCount,
+      rating: rating ?? this.rating,
     );
   }
 }

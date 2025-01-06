@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
+import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import '../../domain/entities/story.dart';
 import '../providers/story_provider.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class GeneratedStoryPage extends StatefulWidget {
   final Story story;
@@ -55,8 +57,11 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => StoryProvider()
-        ..setStory(widget.story, isFromLibrary: widget.isFromLibrary),
+      create: (_) => StoryProvider(
+        updateRatingUseCase: getIt(),
+        deleteStoryUseCase: getIt(),
+        repository: getIt(),
+      )..setStory(widget.story, isFromLibrary: widget.isFromLibrary),
       child: Builder(
         builder: (context) {
           final provider = context.watch<StoryProvider>();
@@ -155,21 +160,28 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                                     child: const Text('Cancelar'),
                                   ),
                                   TextButton(
-                                    onPressed: () {
-                                      provider.unsaveStory();
-                                      Navigator.pop(context);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Historia eliminada de guardados',
-                                            style: TextStyle(
-                                              color: Colors.white,
+                                    onPressed: () async {
+                                      await provider.deleteStory();
+                                      if (mounted) {
+                                        Navigator.pop(
+                                            context); // Cerrar diálogo
+                                        Navigator.pop(context); // Volver atrás
+                                        widget.onStoryStateChanged
+                                            ?.call(); // Actualizar biblioteca
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Historia eliminada correctamente',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontFamily: 'Urbanist',
+                                              ),
                                             ),
+                                            backgroundColor: Colors.red,
                                           ),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                        );
+                                      }
                                     },
                                     child: const Text(
                                       'Eliminar',
@@ -203,7 +215,10 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                                 const SnackBar(
                                   content: Text(
                                     'Error al guardar la historia',
-                                    style: TextStyle(color: AppColors.white),
+                                    style: TextStyle(
+                                      color: AppColors.white,
+                                      fontFamily: 'Urbanist',
+                                    ),
                                   ),
                                   backgroundColor: Colors.red,
                                 ),
@@ -256,7 +271,10 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                               ),
                             ),
                             const SizedBox(height: 24),
-                            _StoryDetails(genre: widget.story.genre),
+                            _StoryDetails(
+                                genre: widget.story.genre,
+                                onStoryStateChanged:
+                                    widget.onStoryStateChanged),
                             const SizedBox(height: 16),
                             _StoryContent(
                               storyKey: _storyKey,
@@ -304,14 +322,17 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
 
 class _StoryDetails extends StatelessWidget {
   final String genre;
+  final VoidCallback? onStoryStateChanged;
 
   const _StoryDetails({
     required this.genre,
+    this.onStoryStateChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    final rating = context.watch<StoryProvider>().rating;
+    final provider = context.watch<StoryProvider>();
+    final rating = provider.rating;
 
     return Column(
       children: [
@@ -326,17 +347,32 @@ class _StoryDetails extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Column(
           children: [
-            ...List.generate(5, (index) {
-              return Icon(
-                index < rating ? Icons.star : Icons.star_border,
+            RatingBar.builder(
+              initialRating: rating,
+              minRating: 0,
+              direction: Axis.horizontal,
+              allowHalfRating: true,
+              itemCount: 5,
+              itemSize: 24,
+              unratedColor: AppColors.accent.withOpacity(0.3),
+              itemBuilder: (context, _) => const Icon(
+                Icons.star_rounded,
                 color: AppColors.accent,
-                size: 20,
-              );
-            }),
-            const SizedBox(width: 8),
+              ),
+              onRatingUpdate: (newRating) async {
+                if (provider.isSaved) {
+                  // Si la historia ya está guardada, actualizamos directamente en la base de datos
+                  await provider.updateRating(newRating);
+                  onStoryStateChanged?.call(); // Actualizamos la biblioteca
+                } else {
+                  // Si la historia no está guardada, solo actualizamos el rating en memoria
+                  provider.setRating(newRating);
+                }
+              },
+            ),
+            const SizedBox(height: 4),
             Text(
               '${rating.toStringAsFixed(1)}/5.0',
               style: const TextStyle(

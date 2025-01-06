@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:storysparks/core/dependency_injection/service_locator.dart';
+import 'package:storysparks/features/story/data/datasources/story_local_datasource.dart';
 import '../../../story/domain/entities/story.dart';
 import '../../../story/data/repositories/story_repository_impl.dart';
 
@@ -10,7 +12,7 @@ class HomeProvider extends ChangeNotifier {
   String? selectedImagePath;
   bool isLoading = false;
 
-  final _storyRepository = StoryRepositoryImpl();
+  final _storyRepository = StoryRepositoryImpl(getIt<StoryLocalDatasource>());
 
   HomeProvider() {
     memoryController.addListener(_updateGenerateButton);
