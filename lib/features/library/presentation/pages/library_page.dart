@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/core/utils/cover_image_helper.dart';
 import 'package:storysparks/core/utils/date_formatter.dart';
@@ -41,9 +42,9 @@ class _LibraryPageContent extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Mi Biblioteca',
-                              style: TextStyle(
+                            Text(
+                              AppLocalizations.of(context)!.library,
+                              style: const TextStyle(
                                 fontFamily: 'Playfair',
                                 fontSize: 32,
                                 fontWeight: FontWeight.w500,

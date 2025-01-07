@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/features/home/presentation/pages/home_page.dart';
 import 'package:storysparks/features/library/presentation/pages/library_page.dart';
@@ -66,6 +67,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -94,21 +96,21 @@ class CustomBottomNavigationBar extends StatelessWidget {
           fontWeight: FontWeight.w500,
           fontSize: 12,
         ),
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
+            icon: const Icon(Icons.home_outlined),
+            activeIcon: const Icon(Icons.home),
+            label: l10n.home,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark_outline),
-            activeIcon: Icon(Icons.bookmark),
-            label: 'Library',
+            icon: const Icon(Icons.bookmark_outline),
+            activeIcon: const Icon(Icons.bookmark),
+            label: l10n.library,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
+            icon: const Icon(Icons.person_outline),
+            activeIcon: const Icon(Icons.person),
+            label: l10n.profile,
           ),
         ],
       ),

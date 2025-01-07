@@ -1,0 +1,9 @@
+{
+    "home": "Inicio",
+    "library": "Biblioteca",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "profile": "Perfil",
+    "settings": "Configuración"
+}
