@@ -37,25 +37,65 @@ class _LibraryPageContent extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Mi Biblioteca',
-                          style: TextStyle(
-                            fontFamily: 'Playfair',
-                            fontSize: 32,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textPrimary,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Mi Biblioteca',
+                              style: TextStyle(
+                                fontFamily: 'Playfair',
+                                fontSize: 32,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => provider.toggleViewType(),
+                              icon: Icon(
+                                provider.viewType == LibraryViewType.grid
+                                    ? Icons.view_agenda_outlined
+                                    : Icons.grid_view_outlined,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 24),
                       ],
                     ),
                   ),
                 ),
-                if (provider.popularStories.isNotEmpty)
-                  const _PopularStoriesSection(),
-                const SliverToBoxAdapter(child: SizedBox(height: 32)),
-                if (provider.recentStories.isNotEmpty)
-                  const _NewStoriesSection(),
+                if (provider.viewType == LibraryViewType.grid) ...[
+                  if (provider.popularStories.isNotEmpty)
+                    const _PopularStoriesSection(),
+                  const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                  if (provider.recentStories.isNotEmpty)
+                    const _NewStoriesSection(),
+                ] else ...[
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Timeline',
+                            style: TextStyle(
+                              fontFamily: 'Playfair',
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _TimelineView(
+                            stories: provider.recentStories,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
                 const SliverToBoxAdapter(child: SizedBox(height: 32)),
               ],
             );
@@ -347,6 +387,240 @@ class _StoryCard extends StatelessWidget {
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TimelineView extends StatelessWidget {
+  final List<Story> stories;
+
+  const _TimelineView({required this.stories});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: stories.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
+      itemBuilder: (context, index) {
+        final story = stories[index];
+        return _TimelineCard(story: story);
+      },
+    );
+  }
+}
+
+class _TimelineCard extends StatelessWidget {
+  final Story story;
+
+  const _TimelineCard({required this.story});
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<LibraryProvider>();
+    final size = MediaQuery.of(context).size;
+    final imageWidth = size.width * 0.25; // 25% del ancho de la pantalla
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          AppRoutes.generatedStory,
+          arguments: {
+            'story': story,
+            'isFromLibrary': true,
+            'onIncrementReadCount': () async {
+              if (story.id != null) {
+                await provider.incrementReadCount(story.id!);
+              }
+            },
+            'onStoryStateChanged': () {
+              provider.loadStories();
+            },
+          },
+        );
+      },
+      child: Container(
+        constraints: BoxConstraints(
+          minHeight:
+              size.height * 0.15, // Mínimo 15% de la altura de la pantalla
+          maxHeight:
+              size.height * 0.2, // Máximo 20% de la altura de la pantalla
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.horizontal(left: Radius.circular(16)),
+              child: SizedBox(
+                width: imageWidth,
+                child: Image.asset(
+                  CoverImageHelper.getCoverImage(story.genre),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding:
+                    EdgeInsets.all(size.width * 0.04), // Padding responsive
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      story.memory,
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: size.width * 0.04, // Texto responsive
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: size.height * 0.008),
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: size.width * 0.03,
+                            vertical: size.height * 0.005,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            story.genre,
+                            style: TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: size.width * 0.03,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: size.height * 0.032),
+                    // Barra de progreso
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: story.readCount > 0 ? 1 : 0,
+                        backgroundColor: AppColors.border,
+                        color: AppColors.primary,
+                        minHeight: 4,
+                      ),
+                    ),
+                    SizedBox(height: size.height * 0.008),
+                    // Información de progreso
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Contador de vistas
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.remove_red_eye_outlined,
+                                size: size.width * 0.04,
+                                color: AppColors.textSecondary,
+                              ),
+                              SizedBox(width: size.width * 0.01),
+                              Text(
+                                '${story.readCount}',
+                                style: TextStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: size.width * 0.03,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (story.rating > 0) ...[
+                            SizedBox(width: size.width * 0.04),
+                            // Rating
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.star_rounded,
+                                  size: size.width * 0.04,
+                                  color: AppColors.accent,
+                                ),
+                                SizedBox(width: size.width * 0.01),
+                                Text(
+                                  story.rating.toStringAsFixed(1),
+                                  style: TextStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: size.width * 0.03,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                          SizedBox(width: size.width * 0.04),
+                          // Estado de lectura
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.description_outlined,
+                                size: size.width * 0.04,
+                                color: AppColors.textSecondary,
+                              ),
+                              SizedBox(width: size.width * 0.01),
+                              Text(
+                                story.readCount > 0 ? 'Completado' : 'Sin leer',
+                                style: TextStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: size.width * 0.03,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Menú de opciones
+            /*SizedBox(
+              width: size.width * 0.12,
+              child: IconButton(
+                icon: Icon(
+                  Icons.more_vert,
+                  color: AppColors.textSecondary,
+                  size: size.width * 0.05,
+                ),
+                onPressed: () {
+                  // TODO: Implementar menú de opciones
+                },
+              ),
+            ),*/
           ],
         ),
       ),
