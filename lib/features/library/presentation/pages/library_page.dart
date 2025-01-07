@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/core/utils/cover_image_helper.dart';
+import 'package:storysparks/core/utils/date_formatter.dart';
 import 'package:storysparks/features/story/domain/entities/story.dart';
 import '../providers/library_provider.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
@@ -401,14 +402,49 @@ class _TimelineView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
+    // Agrupar historias por fecha
+    final groupedStories = <String, List<Story>>{};
+
+    for (var story in stories) {
+      final dateKey = DateFormatter.getFormattedDate(story.createdAt);
+      groupedStories.putIfAbsent(dateKey, () => []).add(story);
+    }
+
+    return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: stories.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 16),
+      itemCount: groupedStories.length,
       itemBuilder: (context, index) {
-        final story = stories[index];
-        return _TimelineCard(story: story);
+        final dateKey = groupedStories.keys.elementAt(index);
+        final storiesForDate = groupedStories[dateKey]!;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (index > 0) const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 12),
+              child: Text(
+                dateKey,
+                style: TextStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: storiesForDate.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 16),
+              itemBuilder: (context, index) {
+                return _TimelineCard(story: storiesForDate[index]);
+              },
+            ),
+          ],
+        );
       },
     );
   }
