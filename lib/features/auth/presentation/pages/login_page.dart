@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import '../providers/auth_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -25,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.background,
@@ -36,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Welcome back 👋',
+              l10n.welcomeBack,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontFamily: 'Playfair',
                     fontWeight: FontWeight.w700,
@@ -45,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Please enter your email & password to sign in.',
+              l10n.loginDescription,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontFamily: 'Urbanist',
                     color: AppColors.textSecondary,
@@ -78,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
         color: AppColors.textPrimary,
       ),
       decoration: InputDecoration(
-        labelText: 'Email',
+        labelText: AppLocalizations.of(context)!.email,
         labelStyle: const TextStyle(
           fontFamily: 'Urbanist',
           fontWeight: FontWeight.w400,
@@ -117,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
         color: AppColors.textPrimary,
       ),
       decoration: InputDecoration(
-        labelText: 'Password',
+        labelText: AppLocalizations.of(context)!.password,
         labelStyle: const TextStyle(
           fontFamily: 'Urbanist',
           fontWeight: FontWeight.w400,
@@ -158,9 +160,9 @@ class _LoginPageState extends State<LoginPage> {
             borderRadius: BorderRadius.circular(4),
           ),
         ),
-        const Text(
-          'Remember me',
-          style: TextStyle(
+        Text(
+          AppLocalizations.of(context)!.rememberMe,
+          style: const TextStyle(
             fontFamily: 'Urbanist',
             fontWeight: FontWeight.w500,
           ),
@@ -171,7 +173,7 @@ class _LoginPageState extends State<LoginPage> {
             // TODO: Implement forgot password
           },
           child: Text(
-            'Forgot password?',
+            AppLocalizations.of(context)!.forgotPassword,
             style: TextStyle(
               color: AppColors.primary,
               fontFamily: 'Urbanist',
@@ -210,9 +212,9 @@ class _LoginPageState extends State<LoginPage> {
             ),
             child: authProvider.isLoading
                 ? const CircularProgressIndicator(color: Colors.white)
-                : const Text(
-                    'Sign in',
-                    style: TextStyle(
+                : Text(
+                    AppLocalizations.of(context)!.signIn,
+                    style: const TextStyle(
                       color: AppColors.white,
                       fontSize: 16,
                       fontFamily: 'Urbanist',
@@ -229,9 +231,9 @@ class _LoginPageState extends State<LoginPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          "Don't have an account?",
-          style: TextStyle(
+        Text(
+          AppLocalizations.of(context)!.dontHaveAccount,
+          style: const TextStyle(
             fontFamily: 'Urbanist',
             fontWeight: FontWeight.w500,
           ),
@@ -241,8 +243,8 @@ class _LoginPageState extends State<LoginPage> {
             // TODO: Navigate to sign up page
           },
           child: Text(
-            'Sign up',
-            style: TextStyle(
+            AppLocalizations.of(context)!.signUp,
+            style: const TextStyle(
               color: AppColors.primary,
               fontFamily: 'Urbanist',
               fontWeight: FontWeight.w600,

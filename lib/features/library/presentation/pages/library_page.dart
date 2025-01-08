@@ -80,9 +80,9 @@ class _LibraryPageContent extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Timeline',
-                            style: TextStyle(
+                          Text(
+                            AppLocalizations.of(context)!.timeline,
+                            style: const TextStyle(
                               fontFamily: 'Playfair',
                               fontSize: 24,
                               fontWeight: FontWeight.w500,
@@ -123,9 +123,9 @@ class _PopularStoriesSection extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Historias Populares 🔥',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.popularStories,
+                  style: const TextStyle(
                     fontFamily: 'Playfair',
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
@@ -136,9 +136,9 @@ class _PopularStoriesSection extends StatelessWidget {
                   onPressed: () {
                     // TODO: Implementar ver todas las historias populares
                   },
-                  child: const Text(
-                    'Ver todas',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.viewAll,
+                    style: const TextStyle(
                       fontFamily: 'Urbanist',
                       color: AppColors.primary,
                     ),
@@ -208,9 +208,9 @@ class _NewStoriesSection extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Nuevas Historias 🎁',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.newStories,
+                  style: const TextStyle(
                     fontFamily: 'Playfair',
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
@@ -221,9 +221,9 @@ class _NewStoriesSection extends StatelessWidget {
                   onPressed: () {
                     // TODO: Implementar ver todas las historias nuevas
                   },
-                  child: const Text(
-                    'Ver todas',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.viewAll,
+                    style: const TextStyle(
                       fontFamily: 'Urbanist',
                       color: AppColors.primary,
                     ),
@@ -628,7 +628,9 @@ class _TimelineCard extends StatelessWidget {
                               ),
                               SizedBox(width: size.width * 0.01),
                               Text(
-                                story.readCount > 0 ? 'Completado' : 'Sin leer',
+                                story.readCount > 0
+                                    ? AppLocalizations.of(context)!.completed
+                                    : AppLocalizations.of(context)!.unread,
                                 style: TextStyle(
                                   fontFamily: 'Urbanist',
                                   fontSize: size.width * 0.03,

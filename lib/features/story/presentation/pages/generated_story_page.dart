@@ -4,9 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/core/utils/cover_image_helper.dart';
+import 'package:storysparks/core/constants/genre_constants.dart';
 import '../../domain/entities/story.dart';
 import '../providers/story_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GeneratedStoryPage extends StatefulWidget {
   final Story story;
@@ -142,23 +144,25 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: const Text(
-                                  'Eliminar de guardados',
-                                  style: TextStyle(
+                                title: Text(
+                                  AppLocalizations.of(context)!.deleteFromSaved,
+                                  style: const TextStyle(
                                     fontFamily: 'Urbanist',
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                content: const Text(
-                                  '¿Estás seguro de que quieres eliminar esta historia de tus guardados?',
-                                  style: TextStyle(
+                                content: Text(
+                                  AppLocalizations.of(context)!
+                                      .deleteConfirmation,
+                                  style: const TextStyle(
                                     fontFamily: 'Urbanist',
                                   ),
                                 ),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(context),
-                                    child: const Text('Cancelar'),
+                                    child: Text(
+                                        AppLocalizations.of(context)!.cancel),
                                   ),
                                   TextButton(
                                     onPressed: () async {
@@ -171,10 +175,11 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                                             ?.call(); // Actualizar biblioteca
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
-                                          const SnackBar(
+                                          SnackBar(
                                             content: Text(
-                                              'Historia eliminada correctamente',
-                                              style: TextStyle(
+                                              AppLocalizations.of(context)!
+                                                  .storyDeletedSuccess,
+                                              style: const TextStyle(
                                                 color: Colors.white,
                                                 fontFamily: 'Urbanist',
                                               ),
@@ -184,9 +189,9 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                                         );
                                       }
                                     },
-                                    child: const Text(
-                                      'Eliminar',
-                                      style: TextStyle(
+                                    child: Text(
+                                      AppLocalizations.of(context)!.delete,
+                                      style: const TextStyle(
                                         color: Colors.red,
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -200,10 +205,11 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                             if (success && mounted) {
                               widget.onStoryStateChanged?.call();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                SnackBar(
                                   content: Text(
-                                    'Historia guardada correctamente',
-                                    style: TextStyle(
+                                    AppLocalizations.of(context)!
+                                        .storySavedSuccess,
+                                    style: const TextStyle(
                                       color: AppColors.white,
                                       fontFamily: 'Urbanist',
                                     ),
@@ -213,10 +219,11 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                               );
                             } else if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                SnackBar(
                                   content: Text(
-                                    'Error al guardar la historia',
-                                    style: TextStyle(
+                                    AppLocalizations.of(context)!
+                                        .storyDeleteError,
+                                    style: const TextStyle(
                                       color: AppColors.white,
                                       fontFamily: 'Urbanist',
                                     ),
@@ -324,7 +331,7 @@ class _StoryDetails extends StatelessWidget {
     return Column(
       children: [
         Text(
-          'Tu Historia',
+          AppLocalizations.of(context)!.yourStory,
           style: const TextStyle(
             fontFamily: 'Playfair',
             fontSize: 28,
@@ -375,9 +382,15 @@ class _StoryDetails extends StatelessWidget {
           alignment: WrapAlignment.center,
           spacing: 8,
           children: [
-            _GenreChip(genre: genre),
-            _GenreChip(genre: 'historia'),
-            _GenreChip(genre: 'recuerdo'),
+            _GenreChip(genre: GenreConstants.fromString(genre)),
+            _GenreChip(
+              genre: Genre.happy,
+              label: '#${AppLocalizations.of(context)!.story}',
+            ),
+            _GenreChip(
+              genre: Genre.happy,
+              label: '#${AppLocalizations.of(context)!.memory}',
+            ),
           ],
         ),
       ],
@@ -497,18 +510,18 @@ class _StoryContentState extends State<_StoryContent> {
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: AnimatedCrossFade(
-                            firstChild: const Text(
-                              'Ver más',
-                              style: TextStyle(
+                            firstChild: Text(
+                              AppLocalizations.of(context)!.seeMore,
+                              style: const TextStyle(
                                 fontFamily: 'Urbanist',
                                 fontSize: 14,
                                 color: AppColors.primary,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            secondChild: const Text(
-                              'Ver menos',
-                              style: TextStyle(
+                            secondChild: Text(
+                              AppLocalizations.of(context)!.seeLess,
+                              style: const TextStyle(
                                 fontFamily: 'Urbanist',
                                 fontSize: 14,
                                 color: AppColors.primary,
@@ -540,9 +553,9 @@ class _StoryContentState extends State<_StoryContent> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Empezar a leer',
-                  style: TextStyle(
+                child: Text(
+                  AppLocalizations.of(context)!.startReading,
+                  style: const TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -555,9 +568,9 @@ class _StoryContentState extends State<_StoryContent> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Historia Generada',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.generatedStory,
+                  style: const TextStyle(
                     fontFamily: 'Playfair',
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
@@ -619,12 +632,14 @@ class _StoryContentState extends State<_StoryContent> {
 }
 
 class _GenreChip extends StatelessWidget {
-  final String genre;
+  final Genre genre;
+  final String? label;
 
-  const _GenreChip({required this.genre});
+  const _GenreChip({required this.genre, this.label});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -632,7 +647,18 @@ class _GenreChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        '#$genre',
+        label ??
+            (genre.key == 'genreHappy'
+                ? l10n.genreHappy
+                : genre.key == 'genreSad'
+                    ? l10n.genreSad
+                    : genre.key == 'genreRomantic'
+                        ? l10n.genreRomantic
+                        : genre.key == 'genreNostalgic'
+                            ? l10n.genreNostalgic
+                            : genre.key == 'genreAdventure'
+                                ? l10n.genreAdventure
+                                : l10n.genreFamily),
         style: const TextStyle(
           fontFamily: 'Urbanist',
           fontSize: 14,

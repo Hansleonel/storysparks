@@ -6,6 +6,7 @@ import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import '../providers/home_provider.dart';
 import 'package:storysparks/core/constants/genre_constants.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -74,8 +75,7 @@ class _MemoryInput extends StatelessWidget {
             color: AppColors.textPrimary,
           ),
           decoration: InputDecoration(
-            hintText:
-                'Comparte un recuerdo especial, como tu primera bicicleta o ese viaje inolvidable con la familia...',
+            hintText: AppLocalizations.of(context)!.shareMemoryHint,
             hintStyle: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 16,
@@ -288,10 +288,10 @@ class _GenreSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text(
-          'El recuerdo es...',
-          style: TextStyle(
+          AppLocalizations.of(context)!.genreTitle,
+          style: const TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 18,
             fontWeight: FontWeight.w500,
@@ -310,56 +310,58 @@ class _GenreChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SingleChildScrollView(
+    return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: [
-          _GenreChip(
-              label: GenreConstants.HAPPY,
-              icon: Icons.sentiment_very_satisfied),
-          _GenreChip(
-              label: GenreConstants.SAD,
-              icon: Icons.sentiment_very_dissatisfied),
-          _GenreChip(label: GenreConstants.ROMANTIC, icon: Icons.favorite),
-          _GenreChip(
-              label: GenreConstants.NOSTALGIC, icon: Icons.hourglass_empty),
-          _GenreChip(label: GenreConstants.ADVENTURE, icon: Icons.explore),
-          _GenreChip(label: GenreConstants.FAMILY, icon: Icons.family_restroom),
-        ],
+        children: Genre.values.map((genre) {
+          return _GenreChip(
+            genre: genre,
+          );
+        }).toList(),
       ),
     );
   }
 }
 
 class _GenreChip extends StatelessWidget {
-  final String label;
-  final IconData icon;
+  final Genre genre;
 
   const _GenreChip({
-    required this.label,
-    required this.icon,
+    required this.genre,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(right: 12),
       child: Consumer<HomeProvider>(
         builder: (context, provider, _) {
-          final isSelected = provider.selectedGenre == label;
+          final isSelected =
+              provider.selectedGenre == GenreConstants.toStringValue(genre);
           return FilterChip(
             selected: isSelected,
             showCheckmark: false,
             label: Row(
               children: [
                 Icon(
-                  icon,
+                  genre.icon,
                   size: 18,
                   color: isSelected ? AppColors.white : AppColors.textSecondary,
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  label,
+                  genre.key == 'genreHappy'
+                      ? l10n.genreHappy
+                      : genre.key == 'genreSad'
+                          ? l10n.genreSad
+                          : genre.key == 'genreRomantic'
+                              ? l10n.genreRomantic
+                              : genre.key == 'genreNostalgic'
+                                  ? l10n.genreNostalgic
+                                  : genre.key == 'genreAdventure'
+                                      ? l10n.genreAdventure
+                                      : l10n.genreFamily,
                   style: TextStyle(
                     fontFamily: 'Urbanist',
                     color:
@@ -371,7 +373,8 @@ class _GenreChip extends StatelessWidget {
             backgroundColor: AppColors.white,
             selectedColor: AppColors.primary,
             onSelected: (bool selected) {
-              provider.setSelectedGenre(selected ? label : '');
+              provider.setSelectedGenre(
+                  selected ? GenreConstants.toStringValue(genre) : '');
             },
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             shape: RoundedRectangleBorder(
@@ -395,9 +398,9 @@ class _ProtagonistSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'El protagonista será...',
-          style: TextStyle(
+        Text(
+          AppLocalizations.of(context)!.theProtagonistWillBe,
+          style: const TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 18,
             fontWeight: FontWeight.w500,
@@ -510,9 +513,9 @@ class _GenerateButton extends StatelessWidget {
               ),
               disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
             ),
-            child: const Text(
-              'Generar historia',
-              style: TextStyle(
+            child: Text(
+              AppLocalizations.of(context)!.generateStory,
+              style: const TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -556,8 +559,8 @@ class _Header extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hello, Shahzaib',
-                  style: TextStyle(
+                  AppLocalizations.of(context)!.hello('Shahzaib'),
+                  style: const TextStyle(
                     fontFamily: 'Playfair',
                     fontSize: 24,
                     fontWeight: FontWeight.w500,
@@ -565,8 +568,8 @@ class _Header extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Good morning',
-                  style: TextStyle(
+                  AppLocalizations.of(context)!.goodMorning,
+                  style: const TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
