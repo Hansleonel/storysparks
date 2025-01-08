@@ -5,6 +5,7 @@ import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/core/utils/cover_image_helper.dart';
 import 'package:storysparks/core/utils/date_formatter.dart';
 import 'package:storysparks/features/story/domain/entities/story.dart';
+import 'package:storysparks/core/widgets/empty_state.dart';
 import '../providers/library_provider.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
 
@@ -29,6 +30,34 @@ class _LibraryPageContent extends StatelessWidget {
           builder: (context, provider, child) {
             if (provider.isLoading) {
               return const Center(child: CircularProgressIndicator());
+            }
+
+            if (provider.popularStories.isEmpty &&
+                provider.recentStories.isEmpty) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      AppLocalizations.of(context)!.library,
+                      style: const TextStyle(
+                        fontFamily: 'Playfair',
+                        fontSize: 32,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: EmptyState(
+                      message: AppLocalizations.of(context)!.noStories,
+                      iconSize: 64.0,
+                      fontSize: 18.0,
+                    ),
+                  ),
+                ],
+              );
             }
 
             return CustomScrollView(

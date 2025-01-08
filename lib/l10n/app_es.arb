@@ -31,6 +31,7 @@
     "signIn": "Iniciar sesión",
     "dontHaveAccount": "¿No tienes una cuenta?",
     "signUp": "Registrarse",
+    "noStories": "No hay historias aún",
     "shareMemoryHint": "Comparte un recuerdo especial, como tu primera bicicleta o ese viaje inolvidable con la familia...",
     "theProtagonistWillBe": "El protagonista será...",
     "hello": "Hola, {name}",

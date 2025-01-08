@@ -31,6 +31,7 @@
     "signIn": "Sign in",
     "dontHaveAccount": "Don't have an account?",
     "signUp": "Sign up",
+    "noStories": "No stories yet",
     "shareMemoryHint": "Share a special memory, like your first bicycle or that unforgettable family trip...",
     "theProtagonistWillBe": "The protagonist will be...",
     "hello": "Hello, {name}",
