@@ -13,13 +13,15 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
 
 - ✅ **Gestión de Historias**:
 
-  - Generación de historias con StoryProvider
-  - Guardado local de historias
+  - Generación de historias con IA usando Google Generative AI
+  - Guardado local de historias con SQLite
   - Visualización de historias generadas
   - Eliminación de historias
   - Biblioteca personal de historias
+  - Sistema de calificación de historias
 
-- **Creación de Historias**:
+- ✅ **Creación de Historias**:
+
   - Campo de texto para compartir recuerdos
   - Soporte para añadir imágenes (galería o cámara)
   - Selección de géneros narrativos:
@@ -30,6 +32,10 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
     - Divertido
   - Personalización del protagonista
 
+- ✅ **Internacionalización**:
+  - Soporte multiidioma (Español e Inglés)
+  - Localización de textos y mensajes
+
 ## 🛠️ Tecnologías Implementadas
 
 - **Framework**: Flutter
@@ -39,7 +45,15 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
   - Presentation Layer (providers, pages)
   - Domain Layer (usecases, repositories)
   - Data Layer (datasources, repositories implementations)
-- **Almacenamiento Local**: Implementado para historias
+- **Almacenamiento Local**: SQLite con sqflite
+- **IA**: Google Generative AI
+- **Networking**: Dio
+- **Inyección de Dependencias**: GetIt + Injectable
+- **Manejo de Errores**: Dartz
+- **Gestión de Assets**:
+  - SVG Support (flutter_svg)
+  - Audio (just_audio)
+  - Image Picker
 
 ## 📂 Estructura del Proyecto Actual
 
@@ -110,10 +124,19 @@ lib/
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^6.0.0
+  provider: ^6.1.1
+  dio: ^5.4.0
+  sqflite: ^2.3.0
+  flutter_svg: ^2.0.9
+  just_audio: ^0.9.36
   image_picker: ^1.0.4
-  # Inyección de dependencias
+  equatable: ^2.0.5
+  dartz: ^0.10.1
   get_it: ^7.6.4
+  injectable: ^2.3.2
+  google_generative_ai: ^0.2.0
+  flutter_dotenv: ^5.1.0
+  flutter_rating_bar: ^4.0.1
 ```
 
 ## 🔄 Flujo de la Aplicación Implementado
@@ -144,10 +167,13 @@ dependencies:
 ## 🔜 Próximas Características
 
 - [x] Integración con IA para generación de historias
-- [ ] Compartir historias en redes sociales
 - [x] Modo offline con almacenamiento local
+- [x] Múltiples idiomas
+- [ ] Compartir historias en redes sociales
 - [ ] Temas personalizables
-- [ ] Múltiples idiomas
+- [ ] Exportación de historias en diferentes formatos
+- [ ] Generación de audiolibros
+- [ ] Personalización avanzada de portadas
 
 ## 👥 Contribución
 
