@@ -1,14 +1,14 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
-import '../../features/auth/data/datasources/auth_remote_datasource.dart';
-import '../../features/auth/data/repositories/auth_repository_impl.dart';
-import '../../features/auth/domain/repositories/auth_repository.dart';
-import '../../features/story/data/datasources/story_local_datasource.dart';
-import '../../features/story/data/repositories/story_repository_impl.dart';
-import '../../features/story/domain/repositories/story_repository.dart';
-import '../../features/story/domain/usecases/delete_story_usecase.dart';
-import '../../features/story/domain/usecases/update_story_rating_usecase.dart';
-import '../constants/api_constants.dart';
+import 'package:storysparks/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:storysparks/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
+import 'package:storysparks/features/story/data/datasources/story_local_datasource.dart';
+import 'package:storysparks/features/story/data/repositories/story_repository_impl.dart';
+import 'package:storysparks/features/story/domain/repositories/story_repository.dart';
+import 'package:storysparks/features/story/domain/usecases/delete_story_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/update_story_rating_usecase.dart';
+import 'package:storysparks/core/constants/api_constants.dart';
 
 final getIt = GetIt.instance;
 

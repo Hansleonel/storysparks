@@ -8,6 +8,8 @@ import 'package:storysparks/features/auth/domain/repositories/auth_repository.da
 import 'package:storysparks/features/auth/presentation/pages/login_page.dart';
 import 'package:storysparks/features/auth/presentation/providers/auth_provider.dart';
 import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
+import 'package:storysparks/features/profile/domain/repositories/story_repository.dart';
+import 'package:storysparks/features/profile/presentation/providers/story_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() async {
@@ -23,6 +25,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => LibraryProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => StoryProvider(getIt<StoryRepository>()),
         ),
       ],
       child: const MyApp(),
