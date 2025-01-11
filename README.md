@@ -4,7 +4,13 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
 
 ## 🚀 Características Implementadas
 
-- ✅ **Autenticación de Usuarios**: Sistema de login seguro implementado con AuthProvider y AuthRepository.
+- ✅ **Autenticación de Usuarios**:
+
+  - Sistema de login seguro implementado con AuthProvider y AuthRepository
+  - Integración con Sign in with Apple
+  - Manejo de errores en autenticación con mensajes de usuario
+  - Persistencia de sesión
+
 - ✅ **Navegación Intuitiva**: Barra de navegación implementada con MainNavigation:
 
   - 🏠 Home: Creación de nuevas historias
@@ -41,6 +47,9 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
 - **Framework**: Flutter
 - **Lenguaje**: Dart
 - **Gestión de Estado**: Provider
+- **Backend y Autenticación**:
+  - Supabase para autenticación y almacenamiento
+  - Sign in with Apple integration
 - **Arquitectura**: Clean Architecture implementada con:
   - Presentation Layer (providers, pages)
   - Domain Layer (usecases, repositories)
@@ -137,6 +146,8 @@ dependencies:
   google_generative_ai: ^0.2.0
   flutter_dotenv: ^5.1.0
   flutter_rating_bar: ^4.0.1
+  sign_in_with_apple: ^6.1.4
+  supabase_flutter: ^2.8.3
 ```
 
 ## 🔄 Flujo de la Aplicación Implementado
@@ -144,6 +155,8 @@ dependencies:
 1. **Inicio de Sesión**:
 
    - ✅ Autenticación implementada con AuthProvider y AuthRepository
+   - ✅ Integración con Sign in with Apple
+   - ✅ Manejo de errores y feedback al usuario
    - ✅ Redirección a la navegación principal tras autenticación exitosa
 
 2. **Navegación Principal**:
