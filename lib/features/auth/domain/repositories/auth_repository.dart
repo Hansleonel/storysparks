@@ -1,7 +1,10 @@
-import 'package:storysparks/features/auth/data/models/user_model.dart';
+import 'package:dartz/dartz.dart';
+import 'package:storysparks/core/error/failures.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AuthRepository {
-  Future<UserModel> login(String email, String password);
-  Future<UserModel> register(String email, String password);
-  Future<bool> logout();
+  Future<Either<Failure, AuthResponse>> login(String email, String password);
+  Future<Either<Failure, AuthResponse>> signInWithApple(
+      String idToken, String accessToken);
+  Future<Either<Failure, void>> signOut();
 }

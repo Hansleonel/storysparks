@@ -1,31 +1,62 @@
-import 'package:flutter/foundation.dart';
-import 'package:storysparks/features/auth/data/models/user_model.dart';
-import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
+import 'package:flutter/material.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:storysparks/features/auth/domain/usecases/login_usecase.dart';
+import 'package:storysparks/features/auth/domain/usecases/sign_in_with_apple_usecase.dart';
+import 'package:storysparks/features/auth/domain/usecases/sign_out_usecase.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final AuthRepository _authRepository;
-  bool _isLoading = false;
-  bool _isAuthenticated = false;
+  final LoginUseCase _loginUseCase;
+  final SignInWithAppleUseCase _signInWithAppleUseCase;
+  final SignOutUseCase _signOutUseCase;
 
-  AuthProvider(this._authRepository);
+  bool _isLoading = false;
+  String? _error;
+  bool _isAuthenticated = false;
+  User? _currentUser;
+
+  AuthProvider(
+    this._loginUseCase,
+    this._signInWithAppleUseCase,
+    this._signOutUseCase,
+  );
 
   bool get isLoading => _isLoading;
+  String? get error => _error;
   bool get isAuthenticated => _isAuthenticated;
+  User? get currentUser => _currentUser;
 
-  Future<UserModel?> login(String email, String password) async {
+  Future<User?> login(String email, String password) async {
     _isLoading = true;
+    _error = null;
     notifyListeners();
 
     try {
-      // final user = await _authRepository.login(email, password);
-      const user = UserModel(
-        id: '1',
-        email: 'test@test.com',
-        name: 'Test',
+      final result = await _loginUseCase(
+        LoginParams(
+          email: email,
+          password: password,
+        ),
       );
-      _isAuthenticated = true;
-      return user;
+
+      return result.fold(
+        (failure) {
+          _error = failure.message;
+          _isAuthenticated = false;
+          _currentUser = null;
+          return null;
+        },
+        (response) {
+          _currentUser = response.user;
+          _isAuthenticated = true;
+          _error = null;
+          return _currentUser;
+        },
+      );
     } catch (e) {
+      _error = e.toString();
+      _isAuthenticated = false;
+      _currentUser = null;
       return null;
     } finally {
       _isLoading = false;
@@ -33,33 +64,64 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<UserModel> register(String email, String password) async {
+  Future<void> signInWithApple() async {
     _isLoading = true;
+    _error = null;
     notifyListeners();
 
     try {
-      final user = await _authRepository.register(email, password);
-      _isAuthenticated = true;
-      return user;
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final result = await _signInWithAppleUseCase(
+        SignInWithAppleParams(
+          idToken: credential.identityToken!,
+          accessToken: credential.authorizationCode,
+        ),
+      );
+
+      result.fold(
+        (failure) {
+          _error = failure.message;
+          _isAuthenticated = false;
+          _currentUser = null;
+        },
+        (response) {
+          _currentUser = response.user;
+          _isAuthenticated = true;
+          _error = null;
+        },
+      );
+    } catch (e) {
+      _error = e.toString();
+      _isAuthenticated = false;
+      _currentUser = null;
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<bool> logout() async {
+  Future<void> signOut() async {
     _isLoading = true;
     notifyListeners();
 
-    try {
-      final success = await _authRepository.logout();
-      if (success) {
+    final result = await _signOutUseCase(const NoParams());
+
+    result.fold(
+      (failure) => _error = failure.message,
+      (_) {
         _isAuthenticated = false;
-      }
-      return success;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+        _error = null;
+        _currentUser = null;
+      },
+    );
+
+    _isLoading = false;
+    notifyListeners();
   }
 }

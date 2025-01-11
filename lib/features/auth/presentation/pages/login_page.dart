@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
-import '../providers/auth_provider.dart';
+import 'package:storysparks/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
@@ -64,6 +65,8 @@ class _LoginPageState extends State<LoginPage> {
             _buildLoginButton(),
             const SizedBox(height: 20),
             _buildSignUpLink(),
+            const SizedBox(height: 20),
+            _buildAppleSignInButton(),
           ],
         ),
       ),
@@ -174,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
           },
           child: Text(
             AppLocalizations.of(context)!.forgotPassword,
-            style: TextStyle(
+            style: const TextStyle(
               color: AppColors.primary,
               fontFamily: 'Urbanist',
               fontWeight: FontWeight.w600,
@@ -198,8 +201,18 @@ class _LoginPageState extends State<LoginPage> {
                       _emailController.text,
                       _passwordController.text,
                     );
+
+                    if (authProvider.error != null && mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(authProvider.error!),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
                     if (user != null && mounted) {
-                      // Navigate to home page
                       Navigator.pushReplacementNamed(context, AppRoutes.main);
                     }
                   },
@@ -252,6 +265,41 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildAppleSignInButton() {
+    final l10n = AppLocalizations.of(context)!;
+    return Consumer<AuthProvider>(
+      builder: (context, provider, _) {
+        if (provider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return SignInWithAppleButton(
+          text: l10n.signInWithApple,
+          style: SignInWithAppleButtonStyle.black,
+          onPressed: () async {
+            await provider.signInWithApple();
+
+            if (provider.error != null) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(provider.error!),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+              return;
+            }
+
+            if (provider.isAuthenticated && mounted) {
+              Navigator.pushReplacementNamed(context, AppRoutes.main);
+            }
+          },
+        );
+      },
     );
   }
 }

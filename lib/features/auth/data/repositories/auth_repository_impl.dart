@@ -1,7 +1,8 @@
+import 'package:dartz/dartz.dart';
+import 'package:storysparks/core/error/failures.dart';
 import 'package:storysparks/features/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:storysparks/features/auth/data/models/login_request_model.dart';
-import 'package:storysparks/features/auth/data/models/user_model.dart';
 import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
@@ -9,40 +10,35 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._remoteDataSource);
 
   @override
-  Future<UserModel> login(String email, String password) async {
+  Future<Either<Failure, AuthResponse>> login(
+      String email, String password) async {
     try {
-      final loginRequest = LoginRequestModel(
-        email: email,
-        password: password,
-      );
-      final user = await _remoteDataSource.login(loginRequest);
-      return user;
+      final response = await _remoteDataSource.login(email, password);
+      return Right(response);
     } catch (e) {
-      throw Exception('Failed to login');
+      return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
-  Future<UserModel> register(String email, String password) async {
+  Future<Either<Failure, AuthResponse>> signInWithApple(
+      String idToken, String accessToken) async {
     try {
-      final registerRequest = LoginRequestModel(
-        email: email,
-        password: password,
-      );
-      final user = await _remoteDataSource.register(registerRequest);
-      return user;
+      final response =
+          await _remoteDataSource.signInWithApple(idToken, accessToken);
+      return Right(response);
     } catch (e) {
-      throw Exception('Failed to register');
+      return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
-  Future<bool> logout() async {
+  Future<Either<Failure, void>> signOut() async {
     try {
-      await _remoteDataSource.logout();
-      return true;
+      await _remoteDataSource.signOut();
+      return const Right(null);
     } catch (e) {
-      return false;
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

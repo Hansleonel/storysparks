@@ -32,7 +32,8 @@
     "dontHaveAccount": "Don't have an account?",
     "signUp": "Sign up",
     "noStories": "No stories yet",
-    "shareMemoryHint": "Share a special memory, like your first bicycle or that unforgettable family trip...",
+    "shareMemoryHint": "Share that special memory with the one who left a mark on your life. Describe it in detail, without fearing the sadness, and you’ll see the magic of reliving it.",
+    "signInWithApple": "Sign in with Apple",
     "theProtagonistWillBe": "The protagonist will be...",
     "hello": "Hello, {name}",
     "@hello": {

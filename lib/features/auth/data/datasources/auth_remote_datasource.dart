@@ -1,55 +1,60 @@
-import 'package:dio/dio.dart';
-import 'package:injectable/injectable.dart';
-import 'package:storysparks/core/constants/api_constants.dart';
-import 'package:storysparks/features/auth/data/models/login_request_model.dart';
-import 'package:storysparks/features/auth/data/models/user_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<UserModel> login(LoginRequestModel loginRequest);
-  Future<UserModel> register(LoginRequestModel registerRequest);
-  Future<void> logout();
+  Future<AuthResponse> login(String email, String password);
+  Future<AuthResponse> signInWithApple(String idToken, String accessToken);
+  Future<void> signOut();
 }
 
-@Injectable(as: AuthRemoteDataSource)
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final Dio _dio;
+  final SupabaseClient _supabase;
 
-  AuthRemoteDataSourceImpl(@Named('authDio') this._dio);
+  AuthRemoteDataSourceImpl(this._supabase);
 
   @override
-  Future<UserModel> login(LoginRequestModel loginRequest) async {
+  Future<AuthResponse> login(String email, String password) async {
     try {
-      final response = await _dio.post(
-        ApiConstants.login,
-        data: loginRequest.toJson(),
+      return await _supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
       );
-
-      return UserModel.fromJson(response.data['user']);
-    } catch (e) {
-      throw Exception('Failed to login');
+    } catch (error) {
+      throw Exception('Error signing in: $error');
     }
   }
 
   @override
-  Future<UserModel> register(LoginRequestModel registerRequest) async {
+  Future<AuthResponse> signInWithApple(
+      String idToken, String accessToken) async {
     try {
-      final response = await _dio.post(
-        ApiConstants.register,
-        data: registerRequest.toJson(),
+      print('Attempting to sign in with Apple...');
+      print('ID Token: ${idToken.substring(0, 50)}...');
+      print('Access Token: ${accessToken.substring(0, 20)}...');
+
+      final response = await _supabase.auth.signInWithIdToken(
+        provider: OAuthProvider.apple,
+        idToken: idToken,
+        accessToken: accessToken,
       );
 
-      return UserModel.fromJson(response.data['user']);
-    } catch (e) {
-      throw Exception('Failed to register');
+      print('Sign in successful: ${response.user?.email}');
+      return response;
+    } catch (error) {
+      print('Error details: $error');
+      if (error is AuthException) {
+        print('Status Code: ${error.statusCode}');
+        print('Message: ${error.message}');
+      }
+      throw Exception('Error signing in with Apple: $error');
     }
   }
 
   @override
-  Future<void> logout() async {
+  Future<void> signOut() async {
     try {
-      await _dio.post(ApiConstants.logout);
-    } catch (e) {
-      throw Exception('Failed to logout');
+      await _supabase.auth.signOut();
+    } catch (error) {
+      throw Exception('Error signing out: $error');
     }
   }
 }
