@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 abstract class AuthRepository {
   Future<Either<Failure, AuthResponse>> login(String email, String password);
   Future<Either<Failure, AuthResponse>> signInWithApple(
-      String idToken, String accessToken);
+      String idToken, String accessToken,
+      {String? givenName, String? familyName});
   Future<Either<Failure, void>> signOut();
 }

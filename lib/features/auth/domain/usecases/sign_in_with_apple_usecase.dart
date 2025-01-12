@@ -14,19 +14,28 @@ class SignInWithAppleUseCase
   @override
   Future<Either<Failure, AuthResponse>> call(
       SignInWithAppleParams params) async {
-    return await repository.signInWithApple(params.idToken, params.accessToken);
+    return await repository.signInWithApple(
+      params.idToken,
+      params.accessToken,
+      givenName: params.givenName,
+      familyName: params.familyName,
+    );
   }
 }
 
 class SignInWithAppleParams extends Equatable {
   final String idToken;
   final String accessToken;
+  final String? givenName;
+  final String? familyName;
 
   const SignInWithAppleParams({
     required this.idToken,
     required this.accessToken,
+    this.givenName,
+    this.familyName,
   });
 
   @override
-  List<Object> get props => [idToken, accessToken];
+  List<Object?> get props => [idToken, accessToken, givenName, familyName];
 }

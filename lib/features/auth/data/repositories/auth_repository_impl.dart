@@ -22,10 +22,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, AuthResponse>> signInWithApple(
-      String idToken, String accessToken) async {
+      String idToken, String accessToken,
+      {String? givenName, String? familyName}) async {
     try {
-      final response =
-          await _remoteDataSource.signInWithApple(idToken, accessToken);
+      final response = await _remoteDataSource.signInWithApple(
+          idToken, accessToken,
+          givenName: givenName, familyName: familyName);
       return Right(response);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

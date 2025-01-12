@@ -81,6 +81,8 @@ class AuthProvider extends ChangeNotifier {
         SignInWithAppleParams(
           idToken: credential.identityToken!,
           accessToken: credential.authorizationCode,
+          givenName: credential.givenName,
+          familyName: credential.familyName,
         ),
       );
 
