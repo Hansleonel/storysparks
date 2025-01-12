@@ -566,7 +566,7 @@ class _Header extends StatelessWidget {
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 200),
                   child: Text(
-                    AppLocalizations.of(context)!.hello(userName ?? 'Usuario'),
+                    AppLocalizations.of(context)!.hello(userName ?? 'User'),
                     style: const TextStyle(
                       fontFamily: 'Playfair',
                       fontSize: 24,

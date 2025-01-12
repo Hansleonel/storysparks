@@ -28,8 +28,8 @@ class HomeProvider extends ChangeNotifier {
   Future<void> _loadUserName() async {
     final result = await _getUserNameUseCase(NoParams());
     result.fold(
-      (failure) => _userName = 'Usuario',
-      (name) => _userName = name ?? 'Usuario',
+      (failure) => _userName = 'User',
+      (name) => _userName = name ?? 'User',
     );
     notifyListeners();
   }
