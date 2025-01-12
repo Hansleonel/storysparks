@@ -5,6 +5,7 @@ abstract class AuthRemoteDataSource {
   Future<AuthResponse> signInWithApple(String idToken, String accessToken,
       {String? givenName, String? familyName});
   Future<void> signOut();
+  Future<User?> getCurrentUser();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -77,6 +78,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       await _supabase.auth.signOut();
     } catch (error) {
       throw Exception('Error signing out: $error');
+    }
+  }
+
+  @override
+  Future<User?> getCurrentUser() async {
+    try {
+      return _supabase.auth.currentUser;
+    } catch (error) {
+      throw Exception('Error getting current user: $error');
     }
   }
 }

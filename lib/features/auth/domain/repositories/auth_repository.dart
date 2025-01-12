@@ -8,4 +8,5 @@ abstract class AuthRepository {
       String idToken, String accessToken,
       {String? givenName, String? familyName});
   Future<Either<Failure, void>> signOut();
+  Future<User?> getCurrentUser();
 }

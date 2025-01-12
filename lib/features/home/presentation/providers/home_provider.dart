@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:storysparks/core/dependency_injection/service_locator.dart';
+import 'package:storysparks/core/usecases/usecase.dart';
 import 'package:storysparks/features/story/data/datasources/story_local_datasource.dart';
+import 'package:storysparks/features/home/domain/usecases/get_user_name_usecase.dart';
 import '../../../story/domain/entities/story.dart';
 import '../../../story/data/repositories/story_repository_impl.dart';
 
@@ -11,11 +13,25 @@ class HomeProvider extends ChangeNotifier {
   bool isGenerateEnabled = false;
   String? selectedImagePath;
   bool isLoading = false;
+  String? _userName;
+  final GetUserNameUseCase _getUserNameUseCase;
 
   final _storyRepository = StoryRepositoryImpl(getIt<StoryLocalDatasource>());
 
-  HomeProvider() {
+  HomeProvider(this._getUserNameUseCase) {
     memoryController.addListener(_updateGenerateButton);
+    _loadUserName();
+  }
+
+  String? get userName => _userName;
+
+  Future<void> _loadUserName() async {
+    final result = await _getUserNameUseCase(NoParams());
+    result.fold(
+      (failure) => _userName = 'Usuario',
+      (name) => _userName = name ?? 'Usuario',
+    );
+    notifyListeners();
   }
 
   void _updateGenerateButton() {
