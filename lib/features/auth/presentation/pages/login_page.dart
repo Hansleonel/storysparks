@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
@@ -269,6 +270,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildAppleSignInButton() {
+    if (!Platform.isIOS) {
+      return const SizedBox.shrink();
+    }
+
     final l10n = AppLocalizations.of(context)!;
     return Consumer<AuthProvider>(
       builder: (context, provider, _) {
