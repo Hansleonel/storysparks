@@ -6,6 +6,7 @@ class Story {
   final String memory;
   final int readCount;
   final double rating;
+  final String userId;
 
   Story({
     this.id,
@@ -15,6 +16,7 @@ class Story {
     required this.memory,
     this.readCount = 0,
     this.rating = 0.0,
+    required this.userId,
   });
 
   Story copyWith({
@@ -25,6 +27,7 @@ class Story {
     String? memory,
     int? readCount,
     double? rating,
+    String? userId,
   }) {
     return Story(
       id: id ?? this.id,
@@ -34,6 +37,7 @@ class Story {
       memory: memory ?? this.memory,
       readCount: readCount ?? this.readCount,
       rating: rating ?? this.rating,
+      userId: userId ?? this.userId,
     );
   }
 }

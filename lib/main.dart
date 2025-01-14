@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
+import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
 import 'package:storysparks/features/auth/domain/usecases/login_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_in_with_apple_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_out_usecase.dart';
@@ -12,8 +15,6 @@ import 'package:storysparks/features/auth/presentation/providers/auth_provider.d
 import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
 import 'package:storysparks/features/profile/domain/repositories/story_repository.dart';
 import 'package:storysparks/features/profile/presentation/providers/story_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -37,7 +38,7 @@ void main() async {
           ),
         ),
         ChangeNotifierProvider(
-          create: (_) => LibraryProvider(),
+          create: (_) => LibraryProvider(getIt<AuthRepository>()),
         ),
         ChangeNotifierProvider(
           create: (_) => StoryProvider(getIt<StoryRepository>()),

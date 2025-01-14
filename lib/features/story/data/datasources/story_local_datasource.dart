@@ -13,9 +13,12 @@ class StoryLocalDatasource {
   }
 
   Future<Database> _initDB() async {
-    String path = await getDatabasesPath();
+    final dbPath = await getDatabasesPath();
+    final path = join(dbPath, 'stories.db');
+
     return await openDatabase(
-      join(path, 'story_database.db'),
+      path,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE $tableName(
@@ -25,19 +28,15 @@ class StoryLocalDatasource {
             memory TEXT NOT NULL,
             createdAt TEXT NOT NULL,
             readCount INTEGER DEFAULT 0,
-            rating REAL DEFAULT 0.0
+            rating REAL DEFAULT 0.0,
+            userId TEXT NOT NULL
           )
         ''');
       },
-      version: 3,
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           await db.execute(
-              'ALTER TABLE $tableName ADD COLUMN readCount INTEGER DEFAULT 0');
-        }
-        if (oldVersion < 3) {
-          await db.execute(
-              'ALTER TABLE $tableName ADD COLUMN rating REAL DEFAULT 0.0');
+              'ALTER TABLE $tableName ADD COLUMN userId TEXT NOT NULL DEFAULT ""');
         }
       },
     );
@@ -54,14 +53,19 @@ class StoryLocalDatasource {
         'createdAt': story.createdAt.toIso8601String(),
         'readCount': story.readCount,
         'rating': story.rating,
+        'userId': story.userId,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  Future<List<Story>> getSavedStories() async {
+  Future<List<Story>> getSavedStories(String userId) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(tableName);
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: 'userId = ?',
+      whereArgs: [userId],
+    );
 
     return List.generate(maps.length, (i) {
       return Story(
@@ -72,6 +76,7 @@ class StoryLocalDatasource {
         createdAt: DateTime.parse(maps[i]['createdAt']),
         readCount: maps[i]['readCount'] ?? 0,
         rating: maps[i]['rating'] ?? 0.0,
+        userId: maps[i]['userId'],
       );
     });
   }
@@ -86,11 +91,31 @@ class StoryLocalDatasource {
     );
   }
 
-  Future<List<Story>> getPopularStories() async {
+  Future<void> deleteStory(int id) async {
+    final db = await database;
+    await db.delete(
+      tableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> incrementReadCount(int id) async {
+    final db = await database;
+    await db.rawUpdate('''
+      UPDATE $tableName 
+      SET readCount = readCount + 1 
+      WHERE id = ?
+    ''', [id]);
+  }
+
+  Future<List<Story>> getPopularStories(String userId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       tableName,
-      orderBy: 'readCount DESC, rating DESC',
+      where: 'userId = ?',
+      whereArgs: [userId],
+      orderBy: 'readCount DESC',
       limit: 10,
     );
 
@@ -103,14 +128,17 @@ class StoryLocalDatasource {
         createdAt: DateTime.parse(maps[i]['createdAt']),
         readCount: maps[i]['readCount'] ?? 0,
         rating: maps[i]['rating'] ?? 0.0,
+        userId: maps[i]['userId'],
       );
     });
   }
 
-  Future<List<Story>> getRecentStories() async {
+  Future<List<Story>> getRecentStories(String userId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       tableName,
+      where: 'userId = ?',
+      whereArgs: [userId],
       orderBy: 'createdAt DESC',
       limit: 10,
     );
@@ -124,25 +152,8 @@ class StoryLocalDatasource {
         createdAt: DateTime.parse(maps[i]['createdAt']),
         readCount: maps[i]['readCount'] ?? 0,
         rating: maps[i]['rating'] ?? 0.0,
+        userId: maps[i]['userId'],
       );
     });
-  }
-
-  Future<void> incrementReadCount(int id) async {
-    final db = await database;
-    await db.rawUpdate('''
-      UPDATE $tableName 
-      SET readCount = readCount + 1 
-      WHERE id = ?
-    ''', [id]);
-  }
-
-  Future<void> deleteStory(int id) async {
-    final db = await database;
-    await db.delete(
-      tableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
   }
 }

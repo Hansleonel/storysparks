@@ -18,6 +18,7 @@ class StoryRepositoryImpl implements StoryRepository {
   Future<Story> generateStory({
     required String memory,
     required String genre,
+    required String userId,
   }) async {
     try {
       final prompt = '''
@@ -39,6 +40,7 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
         genre: genre,
         createdAt: DateTime.now(),
         memory: memory,
+        userId: userId,
       );
     } catch (e) {
       throw Exception('Error al generar la historia: $e');
@@ -51,8 +53,8 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
   }
 
   @override
-  Future<List<Story>> getSavedStories() async {
-    return await _localDatasource.getSavedStories();
+  Future<List<Story>> getSavedStories(String userId) async {
+    return await _localDatasource.getSavedStories(userId);
   }
 
   @override
@@ -71,12 +73,12 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
   }
 
   @override
-  Future<List<Story>> getPopularStories() async {
-    return await _localDatasource.getPopularStories();
+  Future<List<Story>> getPopularStories(String userId) async {
+    return await _localDatasource.getPopularStories(userId);
   }
 
   @override
-  Future<List<Story>> getRecentStories() async {
-    return await _localDatasource.getRecentStories();
+  Future<List<Story>> getRecentStories(String userId) async {
+    return await _localDatasource.getRecentStories(userId);
   }
 }

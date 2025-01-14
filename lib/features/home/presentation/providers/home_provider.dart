@@ -3,6 +3,7 @@ import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/usecases/usecase.dart';
 import 'package:storysparks/features/story/data/datasources/story_local_datasource.dart';
 import 'package:storysparks/features/home/domain/usecases/get_user_name_usecase.dart';
+import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
 import '../../../story/domain/entities/story.dart';
 import '../../../story/data/repositories/story_repository_impl.dart';
 
@@ -15,10 +16,11 @@ class HomeProvider extends ChangeNotifier {
   bool isLoading = false;
   String? _userName;
   final GetUserNameUseCase _getUserNameUseCase;
+  final AuthRepository _authRepository;
 
   final _storyRepository = StoryRepositoryImpl(getIt<StoryLocalDatasource>());
 
-  HomeProvider(this._getUserNameUseCase) {
+  HomeProvider(this._getUserNameUseCase, this._authRepository) {
     memoryController.addListener(_updateGenerateButton);
     _loadUserName();
   }
@@ -28,8 +30,8 @@ class HomeProvider extends ChangeNotifier {
   Future<void> _loadUserName() async {
     final result = await _getUserNameUseCase(NoParams());
     result.fold(
-      (failure) => _userName = 'User',
-      (name) => _userName = name ?? 'User',
+      (failure) => _userName = 'Usuario',
+      (name) => _userName = name ?? 'Usuario',
     );
     notifyListeners();
   }
@@ -70,6 +72,11 @@ class HomeProvider extends ChangeNotifier {
       throw Exception('Por favor, selecciona un género');
     }
 
+    final currentUser = await _authRepository.getCurrentUser();
+    if (currentUser == null) {
+      throw Exception('Usuario no autenticado');
+    }
+
     isLoading = true;
     notifyListeners();
 
@@ -77,6 +84,7 @@ class HomeProvider extends ChangeNotifier {
       final story = await _storyRepository.generateStory(
         memory: memoryController.text,
         genre: selectedGenre,
+        userId: currentUser.id,
       );
       return story;
     } finally {

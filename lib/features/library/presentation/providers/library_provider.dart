@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:storysparks/features/story/data/datasources/story_local_datasource.dart';
 import 'package:storysparks/features/story/domain/entities/story.dart';
+import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
 
 enum LibraryViewType {
   grid, // Vista actual con scroll horizontal
@@ -9,10 +10,13 @@ enum LibraryViewType {
 
 class LibraryProvider extends ChangeNotifier {
   final _localDatasource = StoryLocalDatasource();
+  final AuthRepository _authRepository;
   List<Story> _popularStories = [];
   List<Story> _recentStories = [];
   bool _isLoading = false;
   LibraryViewType _viewType = LibraryViewType.grid;
+
+  LibraryProvider(this._authRepository);
 
   List<Story> get popularStories => _popularStories;
   List<Story> get recentStories => _recentStories;
@@ -31,13 +35,21 @@ class LibraryProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _popularStories = await _localDatasource.getPopularStories();
-      _recentStories = await _localDatasource.getRecentStories();
+      final currentUser = await _authRepository.getCurrentUser();
+      if (currentUser == null) {
+        throw Exception('Usuario no autenticado');
+      }
+
+      _popularStories =
+          await _localDatasource.getPopularStories(currentUser.id);
+      _recentStories = await _localDatasource.getRecentStories(currentUser.id);
 
       // Aseguramos que las historias recientes estén ordenadas por fecha de creación (más recientes primero)
       _recentStories.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     } catch (e) {
       debugPrint('Error loading stories: $e');
+      _popularStories = [];
+      _recentStories = [];
     }
 
     _isLoading = false;
