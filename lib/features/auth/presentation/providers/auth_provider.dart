@@ -14,6 +14,7 @@ class AuthProvider extends ChangeNotifier {
   String? _error;
   bool _isAuthenticated = false;
   User? _currentUser;
+  bool _isPasswordVisible = false;
 
   AuthProvider(
     this._loginUseCase,
@@ -25,6 +26,12 @@ class AuthProvider extends ChangeNotifier {
   String? get error => _error;
   bool get isAuthenticated => _isAuthenticated;
   User? get currentUser => _currentUser;
+  bool get isPasswordVisible => _isPasswordVisible;
+
+  void togglePasswordVisibility() {
+    _isPasswordVisible = !_isPasswordVisible;
+    notifyListeners();
+  }
 
   Future<User?> login(String email, String password) async {
     _isLoading = true;

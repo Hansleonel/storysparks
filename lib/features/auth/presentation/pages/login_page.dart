@@ -119,43 +119,54 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildPasswordField() {
-    return TextField(
-      controller: _passwordController,
-      obscureText: true,
-      style: const TextStyle(
-        fontFamily: 'Urbanist',
-        fontWeight: FontWeight.w500,
-        color: AppColors.textPrimary,
-      ),
-      decoration: InputDecoration(
-        labelText: AppLocalizations.of(context)!.password,
-        labelStyle: const TextStyle(
-          fontFamily: 'Urbanist',
-          fontWeight: FontWeight.w400,
-          color: AppColors.textSecondary,
-        ),
-        prefixIcon:
-            const Icon(Icons.lock_outline, color: AppColors.textSecondary),
-        suffixIcon: const Icon(Icons.visibility_off_outlined,
-            color: AppColors.textSecondary),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
-        ),
-        floatingLabelStyle: const TextStyle(
-          color: AppColors.primary,
-          fontFamily: 'Urbanist',
-          fontWeight: FontWeight.w500,
-        ),
-      ),
+    return Consumer<AuthProvider>(
+      builder: (context, provider, _) {
+        return TextField(
+          controller: _passwordController,
+          obscureText: !provider.isPasswordVisible,
+          style: const TextStyle(
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.w500,
+            color: AppColors.textPrimary,
+          ),
+          decoration: InputDecoration(
+            labelText: AppLocalizations.of(context)!.password,
+            labelStyle: const TextStyle(
+              fontFamily: 'Urbanist',
+              fontWeight: FontWeight.w400,
+              color: AppColors.textSecondary,
+            ),
+            prefixIcon:
+                const Icon(Icons.lock_outline, color: AppColors.textSecondary),
+            suffixIcon: IconButton(
+              icon: Icon(
+                provider.isPasswordVisible
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
+                color: AppColors.textSecondary,
+              ),
+              onPressed: provider.togglePasswordVisibility,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.border),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.border),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+            ),
+            floatingLabelStyle: const TextStyle(
+              color: AppColors.primary,
+              fontFamily: 'Urbanist',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        );
+      },
     );
   }
 
