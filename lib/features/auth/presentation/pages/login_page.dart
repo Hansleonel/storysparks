@@ -34,41 +34,46 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: AppColors.background,
       ),
       backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.welcomeBack,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontFamily: 'Playfair',
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black,
-                  ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.loginDescription,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontFamily: 'Urbanist',
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w400,
-                  ),
-            ),
-            const SizedBox(height: 60),
-            _buildEmailField(),
-            const SizedBox(height: 20),
-            _buildPasswordField(),
-            const SizedBox(height: 20),
-            _buildRememberMeAndForgotPassword(),
-            const SizedBox(height: 40),
-            _buildLoginButton(),
-            const SizedBox(height: 20),
-            _buildSignUpLink(),
-            const SizedBox(height: 20),
-            _buildAppleSignInButton(),
-          ],
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.welcomeBack,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontFamily: 'Playfair',
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.loginDescription,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontFamily: 'Urbanist',
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w400,
+                    ),
+              ),
+              const SizedBox(height: 60),
+              _buildEmailField(),
+              const SizedBox(height: 20),
+              _buildPasswordField(),
+              const SizedBox(height: 20),
+              _buildRememberMeAndForgotPassword(),
+              const SizedBox(height: 40),
+              _buildLoginButton(),
+              const SizedBox(height: 20),
+              _buildSignUpLink(),
+              const SizedBox(height: 20),
+              _buildAppleSignInButton(),
+            ],
+          ),
         ),
       ),
     );
