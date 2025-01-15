@@ -8,6 +8,7 @@ import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
 import 'package:storysparks/features/auth/domain/usecases/login_usecase.dart';
+import 'package:storysparks/features/auth/domain/usecases/register_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_in_with_apple_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:storysparks/features/auth/presentation/pages/login_page.dart';
@@ -35,6 +36,7 @@ void main() async {
             getIt<LoginUseCase>(),
             getIt<SignInWithAppleUseCase>(),
             getIt<SignOutUseCase>(),
+            getIt<RegisterUseCase>(),
           ),
         ),
         ChangeNotifierProvider(

@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:storysparks/core/error/failures.dart';
+import 'package:storysparks/features/auth/domain/entities/profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AuthRepository {
@@ -9,4 +10,13 @@ abstract class AuthRepository {
       {String? givenName, String? familyName});
   Future<Either<Failure, void>> signOut();
   Future<User?> getCurrentUser();
+  Future<Either<Failure, Profile>> updateProfile(Profile profile);
+  Future<Either<Failure, Profile?>> getProfile(String userId);
+  Future<Either<Failure, Profile>> register({
+    required String email,
+    required String password,
+    required String username,
+    String? fullName,
+    String? bio,
+  });
 }

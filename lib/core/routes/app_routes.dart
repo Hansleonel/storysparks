@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:storysparks/features/auth/presentation/pages/login_page.dart';
+import 'package:storysparks/features/auth/presentation/pages/register_page.dart';
 import 'package:storysparks/features/navigation/presentation/pages/main_navigation.dart';
 import 'package:storysparks/features/story/domain/entities/story.dart';
 import 'package:storysparks/features/story/presentation/pages/generated_story_page.dart';
 
 class AppRoutes {
   static const String login = '/login';
+  static const String register = '/register';
   static const String main = '/main';
   static const String generatedStory = '/generated-story';
 
@@ -14,6 +16,10 @@ class AppRoutes {
       case login:
         return MaterialPageRoute(
           builder: (_) => const LoginPage(),
+        );
+      case register:
+        return MaterialPageRoute(
+          builder: (_) => const RegisterPage(),
         );
       case main:
         return MaterialPageRoute(

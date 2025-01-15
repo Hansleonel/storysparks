@@ -270,7 +270,7 @@ class _LoginPageState extends State<LoginPage> {
         ),
         TextButton(
           onPressed: () {
-            // TODO: Navigate to sign up page
+            Navigator.pushNamed(context, AppRoutes.register);
           },
           child: Text(
             AppLocalizations.of(context)!.signUp,
