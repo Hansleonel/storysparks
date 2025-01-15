@@ -57,7 +57,7 @@ class _RegisterPageState extends State<RegisterPage> {
       return l10n.emailRequired;
     }
     if (!_emailRegExp.hasMatch(value)) {
-      return 'El formato del email no es válido';
+      return l10n.invalidEmailFormat;
     }
     return null;
   }
@@ -68,19 +68,19 @@ class _RegisterPageState extends State<RegisterPage> {
       return l10n.passwordRequired;
     }
     if (value.length < 8) {
-      return 'La contraseña debe tener al menos 8 caracteres';
+      return l10n.passwordMinLength;
     }
     if (!value.contains(RegExp(r'[A-Z]'))) {
-      return 'Debe contener al menos una mayúscula';
+      return l10n.passwordUppercase;
     }
     if (!value.contains(RegExp(r'[a-z]'))) {
-      return 'Debe contener al menos una minúscula';
+      return l10n.passwordLowercase;
     }
     if (!value.contains(RegExp(r'[0-9]'))) {
-      return 'Debe contener al menos un número';
+      return l10n.passwordNumber;
     }
     if (!value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
-      return 'Debe contener al menos un carácter especial';
+      return l10n.passwordSpecial;
     }
     return null;
   }
@@ -91,10 +91,10 @@ class _RegisterPageState extends State<RegisterPage> {
       return l10n.usernameRequired;
     }
     if (value.length < 3 || value.length > 30) {
-      return 'El nombre de usuario debe tener entre 3 y 30 caracteres';
+      return l10n.usernameLength;
     }
     if (!_usernameRegExp.hasMatch(value)) {
-      return 'Solo puede contener letras, números y guiones bajos';
+      return l10n.usernameInvalidChars;
     }
     return _usernameError;
   }
@@ -115,12 +115,12 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (existingUser != null) {
         setState(() {
-          _usernameError = 'Este nombre de usuario ya está en uso';
+          _usernameError = l10n.usernameExists;
         });
       }
     } catch (e) {
       setState(() {
-        _usernameError = 'Error al verificar disponibilidad';
+        _usernameError = l10n.profileUpdateError;
       });
     } finally {
       setState(() {
@@ -192,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   prefixIcon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
                   validator: _validateEmail,
-                  helperText: 'Ejemplo: usuario@dominio.com',
+                  helperText: l10n.emailHelperText,
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
@@ -205,8 +205,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       _checkUsernameAvailability(value);
                     }
                   },
-                  helperText:
-                      'Entre 3 y 30 caracteres, solo letras, números y guiones bajos',
+                  helperText: l10n.usernameHelperText,
                   suffixIcon: _isCheckingUsername
                       ? const SizedBox(
                           width: 20,
@@ -227,12 +226,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   prefixIcon: Icons.lock_outline,
                   obscureText: !_isPasswordVisible,
                   validator: _validatePassword,
-                  helperText: '''
-• Mínimo 8 caracteres
-• Al menos una mayúscula
-• Al menos una minúscula
-• Al menos un número
-• Al menos un carácter especial''',
+                  helperText: l10n.passwordHelperText,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isPasswordVisible
@@ -275,7 +269,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   controller: _fullNameController,
                   label: l10n.fullName,
                   prefixIcon: Icons.badge_outlined,
-                  helperText: 'Opcional',
+                  helperText: l10n.optional,
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
@@ -283,7 +277,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   label: l10n.bio,
                   prefixIcon: Icons.edit_note_outlined,
                   maxLines: 3,
-                  helperText: 'Opcional',
+                  helperText: l10n.optional,
                 ),
                 const SizedBox(height: 32),
                 if (authProvider.error != null)
