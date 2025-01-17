@@ -9,6 +9,9 @@ import 'package:storysparks/features/auth/domain/usecases/register_usecase.dart'
 import 'package:storysparks/features/auth/domain/usecases/sign_in_with_apple_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:storysparks/features/home/domain/usecases/get_user_name_usecase.dart';
+import 'package:storysparks/features/home/presentation/providers/home_provider.dart';
+import 'package:storysparks/features/profile/domain/usecases/get_profile_usecase.dart';
+import 'package:storysparks/features/profile/presentation/providers/profile_provider.dart';
 import 'package:storysparks/features/story/data/datasources/story_local_datasource.dart';
 import 'package:storysparks/features/story/data/repositories/story_repository_impl.dart';
 import 'package:storysparks/features/story/domain/repositories/story_repository.dart';
@@ -19,10 +22,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 final getIt = GetIt.instance;
 
 void setupServiceLocator() {
-  // External
+  // External Dependencies (Singleton ✅)
   getIt.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
-
-  // Network
   getIt.registerLazySingleton<Dio>(
     () => Dio(BaseOptions(
       baseUrl: ApiConstants.baseUrl,
@@ -31,16 +32,25 @@ void setupServiceLocator() {
     )),
   );
 
+  // Data Layer (Singleton ✅)
   // Auth
   getIt.registerLazySingleton<AuthRemoteDataSource>(
     () => AuthRemoteDataSourceImpl(getIt<SupabaseClient>()),
   );
-
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(getIt<AuthRemoteDataSource>()),
   );
 
-  // Auth Use Cases
+  // Story
+  getIt.registerLazySingleton<StoryLocalDatasource>(
+    () => StoryLocalDatasource(),
+  );
+  getIt.registerLazySingleton<StoryRepository>(
+    () => StoryRepositoryImpl(getIt<StoryLocalDatasource>()),
+  );
+
+  // Domain Layer - Use Cases (Singleton ✅)
+  // Auth
   getIt.registerLazySingleton(() => LoginUseCase(getIt<AuthRepository>()));
   getIt.registerLazySingleton(
       () => SignInWithAppleUseCase(getIt<AuthRepository>()));
@@ -48,21 +58,29 @@ void setupServiceLocator() {
   getIt.registerLazySingleton(() => RegisterUseCase(getIt<AuthRepository>()));
   getIt
       .registerLazySingleton(() => GetUserNameUseCase(getIt<AuthRepository>()));
+  getIt.registerLazySingleton(() => GetProfileUseCase(getIt<AuthRepository>()));
 
   // Story
-  getIt.registerLazySingleton<StoryLocalDatasource>(
-    () => StoryLocalDatasource(),
-  );
-
-  getIt.registerLazySingleton<StoryRepository>(
-    () => StoryRepositoryImpl(getIt<StoryLocalDatasource>()),
-  );
-
-  // Story Use Cases
   getIt.registerLazySingleton(
     () => UpdateStoryRatingUseCase(getIt<StoryRepository>()),
   );
   getIt.registerLazySingleton(
     () => DeleteStoryUseCase(getIt<StoryRepository>()),
   );
+
+  // Presentation Layer - Page Providers (Factory ✅)
+  getIt.registerFactory(
+    () => ProfileProvider(getIt<GetProfileUseCase>()),
+  );
+  getIt.registerFactory(
+    () => HomeProvider(
+      getIt<GetUserNameUseCase>(),
+      getIt<AuthRepository>(),
+    ),
+  );
+
+  // Nota: Los providers globales están en main.dart ℹ️
+  // - AuthProvider
+  // - LibraryProvider
+  // - StoryProvider
 }

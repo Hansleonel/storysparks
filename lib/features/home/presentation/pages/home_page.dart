@@ -2,32 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
-import 'package:storysparks/features/home/domain/usecases/get_user_name_usecase.dart';
-import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
 import '../providers/home_provider.dart';
 import 'package:storysparks/core/constants/genre_constants.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => HomeProvider(
-        getIt<GetUserNameUseCase>(),
-        getIt<AuthRepository>(),
-      ),
-      child: const _HomePageContent(),
-    );
-  }
-}
-
-class _HomePageContent extends StatelessWidget {
-  const _HomePageContent();
 
   @override
   Widget build(BuildContext context) {

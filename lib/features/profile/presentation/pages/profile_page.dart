@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/core/utils/cover_image_helper.dart';
 import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
+import 'package:storysparks/features/profile/presentation/providers/profile_provider.dart';
 import 'package:storysparks/features/profile/presentation/widgets/review_card.dart';
 import 'package:storysparks/features/story/domain/entities/story.dart';
 
@@ -17,131 +17,231 @@ class ProfilePage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.background,
         body: SafeArea(
-          child: NestedScrollView(
-            headerSliverBuilder: (context, innerBoxIsScrolled) {
-              return [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 24),
-                        // Profile Image
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.primary.withOpacity(0.1),
-                              width: 4,
-                            ),
-                          ),
-                          child: ClipOval(
-                            child: Image.network(
-                              'https://randomuser.me/api/portraits/women/2.jpg',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+          child: Consumer<ProfileProvider>(
+            builder: (context, provider, child) {
+              if (provider.isLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (provider.error != null) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Error al cargar el perfil',
+                        style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 16,
+                          color: AppColors.textSecondary,
                         ),
-                        const SizedBox(height: 16),
-                        // Name
-                        Text(
-                          'Ana García',
-                          style: TextStyle(
-                            fontFamily: 'Playfair',
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        // Username
-                        Text(
-                          '@anagarcia',
-                          style: TextStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 18,
-                            color: AppColors.accent,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        // Biography
-                        Text(
-                          'Amante de la literatura y escritora amateur. Me encanta crear historias que inspiren a otros.',
-                          style: TextStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 16,
-                            color: AppColors.textSecondary,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 8),
-                        // Instagram Link
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () => provider.refreshProfile(),
+                        child: const Text('Reintentar'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              final profile = provider.profile;
+              if (profile == null) {
+                return const Center(
+                  child: Text(
+                    'No se encontró el perfil',
+                    style: TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 16,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                );
+              }
+
+              return NestedScrollView(
+                headerSliverBuilder: (context, innerBoxIsScrolled) {
+                  return [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Column(
                           children: [
-                            SvgPicture.asset(
-                              'assets/icons/instagram_icon.svg',
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                AppColors.textSecondary,
-                                BlendMode.srcIn,
+                            const SizedBox(height: 24),
+                            // Profile Image
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: AppColors.primary.withOpacity(0.1),
+                                  width: 4,
+                                ),
+                              ),
+                              child: ClipOval(
+                                child: profile.avatarUrl != null
+                                    ? Image.network(
+                                        profile.avatarUrl!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Container(
+                                            color: AppColors.primary
+                                                .withOpacity(0.1),
+                                            child: Icon(
+                                              Icons.person,
+                                              size: 60,
+                                              color: AppColors.primary,
+                                            ),
+                                          );
+                                        },
+                                      )
+                                    : Container(
+                                        color:
+                                            AppColors.primary.withOpacity(0.1),
+                                        child: Icon(
+                                          Icons.person,
+                                          size: 60,
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(height: 16),
+                            // Name
                             Text(
-                              '@anagarcia.writes',
+                              provider.getDisplayName(),
+                              style: TextStyle(
+                                fontFamily: 'Playfair',
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            // Username
+                            Text(
+                              '@${profile.username}',
                               style: TextStyle(
                                 fontFamily: 'Urbanist',
-                                fontSize: 16,
-                                color: AppColors.textSecondary,
+                                fontSize: 18,
+                                color: AppColors.accent,
                               ),
                             ),
+                            if (profile.bio != null) ...[
+                              const SizedBox(height: 8),
+                              // Biography
+                              Text(
+                                profile.bio!,
+                                style: TextStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: 16,
+                                  color: AppColors.textSecondary,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                            const SizedBox(height: 24),
+                            // Stats Row
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _StatItem(
+                                  label: 'Historias',
+                                  value: '${profile.storiesGenerated}',
+                                ),
+                                _StatItem(
+                                  label: 'Seguidores',
+                                  value: '${profile.followersCount}',
+                                ),
+                                _StatItem(
+                                  label: 'Siguiendo',
+                                  value: '${profile.followingCount}',
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
                           ],
                         ),
-                        const SizedBox(height: 24),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverPersistentHeader(
-                  delegate: _SliverAppBarDelegate(
-                    TabBar(
-                      labelColor: AppColors.primary,
-                      unselectedLabelColor: AppColors.textSecondary,
-                      indicatorColor: AppColors.primary,
-                      labelStyle: const TextStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
                       ),
-                      unselectedLabelStyle: const TextStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      tabs: const [
-                        Tab(text: 'Historias'),
-                        Tab(text: 'Reviews'),
-                      ],
                     ),
-                  ),
-                  pinned: true,
+                    SliverPersistentHeader(
+                      delegate: _SliverAppBarDelegate(
+                        TabBar(
+                          labelColor: AppColors.primary,
+                          unselectedLabelColor: AppColors.textSecondary,
+                          indicatorColor: AppColors.primary,
+                          labelStyle: const TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          unselectedLabelStyle: const TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          tabs: const [
+                            Tab(text: 'Historias'),
+                            Tab(text: 'Reviews'),
+                          ],
+                        ),
+                      ),
+                      pinned: true,
+                    ),
+                  ];
+                },
+                body: TabBarView(
+                  children: [
+                    // Stories Tab
+                    _StoriesTab(),
+                    // Reviews Tab
+                    _ReviewsTab(),
+                  ],
                 ),
-              ];
+              );
             },
-            body: TabBarView(
-              children: [
-                // Stories Tab
-                _StoriesTab(),
-                // Reviews Tab
-                _ReviewsTab(),
-              ],
-            ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _StatItem({
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontFamily: 'Urbanist',
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Urbanist',
+            fontSize: 14,
+            color: AppColors.textSecondary,
+          ),
+        ),
+      ],
     );
   }
 }

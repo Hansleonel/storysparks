@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/features/home/presentation/pages/home_page.dart';
+import 'package:storysparks/features/home/presentation/providers/home_provider.dart';
 import 'package:storysparks/features/library/presentation/pages/library_page.dart';
 import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
 import 'package:storysparks/features/profile/presentation/pages/profile_page.dart';
+import 'package:storysparks/features/profile/presentation/providers/profile_provider.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -22,9 +25,15 @@ class _MainNavigationState extends State<MainNavigation> {
   void initState() {
     super.initState();
     _screens = [
-      const HomePage(),
+      ChangeNotifierProvider(
+        create: (_) => getIt<HomeProvider>(),
+        child: const HomePage(),
+      ),
       const LibraryPage(),
-      const ProfilePage(),
+      ChangeNotifierProvider(
+        create: (_) => getIt<ProfileProvider>(),
+        child: const ProfilePage(),
+      ),
     ];
   }
 
