@@ -91,4 +91,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<void> logout() async {
+    await _remoteDataSource.logout();
+  }
 }

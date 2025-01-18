@@ -6,6 +6,18 @@
             }
         }
     },
+    "accountSettings": "Account",
+    "personalInformation": "Personal Information",
+    "security": "Security",
+    "privacy": "Privacy",
+    "preferences": "Preferences",
+    "notifications": "Notifications",
+    "language": "Language",
+    "theme": "Theme",
+    "help": "Help",
+    "helpCenter": "Help Center",
+    "about": "About",
+    "searchSettings": "Search settings",
     "alreadyHaveAccount": "Already have an account?",
     "authError": "Authentication error",
     "bio": "Bio",

@@ -19,4 +19,5 @@ abstract class AuthRepository {
     String? fullName,
     String? bio,
   });
+  Future<void> logout();
 }

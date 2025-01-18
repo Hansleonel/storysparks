@@ -18,6 +18,8 @@ import 'package:storysparks/features/story/domain/repositories/story_repository.
 import 'package:storysparks/features/story/domain/usecases/delete_story_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/update_story_rating_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:storysparks/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:storysparks/features/profile/presentation/providers/settings_provider.dart';
 
 final getIt = GetIt.instance;
 
@@ -59,6 +61,7 @@ void setupServiceLocator() {
   getIt
       .registerLazySingleton(() => GetUserNameUseCase(getIt<AuthRepository>()));
   getIt.registerLazySingleton(() => GetProfileUseCase(getIt<AuthRepository>()));
+  getIt.registerLazySingleton(() => LogoutUseCase(getIt<AuthRepository>()));
 
   // Story
   getIt.registerLazySingleton(
@@ -78,6 +81,7 @@ void setupServiceLocator() {
       getIt<AuthRepository>(),
     ),
   );
+  getIt.registerFactory(() => SettingsProvider(getIt()));
 
   // Nota: Los providers globales están en main.dart ℹ️
   // - AuthProvider

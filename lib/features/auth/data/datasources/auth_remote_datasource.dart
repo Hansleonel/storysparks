@@ -16,6 +16,7 @@ abstract class AuthRemoteDataSource {
     String? fullName,
     String? bio,
   });
+  Future<void> logout();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -478,6 +479,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return username;
     } catch (error) {
       throw Exception('Error generating unique username: $error');
+    }
+  }
+
+  @override
+  Future<void> logout() async {
+    try {
+      await supabaseClient.auth.signOut();
+    } catch (e) {
+      throw Exception('Error during logout: $e');
     }
   }
 }

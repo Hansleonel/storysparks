@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/core/utils/cover_image_helper.dart';
 import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
@@ -69,6 +70,21 @@ class ProfilePage extends StatelessWidget {
                         child: Column(
                           children: [
                             const SizedBox(height: 24),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.settings_outlined,
+                                    color: AppColors.textPrimary,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                        context, AppRoutes.settingsProfile);
+                                  },
+                                ),
+                              ],
+                            ),
                             // Profile Image
                             Container(
                               width: 120,
