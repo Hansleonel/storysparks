@@ -37,19 +37,15 @@ void setupServiceLocator() {
   // Data Layer (Singleton ✅)
   // Auth
   getIt.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(getIt<SupabaseClient>()),
-  );
+      () => AuthRemoteDataSourceImpl(getIt<SupabaseClient>()));
   getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(getIt<AuthRemoteDataSource>()),
-  );
+      () => AuthRepositoryImpl(getIt<AuthRemoteDataSource>()));
 
   // Story
   getIt.registerLazySingleton<StoryLocalDatasource>(
-    () => StoryLocalDatasource(),
-  );
+      () => StoryLocalDatasource());
   getIt.registerLazySingleton<StoryRepository>(
-    () => StoryRepositoryImpl(getIt<StoryLocalDatasource>()),
-  );
+      () => StoryRepositoryImpl(getIt<StoryLocalDatasource>()));
 
   // Domain Layer - Use Cases (Singleton ✅)
   // Auth
@@ -65,22 +61,16 @@ void setupServiceLocator() {
 
   // Story
   getIt.registerLazySingleton(
-    () => UpdateStoryRatingUseCase(getIt<StoryRepository>()),
-  );
+      () => UpdateStoryRatingUseCase(getIt<StoryRepository>()));
   getIt.registerLazySingleton(
-    () => DeleteStoryUseCase(getIt<StoryRepository>()),
-  );
+      () => DeleteStoryUseCase(getIt<StoryRepository>()));
 
   // Presentation Layer - Page Providers (Factory ✅)
-  getIt.registerFactory(
-    () => ProfileProvider(getIt<GetProfileUseCase>()),
-  );
-  getIt.registerFactory(
-    () => HomeProvider(
-      getIt<GetUserNameUseCase>(),
-      getIt<AuthRepository>(),
-    ),
-  );
+  getIt.registerFactory(() => ProfileProvider(getIt<GetProfileUseCase>()));
+  getIt.registerFactory(() => HomeProvider(
+        getIt<GetUserNameUseCase>(),
+        getIt<AuthRepository>(),
+      ));
   getIt.registerFactory(() => SettingsProvider(getIt()));
 
   // Nota: Los providers globales están en main.dart ℹ️
