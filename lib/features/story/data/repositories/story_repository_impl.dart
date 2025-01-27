@@ -7,10 +7,11 @@ import '../datasources/story_local_datasource.dart';
 class StoryRepositoryImpl implements StoryRepository {
   final StoryLocalDatasource _localDatasource;
   final GenerativeModel _model;
+  final Map<int, ChatSession> _storyChatSessions = {};
 
   StoryRepositoryImpl(this._localDatasource)
       : _model = GenerativeModel(
-          model: 'gemini-1.5-flash',
+          model: 'gemini-1.5-pro',
           apiKey: dotenv.env['GEMINI_API_KEY'] ?? '',
         );
 
@@ -45,6 +46,83 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
     } catch (e) {
       throw Exception('Error al generar la historia: $e');
     }
+  }
+
+  @override
+  Future<String> continueStory({
+    required int storyId,
+    required String continuationPrompt,
+  }) async {
+    try {
+      // Obtener la historia original
+      final story = await _localDatasource.getStoryById(storyId);
+      if (story == null) {
+        throw Exception('Historia no encontrada');
+      }
+
+      // Verificar si ya existe una sesión
+      ChatSession chatSession;
+      bool isNewSession = false;
+
+      if (_storyChatSessions.containsKey(storyId)) {
+        chatSession = _storyChatSessions[storyId]!;
+      } else {
+        chatSession = _model.startChat();
+        _storyChatSessions[storyId] = chatSession;
+        isNewSession = true;
+      }
+
+      // Si es una nueva sesión, inicializamos el contexto
+      if (isNewSession) {
+        final initialContext = '''
+Esta es una historia existente que necesita ser continuada. Actúa como si fueras el autor original.
+La historia hasta ahora es:
+
+${story.content}
+
+Instrucciones para continuar la historia:
+1. Mantén el mismo estilo narrativo y tono emocional y debe de tener al menos 6 parrafos grandes
+2. El género es ${story.genre}
+3. Mantén la coherencia con la trama y personajes existentes
+4. Usa el mismo ambiente y escenario
+5. Si hay diálogos, mantén la personalidad de cada personaje
+6. Si mencionan nuevos personajes, relaciónalos con la historia existente
+7. Añade detalles que enriquezcan la narrativa
+8. Termina de una manera que invite a seguir leyendo
+
+Ahora, cuando te pida continuar la historia, responde solo con la continuación directa, como si fuera el siguiente párrafo natural.
+''';
+        await chatSession.sendMessage(Content.text(initialContext));
+      }
+
+      // Enviar el prompt de continuación
+      final response = await chatSession.sendMessage(
+        Content.text(
+            "Continúa la historia con este contexto adicional: $continuationPrompt"),
+      );
+
+      if (response.text == null) {
+        throw Exception('No se pudo generar la continuación');
+      }
+
+      // Actualizar la historia en la base de datos
+      final updatedContent = '${story.content}\n\n${response.text}';
+      await _localDatasource.updateStoryContent(storyId, updatedContent);
+
+      return response.text!;
+    } catch (e) {
+      throw Exception('Error al continuar la historia: $e');
+    }
+  }
+
+  @override
+  Future<Story?> getStoryById(int storyId) async {
+    return await _localDatasource.getStoryById(storyId);
+  }
+
+  // Método para limpiar la sesión si es necesario
+  void clearStorySession(int storyId) {
+    _storyChatSessions.remove(storyId);
   }
 
   @override

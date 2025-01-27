@@ -108,5 +108,8 @@
     "usernameUnavailable": "Nombre de usuario no disponible",
     "viewAll": "Ver todas",
     "welcomeBack": "¡Bienvenido de nuevo! 👋",
-    "yourStory": "Tu Historia"
+    "yourStory": "Tu Historia",
+    "continueStory": "Continuar la historia",
+    "continueStoryHint": "¿Qué te gustaría que pasara después?",
+    "continueStoryMore": "Continuar la historia"
 }

@@ -13,4 +13,9 @@ abstract class StoryRepository {
   Future<void> incrementReadCount(int storyId);
   Future<List<Story>> getPopularStories(String userId);
   Future<List<Story>> getRecentStories(String userId);
+  Future<Story?> getStoryById(int storyId);
+  Future<String> continueStory({
+    required int storyId,
+    required String continuationPrompt,
+  });
 }

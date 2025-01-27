@@ -64,6 +64,7 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
         updateRatingUseCase: getIt(),
         deleteStoryUseCase: getIt(),
         repository: getIt(),
+        continueStoryUseCase: getIt(),
       )..setStory(widget.story, isFromLibrary: widget.isFromLibrary),
       child: Builder(
         builder: (context) {
@@ -416,6 +417,11 @@ class _StoryContent extends StatefulWidget {
 class _StoryContentState extends State<_StoryContent> {
   bool _hasScrolled = false;
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void _handleExpand(bool isExpanded) {
     if (isExpanded && !_hasScrolled) {
       _hasScrolled = true;
@@ -427,22 +433,9 @@ class _StoryContentState extends State<_StoryContent> {
           final box = context.findRenderObject() as RenderBox;
           final offset = box.localToGlobal(Offset.zero);
 
-          // Calculamos la posición actual del scroll
-          final currentOffset = widget.scrollController.offset;
-          // Calculamos la posición objetivo teniendo en cuenta el padding y la altura de la pantalla
-          final targetOffset =
-              offset.dy - MediaQuery.of(context).size.height * 0.3;
-          // Calculamos la distancia total del scroll
-          final scrollDistance = (targetOffset - currentOffset).abs();
-
-          // Ajustamos la duración basada en la distancia para que sea más natural
-          final duration = Duration(
-            milliseconds: (scrollDistance * 0.5).clamp(800, 1200).toInt(),
-          );
-
           widget.scrollController.animateTo(
-            targetOffset,
-            duration: duration,
+            offset.dy - MediaQuery.of(context).size.height * 0.3,
+            duration: const Duration(milliseconds: 800),
             curve: Curves.easeInOutCubic,
           );
         }
@@ -456,9 +449,14 @@ class _StoryContentState extends State<_StoryContent> {
     final story = context.select((StoryProvider p) => p.story!);
     final isMemoryExpanded =
         context.select((StoryProvider p) => p.isMemoryExpanded);
+    final isLoading = context.select((StoryProvider p) => p.isLoading);
 
     // Solo ejecutamos el scroll cuando cambia isExpanded a true
     _handleExpand(isExpanded);
+
+    // Separar el contenido en partes si existe una continuación
+    final parts = story.content.split('\n\n');
+    final bool hasContinuation = parts.length > 1;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -482,7 +480,6 @@ class _StoryContentState extends State<_StoryContent> {
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
                   ),
-                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 GestureDetector(
@@ -509,29 +506,14 @@ class _StoryContentState extends State<_StoryContent> {
                       if (story.memory.length > 50)
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
-                          child: AnimatedCrossFade(
-                            firstChild: Text(
-                              AppLocalizations.of(context)!.seeMore,
-                              style: const TextStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 14,
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          child: Text(
+                            isMemoryExpanded ? 'Ver menos' : 'Ver más',
+                            style: const TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 14,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
                             ),
-                            secondChild: Text(
-                              AppLocalizations.of(context)!.seeLess,
-                              style: const TextStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 14,
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            crossFadeState: isMemoryExpanded
-                                ? CrossFadeState.showSecond
-                                : CrossFadeState.showFirst,
-                            duration: const Duration(milliseconds: 200),
                           ),
                         ),
                     ],
@@ -614,16 +596,77 @@ class _StoryContentState extends State<_StoryContent> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border),
               ),
-              child: Text(
-                story.content,
-                style: const TextStyle(
-                  fontFamily: 'Urbanist',
-                  fontSize: 16,
-                  height: 1.6,
-                  color: AppColors.textPrimary,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Historia original
+                  Text(
+                    parts[0],
+                    style: const TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 16,
+                      height: 1.6,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  // Continuaciones de la historia
+                  if (hasContinuation) ...[
+                    for (int i = 1; i < parts.length; i++) ...[
+                      const SizedBox(height: 16),
+                      Text(
+                        parts[i],
+                        style: const TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 16,
+                          height: 1.6,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ],
+                ],
               ),
             ),
+            if (story.id != null && !isLoading) ...[
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    context.read<StoryProvider>().continueStory(
+                          storyId: story.id!,
+                          continuationPrompt: '',
+                        );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.accent,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  icon: const Icon(Icons.edit_note, color: AppColors.white),
+                  label: Text(
+                    hasContinuation
+                        ? AppLocalizations.of(context)!.continueStoryMore
+                        : AppLocalizations.of(context)!.continueStory,
+                    style: const TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            if (isLoading)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
           ],
         ],
       ),

@@ -108,5 +108,8 @@
     "usernameUnavailable": "Username is not available",
     "viewAll": "View all",
     "welcomeBack": "Welcome back 👋",
-    "yourStory": "Your Story"
+    "yourStory": "Your Story",
+    "continueStory": "Continue the story",
+    "continueStoryHint": "What would you like to happen next?",
+    "continueStoryMore": "Continue the story"
 }

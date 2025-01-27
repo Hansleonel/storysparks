@@ -156,4 +156,36 @@ class StoryLocalDatasource {
       );
     });
   }
+
+  Future<Story?> getStoryById(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+
+    if (maps.isEmpty) return null;
+    return Story(
+      id: maps.first['id'],
+      content: maps.first['content'],
+      genre: maps.first['genre'],
+      memory: maps.first['memory'],
+      createdAt: DateTime.parse(maps.first['createdAt']),
+      readCount: maps.first['readCount'] ?? 0,
+      rating: maps.first['rating'] ?? 0.0,
+      userId: maps.first['userId'],
+    );
+  }
+
+  Future<void> updateStoryContent(int id, String newContent) async {
+    final db = await database;
+    await db.update(
+      tableName,
+      {'content': newContent},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }
