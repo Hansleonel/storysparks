@@ -107,6 +107,9 @@
     "usernameTooShort": "Username must be at least 3 characters",
     "usernameUnavailable": "Username is not available",
     "viewAll": "View all",
-    "welcomeBack": "Welcome back 👋",
-    "yourStory": "Your Story"
+    "welcomeBack": "Welcome back! 👋",
+    "yourStory": "Your Story",
+    "continueStory": "Continue story",
+    "storyContinueError": "Could not continue the story",
+    "continuingStory": "Continuing story..."
 }

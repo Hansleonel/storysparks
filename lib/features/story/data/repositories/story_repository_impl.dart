@@ -3,6 +3,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import '../../domain/entities/story.dart';
 import '../../domain/repositories/story_repository.dart';
 import '../datasources/story_local_datasource.dart';
+import 'package:flutter/foundation.dart';
 
 class StoryRepositoryImpl implements StoryRepository {
   final StoryLocalDatasource _localDatasource;
@@ -49,7 +50,15 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
 
   @override
   Future<int> saveStory(Story story) async {
-    return await _localDatasource.saveStory(story);
+    debugPrint('💾 Repository: Guardando historia en base de datos local...');
+    try {
+      final id = await _localDatasource.saveStory(story);
+      debugPrint('✅ Repository: Historia guardada con ID: $id');
+      return id;
+    } catch (e) {
+      debugPrint('❌ Repository: Error al guardar la historia: $e');
+      throw Exception('Error al guardar la historia: $e');
+    }
   }
 
   @override
@@ -80,5 +89,61 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
   @override
   Future<List<Story>> getRecentStories(String userId) async {
     return await _localDatasource.getRecentStories(userId);
+  }
+
+  @override
+  Future<Story> continueStory({
+    required Story previousStory,
+    required String userId,
+  }) async {
+    try {
+      final prompt = '''
+        Continúa esta historia manteniendo el mismo género (${previousStory.genre}) y estilo narrativo:
+        Historia anterior: "${previousStory.content}"
+        La continuación debe ser coherente y mantener el mismo tono emocional. puedes agregar detalles o eventos que sucedieron en el pasado, ademas de conversaciones que sucedieron entre los personajes.
+      ''';
+
+      final content = [Content.text(prompt)];
+      final response = await _model.generateContent(content);
+
+      if (response.text == null) {
+        throw Exception('No se pudo generar la continuación de la historia');
+      }
+
+      return Story(
+        content: response.text!,
+        genre: previousStory.genre,
+        memory: previousStory.memory,
+        userId: userId,
+        createdAt: DateTime.now(),
+      );
+    } catch (e) {
+      throw Exception('Error al continuar la historia: $e');
+    }
+  }
+
+  @override
+  Future<void> updateStory(Story story) async {
+    if (story.id == null) {
+      debugPrint('❌ Repository: Intento de actualizar historia sin ID');
+      throw Exception('No se puede actualizar una historia sin ID');
+    }
+    debugPrint('📝 Repository: Actualizando historia ID: ${story.id}');
+    try {
+      await _localDatasource.updateStory(story);
+      debugPrint('✅ Repository: Historia actualizada exitosamente');
+    } catch (e) {
+      debugPrint('❌ Repository: Error al actualizar la historia: $e');
+      throw Exception('Error al actualizar la historia: $e');
+    }
+  }
+
+  @override
+  Future<Story> getStoryById(int storyId) async {
+    try {
+      return await _localDatasource.getStoryById(storyId);
+    } catch (e) {
+      throw Exception('Error al obtener la historia: $e');
+    }
   }
 }

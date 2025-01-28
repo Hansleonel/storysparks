@@ -28,14 +28,50 @@ class GeneratedStoryPage extends StatefulWidget {
   State<GeneratedStoryPage> createState() => _GeneratedStoryPageState();
 }
 
-class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
+class _GeneratedStoryPageState extends State<GeneratedStoryPage>
+    with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _storyKey = GlobalKey();
-  bool _hasIncrementedReadCount = false;
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  bool _isAtBottom = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.1,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
+
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    final delta = 50.0; // margen de error para considerar que está al final
+
+    setState(() {
+      _isAtBottom = (maxScroll - currentScroll) <= delta;
+    });
+  }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -64,6 +100,9 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
         updateRatingUseCase: getIt(),
         deleteStoryUseCase: getIt(),
         repository: getIt(),
+        continueStoryUseCase: getIt(),
+        authRepository: getIt(),
+        onStoryStateChanged: widget.onStoryStateChanged,
       )..setStory(widget.story, isFromLibrary: widget.isFromLibrary),
       child: Builder(
         builder: (context) {
@@ -285,15 +324,10 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                                     widget.onStoryStateChanged),
                             const SizedBox(height: 16),
                             _StoryContent(
+                              story: widget.story,
                               storyKey: _storyKey,
                               scrollController: _scrollController,
-                              onStartReading: () async {
-                                if (!_hasIncrementedReadCount &&
-                                    widget.onIncrementReadCount != null) {
-                                  _hasIncrementedReadCount = true;
-                                  widget.onIncrementReadCount!();
-                                }
-                              },
+                              onIncrementReadCount: widget.onIncrementReadCount,
                             ),
                           ],
                         ),
@@ -303,6 +337,49 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                 ),
               ),
             ),
+            floatingActionButton: _isAtBottom && provider.isExpanded
+                ? ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: FloatingActionButton.extended(
+                      backgroundColor: AppColors.primary,
+                      onPressed: provider.isContinuing
+                          ? null
+                          : () async {
+                              try {
+                                await provider.continueStory();
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      AppLocalizations.of(context)!
+                                          .storyContinueError,
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                      icon: provider.isContinuing
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Icon(Icons.auto_stories, color: Colors.white),
+                      label: Text(
+                        AppLocalizations.of(context)!.continueStory,
+                        style: const TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  )
+                : null,
           );
         },
       ),
@@ -399,14 +476,16 @@ class _StoryDetails extends StatelessWidget {
 }
 
 class _StoryContent extends StatefulWidget {
+  final Story story;
   final GlobalKey storyKey;
-  final VoidCallback onStartReading;
   final ScrollController scrollController;
+  final VoidCallback? onIncrementReadCount;
 
   const _StoryContent({
+    required this.story,
     required this.storyKey,
-    required this.onStartReading,
     required this.scrollController,
+    this.onIncrementReadCount,
   });
 
   @override
@@ -415,11 +494,15 @@ class _StoryContent extends StatefulWidget {
 
 class _StoryContentState extends State<_StoryContent> {
   bool _hasScrolled = false;
+  bool _hasIncrementedReadCount = false;
 
   void _handleExpand(bool isExpanded) {
     if (isExpanded && !_hasScrolled) {
       _hasScrolled = true;
-      widget.onStartReading();
+      if (!_hasIncrementedReadCount && widget.onIncrementReadCount != null) {
+        _hasIncrementedReadCount = true;
+        widget.onIncrementReadCount!();
+      }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         if (widget.storyKey.currentContext != null) {
@@ -452,12 +535,12 @@ class _StoryContentState extends State<_StoryContent> {
 
   @override
   Widget build(BuildContext context) {
-    final isExpanded = context.select((StoryProvider p) => p.isExpanded);
-    final story = context.select((StoryProvider p) => p.story!);
-    final isMemoryExpanded =
-        context.select((StoryProvider p) => p.isMemoryExpanded);
+    final provider = context.watch<StoryProvider>();
+    final hasContinuation = provider.hasContinuation;
+    final continuedContent = provider.continuedContent;
+    final isExpanded = provider.isExpanded;
+    final isMemoryExpanded = provider.isMemoryExpanded;
 
-    // Solo ejecutamos el scroll cuando cambia isExpanded a true
     _handleExpand(isExpanded);
 
     return Padding(
@@ -482,12 +565,10 @@ class _StoryContentState extends State<_StoryContent> {
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
                   ),
-                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 GestureDetector(
-                  onTap: () =>
-                      context.read<StoryProvider>().toggleMemoryExpanded(),
+                  onTap: () => provider.toggleMemoryExpanded(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -495,7 +576,7 @@ class _StoryContentState extends State<_StoryContent> {
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
                         child: Text(
-                          story.memory,
+                          widget.story.memory,
                           style: const TextStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 16,
@@ -506,32 +587,19 @@ class _StoryContentState extends State<_StoryContent> {
                               isMemoryExpanded ? null : TextOverflow.ellipsis,
                         ),
                       ),
-                      if (story.memory.length > 50)
+                      if (widget.story.memory.length > 50)
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
-                          child: AnimatedCrossFade(
-                            firstChild: Text(
-                              AppLocalizations.of(context)!.seeMore,
-                              style: const TextStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 14,
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
+                          child: Text(
+                            isMemoryExpanded
+                                ? AppLocalizations.of(context)!.seeLess
+                                : AppLocalizations.of(context)!.seeMore,
+                            style: const TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 14,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
                             ),
-                            secondChild: Text(
-                              AppLocalizations.of(context)!.seeLess,
-                              style: const TextStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 14,
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            crossFadeState: isMemoryExpanded
-                                ? CrossFadeState.showSecond
-                                : CrossFadeState.showFirst,
-                            duration: const Duration(milliseconds: 200),
                           ),
                         ),
                     ],
@@ -545,7 +613,7 @@ class _StoryContentState extends State<_StoryContent> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () => context.read<StoryProvider>().toggleExpanded(),
+                onPressed: () => provider.toggleExpanded(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -614,14 +682,34 @@ class _StoryContentState extends State<_StoryContent> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border),
               ),
-              child: Text(
-                story.content,
-                style: const TextStyle(
-                  fontFamily: 'Urbanist',
-                  fontSize: 16,
-                  height: 1.6,
-                  color: AppColors.textPrimary,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.story.content,
+                    style: const TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 16,
+                      height: 1.6,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  if (hasContinuation && continuedContent != null) ...[
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Divider(color: AppColors.border),
+                    ),
+                    Text(
+                      continuedContent,
+                      style: const TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 16,
+                        height: 1.6,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ],

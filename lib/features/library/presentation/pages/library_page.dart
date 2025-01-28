@@ -203,8 +203,11 @@ class _PopularStoriesSection extends StatelessWidget {
                                   await provider.incrementReadCount(story.id!);
                                 }
                               },
-                              'onStoryStateChanged': () {
-                                provider.loadStories();
+                              'onStoryStateChanged': () async {
+                                if (story.id != null) {
+                                  await provider.refreshStory(story.id!);
+                                }
+                                await provider.loadStories();
                               },
                             },
                           );
@@ -288,8 +291,11 @@ class _NewStoriesSection extends StatelessWidget {
                                   await provider.incrementReadCount(story.id!);
                                 }
                               },
-                              'onStoryStateChanged': () {
-                                provider.loadStories();
+                              'onStoryStateChanged': () async {
+                                if (story.id != null) {
+                                  await provider.refreshStory(story.id!);
+                                }
+                                await provider.loadStories();
                               },
                             },
                           );
@@ -492,8 +498,8 @@ class _TimelineCard extends StatelessWidget {
     final imageWidth = size.width * 0.25; // 25% del ancho de la pantalla
 
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(
+      onTap: () async {
+        await Navigator.pushNamed(
           context,
           AppRoutes.generatedStory,
           arguments: {
@@ -504,11 +510,18 @@ class _TimelineCard extends StatelessWidget {
                 await provider.incrementReadCount(story.id!);
               }
             },
-            'onStoryStateChanged': () {
-              provider.loadStories();
+            'onStoryStateChanged': () async {
+              if (story.id != null) {
+                await provider.refreshStory(story.id!);
+              }
+              await provider.loadStories();
             },
           },
         );
+        if (story.id != null) {
+          await provider.refreshStory(story.id!);
+        }
+        await provider.loadStories();
       },
       child: Container(
         constraints: BoxConstraints(

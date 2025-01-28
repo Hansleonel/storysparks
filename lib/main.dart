@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:storysparks/features/profile/presentation/providers/story_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
@@ -14,8 +15,8 @@ import 'package:storysparks/features/auth/domain/usecases/sign_out_usecase.dart'
 import 'package:storysparks/features/auth/presentation/pages/login_page.dart';
 import 'package:storysparks/features/auth/presentation/providers/auth_provider.dart';
 import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
-import 'package:storysparks/features/profile/domain/repositories/story_repository.dart';
-import 'package:storysparks/features/profile/presentation/providers/story_provider.dart';
+import 'package:storysparks/features/story/domain/repositories/story_repository.dart';
+import 'package:storysparks/features/profile/domain/usecases/get_user_stories_usecase.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -27,6 +28,10 @@ void main() async {
   );
 
   setupServiceLocator();
+
+  // Solo durante desarrollo si es necesario
+  // final datasource = StoryLocalDatasource();
+  // await datasource.deleteDatabase();
 
   runApp(
     MultiProvider(
@@ -40,10 +45,16 @@ void main() async {
           ),
         ),
         ChangeNotifierProvider(
-          create: (_) => LibraryProvider(getIt<AuthRepository>()),
+          create: (_) => LibraryProvider(
+            getIt<AuthRepository>(),
+            getIt<StoryRepository>(),
+          ),
         ),
         ChangeNotifierProvider(
-          create: (_) => StoryProvider(getIt<StoryRepository>()),
+          create: (_) => StoryProvider(
+            getIt<GetUserStoriesUseCase>(),
+            getIt<AuthRepository>(),
+          ),
         ),
       ],
       child: const MyApp(),
