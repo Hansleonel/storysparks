@@ -11,7 +11,7 @@ class StoryProvider extends ChangeNotifier {
 
   bool _isExpanded = false;
   bool _isMemoryExpanded = false;
-  double _rating = 4.0;
+  double _rating = 5.0;
   Story? _story;
   bool _isSaving = false;
   bool _isSaved = false;
