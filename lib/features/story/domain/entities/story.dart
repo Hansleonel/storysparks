@@ -7,6 +7,8 @@ class Story {
   final int readCount;
   final double rating;
   final String userId;
+  final String title;
+  final String imageUrl;
 
   Story({
     this.id,
@@ -17,6 +19,8 @@ class Story {
     this.readCount = 0,
     this.rating = 0.0,
     required this.userId,
+    required this.title,
+    required this.imageUrl,
   });
 
   Story copyWith({
@@ -28,6 +32,8 @@ class Story {
     int? readCount,
     double? rating,
     String? userId,
+    String? title,
+    String? imageUrl,
   }) {
     return Story(
       id: id ?? this.id,
@@ -38,6 +44,8 @@ class Story {
       readCount: readCount ?? this.readCount,
       rating: rating ?? this.rating,
       userId: userId ?? this.userId,
+      title: title ?? this.title,
+      imageUrl: imageUrl ?? this.imageUrl,
     );
   }
 }

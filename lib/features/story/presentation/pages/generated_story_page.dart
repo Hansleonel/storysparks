@@ -63,7 +63,7 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
       create: (_) => StoryProvider(
         updateRatingUseCase: getIt(),
         deleteStoryUseCase: getIt(),
-        repository: getIt(),
+        saveStoryUseCase: getIt(),
       )..setStory(widget.story, isFromLibrary: widget.isFromLibrary),
       child: Builder(
         builder: (context) {
@@ -127,16 +127,24 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                   },
                 ),
                 IconButton(
-                  icon: Icon(
-                    provider.isSaving
-                        ? Icons.sync
-                        : (provider.isSaved
-                            ? Icons.bookmark
-                            : Icons.bookmark_outline),
-                    color: provider.isSaved
-                        ? AppColors.primary
-                        : AppColors.textPrimary,
-                  ),
+                  icon: provider.isSaving
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.primary),
+                          ),
+                        )
+                      : Icon(
+                          provider.isSaved
+                              ? Icons.bookmark
+                              : Icons.bookmark_outline,
+                          color: provider.isSaved
+                              ? AppColors.primary
+                              : AppColors.textPrimary,
+                        ),
                   onPressed: provider.isSaving
                       ? null
                       : () async {

@@ -14,8 +14,10 @@ import 'package:storysparks/features/auth/domain/usecases/sign_out_usecase.dart'
 import 'package:storysparks/features/auth/presentation/pages/login_page.dart';
 import 'package:storysparks/features/auth/presentation/providers/auth_provider.dart';
 import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
-import 'package:storysparks/features/profile/domain/repositories/story_repository.dart';
-import 'package:storysparks/features/profile/presentation/providers/story_provider.dart';
+import 'package:storysparks/features/story/domain/usecases/delete_story_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/save_story_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/update_story_rating_usecase.dart';
+import 'package:storysparks/features/story/presentation/providers/story_provider.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -43,7 +45,11 @@ void main() async {
           create: (_) => LibraryProvider(getIt<AuthRepository>()),
         ),
         ChangeNotifierProvider(
-          create: (_) => StoryProvider(getIt<StoryRepository>()),
+          create: (_) => StoryProvider(
+            updateRatingUseCase: getIt<UpdateStoryRatingUseCase>(),
+            deleteStoryUseCase: getIt<DeleteStoryUseCase>(),
+            saveStoryUseCase: getIt<SaveStoryUseCase>(),
+          ),
         ),
       ],
       child: const MyApp(),

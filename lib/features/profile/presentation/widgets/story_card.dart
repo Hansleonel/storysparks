@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:storysparks/features/profile/domain/entities/story.dart';
+import 'package:storysparks/features/story/domain/entities/story.dart';
 
 class StoryCard extends StatelessWidget {
   final Story story;

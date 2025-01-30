@@ -16,6 +16,9 @@ import 'package:storysparks/features/story/data/datasources/story_local_datasour
 import 'package:storysparks/features/story/data/repositories/story_repository_impl.dart';
 import 'package:storysparks/features/story/domain/repositories/story_repository.dart';
 import 'package:storysparks/features/story/domain/usecases/delete_story_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/generate_story_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/get_user_stories_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/save_story_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/update_story_rating_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storysparks/features/auth/domain/usecases/logout_usecase.dart';
@@ -64,12 +67,21 @@ void setupServiceLocator() {
       () => UpdateStoryRatingUseCase(getIt<StoryRepository>()));
   getIt.registerLazySingleton(
       () => DeleteStoryUseCase(getIt<StoryRepository>()));
+  getIt.registerLazySingleton(() => SaveStoryUseCase(getIt<StoryRepository>()));
+  getIt.registerLazySingleton(
+      () => GetUserStoriesUseCase(getIt<StoryRepository>()));
+  getIt.registerLazySingleton(
+      () => GenerateStoryUseCase(getIt<StoryRepository>()));
 
   // Presentation Layer - Page Providers (Factory ✅)
-  getIt.registerFactory(() => ProfileProvider(getIt<GetProfileUseCase>()));
+  getIt.registerFactory(() => ProfileProvider(
+        getProfileUseCase: getIt<GetProfileUseCase>(),
+        getUserStoriesUseCase: getIt<GetUserStoriesUseCase>(),
+      ));
   getIt.registerFactory(() => HomeProvider(
         getIt<GetUserNameUseCase>(),
         getIt<AuthRepository>(),
+        getIt<GenerateStoryUseCase>(),
       ));
   getIt.registerFactory(() => SettingsProvider(getIt()));
 
