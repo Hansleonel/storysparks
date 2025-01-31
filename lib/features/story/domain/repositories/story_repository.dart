@@ -6,6 +6,9 @@ abstract class StoryRepository {
     required String genre,
     required String userId,
   });
+
+  Future<Story> continueStory(Story story);
+
   Future<int> saveStory(Story story);
   Future<List<Story>> getSavedStories(String userId);
   Future<void> updateRating(int storyId, double rating);

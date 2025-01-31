@@ -5,16 +5,21 @@ import 'package:storysparks/core/utils/cover_image_helper.dart';
 import '../../domain/entities/story.dart';
 import '../../domain/repositories/story_repository.dart';
 import '../datasources/story_local_datasource.dart';
+import '../managers/chat_session_manager.dart';
 
 class StoryRepositoryImpl implements StoryRepository {
   final StoryLocalDatasource _localDatasource;
   final GenerativeModel _model;
+  // TODO this line is used to create the session manager, need to check if it's working
+  late final ChatSessionManager _sessionManager;
 
   StoryRepositoryImpl(this._localDatasource)
       : _model = GenerativeModel(
-          model: 'gemini-1.5-pro',
+          model: 'gemini-1.5-flash',
           apiKey: dotenv.env['GEMINI_API_KEY'] ?? '',
         ) {
+    // TODO this line is used to create the session manager, need to check if it's working
+    _sessionManager = ChatSessionManager(_model);
     debugPrint('🗄️ StoryRepository: Inicializado con modelo gemini-1.5-flash');
   }
 
@@ -72,26 +77,64 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
     } catch (e) {
       debugPrint('❌ StoryRepository: Error durante la generación');
       debugPrint('   Error detallado: $e');
+      _handleError(e);
+      rethrow;
+    }
+  }
 
-      final errorMessage = e.toString().toLowerCase();
+  // TODO this method is used to continue the story, need to check if it's working
+  @override
+  Future<Story> continueStory(Story story) async {
+    debugPrint('🗄️ StoryRepository: Iniciando continuación de historia');
 
-      // Manejar errores específicos basados en el mensaje
-      if (errorMessage.contains('429') ||
-          errorMessage.contains('too many requests')) {
-        debugPrint('❌ StoryRepository: Detectado límite de solicitudes (429)');
-        throw Exception(
-            'Has excedido el límite de solicitudes. Por favor, espera unos minutos antes de intentar de nuevo.');
+    if (story.id == null) {
+      throw Exception('No se puede continuar una historia sin ID');
+    }
+
+    try {
+      final chatSession =
+          _sessionManager.getOrCreateSession(story.id.toString(), story);
+
+      const prompt = 'Continúa la narración de forma natural y coherente.';
+
+      debugPrint('🤖 StoryRepository: Solicitando continuación...');
+      final response = await chatSession.sendMessage(Content.text(prompt));
+
+      if (response.text == null) {
+        throw Exception('No se pudo continuar la historia');
       }
 
-      if (errorMessage.contains('model is overloaded') ||
-          errorMessage.contains('model is currently overloaded')) {
-        debugPrint('❌ StoryRepository: Detectada sobrecarga del modelo');
-        throw Exception(
-            'El modelo está temporalmente sobrecargado. Por favor, intenta de nuevo en unos momentos.');
+      debugPrint('✅ StoryRepository: Continuación generada exitosamente');
+
+      return story.copyWith(
+        content: '${story.content}\n\n${response.text}',
+        createdAt: DateTime.now(),
+      );
+    } catch (e) {
+      debugPrint('❌ StoryRepository: Error durante la continuación');
+      debugPrint('   Error detallado: $e');
+
+      if (story.id != null) {
+        _sessionManager.clearSession(story.id.toString());
       }
 
-      debugPrint('❌ StoryRepository: Error no específico detectado');
-      throw Exception('Error al generar la historia: $e');
+      _handleError(e);
+      rethrow;
+    }
+  }
+
+  void _handleError(dynamic e) {
+    final errorMessage = e.toString().toLowerCase();
+
+    if (errorMessage.contains('429') ||
+        errorMessage.contains('too many requests')) {
+      throw Exception(
+          'Has excedido el límite de solicitudes. Por favor, espera unos minutos.');
+    }
+
+    if (errorMessage.contains('model is overloaded')) {
+      throw Exception(
+          'El servicio está temporalmente sobrecargado. Por favor, intenta de nuevo.');
     }
   }
 
