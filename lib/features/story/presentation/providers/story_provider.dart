@@ -11,6 +11,7 @@ class StoryProvider extends ChangeNotifier {
 
   bool _isExpanded = false;
   bool _isMemoryExpanded = false;
+  bool _isAtBottom = false;
   double _rating = 5.0;
   Story? _story;
   bool _isSaving = false;
@@ -29,6 +30,7 @@ class StoryProvider extends ChangeNotifier {
 
   bool get isExpanded => _isExpanded;
   bool get isMemoryExpanded => _isMemoryExpanded;
+  bool get isAtBottom => _isAtBottom;
   double get rating => _rating;
   Story? get story => _story;
   bool get isSaving => _isSaving;
@@ -148,5 +150,18 @@ class StoryProvider extends ChangeNotifier {
     debugPrint('🔄 StoryProvider: Toggling memory expanded state');
     _isMemoryExpanded = !_isMemoryExpanded;
     notifyListeners();
+  }
+
+  void updateScrollPosition(double maxScroll, double currentScroll) {
+    final delta = 50.0; // margen de error para considerar que está al final
+    final shouldBeAtBottom = (maxScroll - currentScroll) <= delta;
+
+    if (_isAtBottom != shouldBeAtBottom) {
+      debugPrint('🔄 StoryProvider: Scroll position updated');
+      debugPrint('📏 MaxScroll: $maxScroll, CurrentScroll: $currentScroll');
+      debugPrint('📍 Is at bottom: $shouldBeAtBottom');
+      _isAtBottom = shouldBeAtBottom;
+      notifyListeners();
+    }
   }
 }

@@ -28,14 +28,57 @@ class GeneratedStoryPage extends StatefulWidget {
   State<GeneratedStoryPage> createState() => _GeneratedStoryPageState();
 }
 
-class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
+class _GeneratedStoryPageState extends State<GeneratedStoryPage>
+    with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _storyKey = GlobalKey();
   bool _hasIncrementedReadCount = false;
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late StoryProvider _storyProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeProviderAndAnimations();
+  }
+
+  void _initializeProviderAndAnimations() {
+    _storyProvider = StoryProvider(
+      updateRatingUseCase: getIt(),
+      deleteStoryUseCase: getIt(),
+      saveStoryUseCase: getIt(),
+    )..setStory(widget.story, isFromLibrary: widget.isFromLibrary);
+
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 1.1,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
+
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    _storyProvider.updateScrollPosition(
+      _scrollController.position.maxScrollExtent,
+      _scrollController.offset,
+    );
+  }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _scrollController.removeListener(_onScroll);
+    _controller.dispose();
+    _storyProvider.dispose();
     super.dispose();
   }
 
@@ -59,16 +102,12 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => StoryProvider(
-        updateRatingUseCase: getIt(),
-        deleteStoryUseCase: getIt(),
-        saveStoryUseCase: getIt(),
-      )..setStory(widget.story, isFromLibrary: widget.isFromLibrary),
-      child: Builder(
-        builder: (context) {
-          final provider = context.watch<StoryProvider>();
-
+    return ChangeNotifierProvider.value(
+      value: _storyProvider,
+      child: Consumer<StoryProvider>(
+        builder: (context, provider, _) {
+          debugPrint(
+              '🔄 Building GeneratedStoryPage - isExpanded: ${provider.isExpanded}, isAtBottom: ${provider.isAtBottom}');
           return Scaffold(
             backgroundColor: AppColors.background,
             appBar: AppBar(
@@ -311,6 +350,38 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage> {
                 ),
               ),
             ),
+            floatingActionButton: provider.isExpanded && provider.isAtBottom
+                ? ScaleTransition(
+                    scale: _scaleAnimation,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: FloatingActionButton.extended(
+                        backgroundColor: AppColors.primary,
+                        onPressed: () {
+                          debugPrint('🔘 FAB pressed');
+                        },
+                        icon:
+                            const Icon(Icons.auto_stories, color: Colors.white),
+                        label: const Text(
+                          'Continuar historia',
+                          style: TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : null,
           );
         },
       ),
