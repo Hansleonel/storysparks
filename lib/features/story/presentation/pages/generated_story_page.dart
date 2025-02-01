@@ -370,9 +370,9 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                         },
                         icon:
                             const Icon(Icons.auto_stories, color: Colors.white),
-                        label: const Text(
-                          'Continuar historia',
-                          style: TextStyle(
+                        label: Text(
+                          AppLocalizations.of(context)!.continueStory,
+                          style: const TextStyle(
                             fontFamily: 'Urbanist',
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
