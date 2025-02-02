@@ -5,9 +5,9 @@ import '../entities/story.dart';
 import '../repositories/story_repository.dart';
 
 class ContinueStoryUseCase {
-  final StoryRepository repository;
+  final StoryRepository _repository;
 
-  ContinueStoryUseCase(this.repository);
+  ContinueStoryUseCase(this._repository);
 
   Future<Either<Failure, Story>> execute(Story story) async {
     debugPrint('📖 ContinueStoryUseCase: Iniciando continuación de historia');
@@ -17,15 +17,15 @@ class ContinueStoryUseCase {
 
     try {
       debugPrint('📖 ContinueStoryUseCase: Llamando al repositorio...');
-      final continuedStory = await repository.continueStory(story);
+      final updatedStory = await _repository.continueStory(story);
 
       debugPrint('✅ ContinueStoryUseCase: Historia continuada exitosamente');
       debugPrint(
-          '   Nueva longitud: ${continuedStory.content.length} caracteres');
+          '   Nueva longitud: ${updatedStory.content.length} caracteres');
       debugPrint(
-          '   Incremento: ${continuedStory.content.length - story.content.length} caracteres');
+          '   Incremento: ${updatedStory.content.length - story.content.length} caracteres');
 
-      return Right(continuedStory);
+      return Right(updatedStory);
     } catch (e) {
       debugPrint('❌ ContinueStoryUseCase: Error durante la continuación');
       debugPrint('   Error detallado: $e');

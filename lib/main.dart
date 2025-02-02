@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:storysparks/features/story/domain/usecases/update_story_status_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
@@ -17,6 +18,7 @@ import 'package:storysparks/features/library/presentation/providers/library_prov
 import 'package:storysparks/features/story/domain/usecases/delete_story_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/save_story_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/update_story_rating_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/continue_story_usecase.dart';
 import 'package:storysparks/features/story/presentation/providers/story_provider.dart';
 
 void main() async {
@@ -45,10 +47,12 @@ void main() async {
           create: (_) => LibraryProvider(getIt<AuthRepository>()),
         ),
         ChangeNotifierProvider(
-          create: (_) => StoryProvider(
+          create: (context) => StoryProvider(
             updateRatingUseCase: getIt<UpdateStoryRatingUseCase>(),
             deleteStoryUseCase: getIt<DeleteStoryUseCase>(),
             saveStoryUseCase: getIt<SaveStoryUseCase>(),
+            updateStoryStatusUseCase: getIt<UpdateStoryStatusUseCase>(),
+            continueStoryUseCase: getIt<ContinueStoryUseCase>(),
           ),
         ),
       ],

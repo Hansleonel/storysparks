@@ -3,11 +3,15 @@ import '../../domain/entities/story.dart';
 import '../../domain/usecases/delete_story_usecase.dart';
 import '../../domain/usecases/update_story_rating_usecase.dart';
 import '../../domain/usecases/save_story_usecase.dart';
+import '../../domain/usecases/update_story_status_usecase.dart';
+import '../../domain/usecases/continue_story_usecase.dart';
 
 class StoryProvider extends ChangeNotifier {
   final UpdateStoryRatingUseCase _updateRatingUseCase;
   final DeleteStoryUseCase _deleteStoryUseCase;
   final SaveStoryUseCase _saveStoryUseCase;
+  final UpdateStoryStatusUseCase _updateStoryStatusUseCase;
+  final ContinueStoryUseCase _continueStoryUseCase;
 
   bool _isExpanded = false;
   bool _isMemoryExpanded = false;
@@ -16,15 +20,20 @@ class StoryProvider extends ChangeNotifier {
   Story? _story;
   bool _isSaving = false;
   bool _isSaved = false;
+  bool _isContinuing = false;
   String? _error;
 
   StoryProvider({
     required UpdateStoryRatingUseCase updateRatingUseCase,
     required DeleteStoryUseCase deleteStoryUseCase,
     required SaveStoryUseCase saveStoryUseCase,
+    required UpdateStoryStatusUseCase updateStoryStatusUseCase,
+    required ContinueStoryUseCase continueStoryUseCase,
   })  : _updateRatingUseCase = updateRatingUseCase,
         _deleteStoryUseCase = deleteStoryUseCase,
-        _saveStoryUseCase = saveStoryUseCase {
+        _saveStoryUseCase = saveStoryUseCase,
+        _updateStoryStatusUseCase = updateStoryStatusUseCase,
+        _continueStoryUseCase = continueStoryUseCase {
     debugPrint('🔄 StoryProvider: Initializing...');
   }
 
@@ -36,6 +45,7 @@ class StoryProvider extends ChangeNotifier {
   bool get isSaving => _isSaving;
   bool get isSaved => _isSaved;
   String? get error => _error;
+  bool get isContinuing => _isContinuing;
 
   void setStory(Story story, {bool isFromLibrary = false}) {
     debugPrint(
@@ -70,18 +80,25 @@ class StoryProvider extends ChangeNotifier {
         _error = null;
         notifyListeners();
 
-        final storyToSave = _story!.copyWith(rating: _rating);
-        debugPrint('📊 StoryProvider: Saving story with rating: $_rating');
+        if (_story!.id != null) {
+          // Si la historia ya existe, solo actualizamos su estado
+          debugPrint(
+              '📊 StoryProvider: Updating story with ID: ${_story!.id} to status: saved');
+          await _updateStoryStatusUseCase(_story!.id!, 'saved');
+          _story = _story!.copyWith(status: 'saved');
+        } else {
+          // Si es una nueva historia, la guardamos completa
+          final storyToSave =
+              _story!.copyWith(rating: _rating, status: 'saved');
+          debugPrint(
+              '📊 StoryProvider: Saving new story with rating: $_rating');
+          final id = await _saveStoryUseCase.execute(storyToSave);
+          _story = storyToSave.copyWith(id: id);
+        }
 
-        final id = await _saveStoryUseCase.execute(storyToSave);
-        debugPrint('✅ StoryProvider: Story saved successfully with ID: $id');
-
-        _story = storyToSave.copyWith(id: id);
         _isSaved = true;
         _error = null;
-
-        debugPrint(
-            '🏁 StoryProvider: Save process completed - Story is now saved');
+        debugPrint('✅ StoryProvider: Save process completed successfully');
         notifyListeners();
         return true;
       } catch (e) {
@@ -125,7 +142,28 @@ class StoryProvider extends ChangeNotifier {
     if (_story != null && _story!.id != null) {
       try {
         debugPrint('🔄 StoryProvider: Deleting story with ID: ${_story!.id}');
+        await _updateStoryStatusUseCase(_story!.id!, 'deleted');
+        _isSaved = false;
+        _error = null;
+        debugPrint('✅ StoryProvider: Story marked as deleted successfully');
+        notifyListeners();
+      } catch (e) {
+        debugPrint('❌ StoryProvider: Error deleting story - $e');
+        _error = e.toString();
+        notifyListeners();
+      }
+    } else {
+      debugPrint('⚠️ StoryProvider: Cannot delete - No story or story ID');
+    }
+  }
+
+  Future<void> hardDeleteStory() async {
+    if (_story != null && _story!.id != null) {
+      try {
+        debugPrint(
+            '🔄 StoryProvider: Hard deleting story with ID: ${_story!.id}');
         await _deleteStoryUseCase(_story!.id!);
+        _story = null;
         _isSaved = false;
         _error = null;
         debugPrint('✅ StoryProvider: Story deleted successfully');
@@ -163,5 +201,41 @@ class StoryProvider extends ChangeNotifier {
       _isAtBottom = shouldBeAtBottom;
       notifyListeners();
     }
+  }
+
+  Future<bool> continueStory() async {
+    if (_story != null && _story!.id != null) {
+      try {
+        debugPrint('🔄 StoryProvider: Starting story continuation process...');
+        _isContinuing = true;
+        _error = null;
+        notifyListeners();
+
+        final result = await _continueStoryUseCase.execute(_story!);
+
+        return result.fold(
+          (failure) {
+            debugPrint('❌ StoryProvider: Error continuing story - $failure');
+            _error = failure.toString();
+            notifyListeners();
+            return false;
+          },
+          (updatedStory) {
+            _story = updatedStory;
+            _error = null;
+            debugPrint(
+                '✅ StoryProvider: Story continuation completed successfully');
+            notifyListeners();
+            return true;
+          },
+        );
+      } finally {
+        _isContinuing = false;
+        notifyListeners();
+      }
+    }
+    debugPrint(
+        '⚠️ StoryProvider: Cannot continue - No story or story ID available');
+    return false;
   }
 }

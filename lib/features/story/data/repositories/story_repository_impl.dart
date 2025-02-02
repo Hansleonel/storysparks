@@ -66,6 +66,7 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
         userId: userId,
         title: 'Mi Historia de ${genre.toLowerCase()}',
         imageUrl: CoverImageHelper.getCoverImage(genre),
+        status: 'draft',
       );
 
       debugPrint('✅ StoryRepository: Historia creada exitosamente');
@@ -73,7 +74,11 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
       debugPrint('   - Fecha: ${story.createdAt}');
       debugPrint('   - URL de imagen: ${story.imageUrl}');
 
-      return story;
+      // Guardar automáticamente como draft
+      final id = await _localDatasource.saveStory(story);
+      debugPrint('✅ StoryRepository: Historia guardada como draft con ID: $id');
+
+      return story.copyWith(id: id);
     } catch (e) {
       debugPrint('❌ StoryRepository: Error durante la generación');
       debugPrint('   Error detallado: $e');
@@ -82,7 +87,6 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
     }
   }
 
-  // TODO this method is used to continue the story, need to check if it's working
   @override
   Future<Story> continueStory(Story story) async {
     debugPrint('🗄️ StoryRepository: Iniciando continuación de historia');
@@ -95,7 +99,8 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
       final chatSession =
           _sessionManager.getOrCreateSession(story.id.toString(), story);
 
-      const prompt = 'Continúa la narración de forma natural y coherente.';
+      const prompt =
+          'Continúa la narración de forma natural y coherente. La continuación debe mantener el mismo tono y estilo.';
 
       debugPrint('🤖 StoryRepository: Solicitando continuación...');
       final response = await chatSession.sendMessage(Content.text(prompt));
@@ -106,10 +111,20 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
 
       debugPrint('✅ StoryRepository: Continuación generada exitosamente');
 
-      return story.copyWith(
-        content: '${story.content}\n\n${response.text}',
+      // Crear una versión actualizada de la historia con la continuación
+      final updatedStory = story.copyWith(
+        content: '${story.content}\n\n--- Continuación ---\n\n${response.text}',
         createdAt: DateTime.now(),
+        rating: story.rating > 0
+            ? story.rating
+            : 5.0, // Mantener el rating existente o usar 5.0 si es 0
       );
+
+      // Actualizar la historia existente en la base de datos
+      await _localDatasource.updateStoryContent(updatedStory);
+      debugPrint('✅ StoryRepository: Historia actualizada en base de datos');
+
+      return updatedStory;
     } catch (e) {
       debugPrint('❌ StoryRepository: Error durante la continuación');
       debugPrint('   Error detallado: $e');
@@ -144,6 +159,11 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
   }
 
   @override
+  Future<void> updateStoryStatus(int storyId, String status) async {
+    await _localDatasource.updateStoryStatus(storyId, status);
+  }
+
+  @override
   Future<List<Story>> getSavedStories(String userId) async {
     return await _localDatasource.getSavedStories(userId);
   }
@@ -171,5 +191,10 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
   @override
   Future<List<Story>> getRecentStories(String userId) async {
     return await _localDatasource.getRecentStories(userId);
+  }
+
+  @override
+  Future<void> cleanupOldDraftStories() async {
+    await _localDatasource.cleanupOldDraftStories();
   }
 }

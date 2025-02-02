@@ -5,6 +5,11 @@ import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/core/utils/cover_image_helper.dart';
 import 'package:storysparks/core/constants/genre_constants.dart';
+import 'package:storysparks/features/story/domain/usecases/update_story_rating_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/delete_story_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/save_story_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/update_story_status_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/continue_story_usecase.dart';
 import '../../domain/entities/story.dart';
 import '../providers/story_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -45,9 +50,11 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
 
   void _initializeProviderAndAnimations() {
     _storyProvider = StoryProvider(
-      updateRatingUseCase: getIt(),
-      deleteStoryUseCase: getIt(),
-      saveStoryUseCase: getIt(),
+      updateRatingUseCase: getIt<UpdateStoryRatingUseCase>(),
+      deleteStoryUseCase: getIt<DeleteStoryUseCase>(),
+      saveStoryUseCase: getIt<SaveStoryUseCase>(),
+      updateStoryStatusUseCase: getIt<UpdateStoryStatusUseCase>(),
+      continueStoryUseCase: getIt<ContinueStoryUseCase>(),
     )..setStory(widget.story, isFromLibrary: widget.isFromLibrary);
 
     _controller = AnimationController(
@@ -365,13 +372,59 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                       ),
                       child: FloatingActionButton.extended(
                         backgroundColor: AppColors.primary,
-                        onPressed: () {
-                          debugPrint('🔘 FAB pressed');
-                        },
-                        icon:
-                            const Icon(Icons.auto_stories, color: Colors.white),
+                        onPressed: provider.isContinuing
+                            ? null
+                            : () async {
+                                debugPrint('🔘 FAB pressed - Continuing story');
+                                final success = await provider.continueStory();
+                                if (success && mounted) {
+                                  widget.onStoryStateChanged?.call();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        AppLocalizations.of(context)!
+                                            .storyContinuedSuccess,
+                                        style: const TextStyle(
+                                          color: AppColors.white,
+                                          fontFamily: 'Urbanist',
+                                        ),
+                                      ),
+                                      backgroundColor: AppColors.success,
+                                    ),
+                                  );
+                                } else if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        provider.error ??
+                                            AppLocalizations.of(context)!
+                                                .storyContinueError,
+                                        style: const TextStyle(
+                                          color: AppColors.white,
+                                          fontFamily: 'Urbanist',
+                                        ),
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              },
+                        icon: provider.isContinuing
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                ),
+                              )
+                            : const Icon(Icons.auto_stories,
+                                color: Colors.white),
                         label: Text(
-                          AppLocalizations.of(context)!.continueStory,
+                          provider.isContinuing
+                              ? AppLocalizations.of(context)!.continuing
+                              : AppLocalizations.of(context)!.continueStory,
                           style: const TextStyle(
                             fontFamily: 'Urbanist',
                             fontWeight: FontWeight.w600,

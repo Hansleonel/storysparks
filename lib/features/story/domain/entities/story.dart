@@ -9,6 +9,7 @@ class Story {
   final String userId;
   final String title;
   final String imageUrl;
+  final String status;
 
   Story({
     this.id,
@@ -21,6 +22,7 @@ class Story {
     required this.userId,
     required this.title,
     required this.imageUrl,
+    this.status = 'draft',
   });
 
   Story copyWith({
@@ -34,6 +36,7 @@ class Story {
     String? userId,
     String? title,
     String? imageUrl,
+    String? status,
   }) {
     return Story(
       id: id ?? this.id,
@@ -46,6 +49,7 @@ class Story {
       userId: userId ?? this.userId,
       title: title ?? this.title,
       imageUrl: imageUrl ?? this.imageUrl,
+      status: status ?? this.status,
     );
   }
 }

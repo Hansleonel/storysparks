@@ -342,10 +342,23 @@ class _StoriesTabState extends State<_StoriesTab> {
   }
 }
 
-class _StoryGridItem extends StatelessWidget {
+class _StoryGridItem extends StatefulWidget {
   final Story story;
 
   const _StoryGridItem({required this.story});
+
+  @override
+  State<_StoryGridItem> createState() => _StoryGridItemState();
+}
+
+class _StoryGridItemState extends State<_StoryGridItem> {
+  late LibraryProvider _libraryProvider;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _libraryProvider = context.read<LibraryProvider>();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -355,26 +368,28 @@ class _StoryGridItem extends StatelessWidget {
           context,
           '/generated-story',
           arguments: {
-            'story': story,
+            'story': widget.story,
             'isFromLibrary': true,
             'onIncrementReadCount': () async {
-              if (story.id != null) {
-                await context
-                    .read<LibraryProvider>()
-                    .incrementReadCount(story.id!);
+              if (widget.story.id != null) {
+                await _libraryProvider.incrementReadCount(widget.story.id!);
               }
             },
             'onStoryStateChanged': () {
-              context.read<LibraryProvider>().loadStories();
+              _libraryProvider.loadStories();
             },
           },
-        );
+        ).then((_) {
+          // Recargar las historias cuando se regresa de la página de historia
+          _libraryProvider.loadStories();
+        });
       },
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           image: DecorationImage(
-            image: AssetImage(CoverImageHelper.getCoverImage(story.genre)),
+            image:
+                AssetImage(CoverImageHelper.getCoverImage(widget.story.genre)),
             fit: BoxFit.cover,
           ),
         ),
@@ -396,7 +411,7 @@ class _StoryGridItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                story.memory,
+                widget.story.memory,
                 style: const TextStyle(
                   fontFamily: 'Playfair',
                   fontSize: 16,

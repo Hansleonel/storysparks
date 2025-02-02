@@ -9,8 +9,31 @@ import 'package:storysparks/core/widgets/empty_state.dart';
 import '../providers/library_provider.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
 
-class LibraryPage extends StatelessWidget {
+class LibraryPage extends StatefulWidget {
   const LibraryPage({super.key});
+
+  @override
+  _LibraryPageState createState() => _LibraryPageState();
+}
+
+class _LibraryPageState extends State<LibraryPage> {
+  @override
+  void initState() {
+    super.initState();
+    // Mover la inicialización después del build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeLibrary();
+    });
+  }
+
+  Future<void> _initializeLibrary() async {
+    final provider = context.read<LibraryProvider>();
+    // Ejecutar limpieza de drafts antiguos
+    // TODO: Uncomment this when the story cleanup service is ready, improve this logic
+    // await getIt<StoryCleanupService>().checkAndCleanup();
+    // Cargar historias
+    await provider.loadStories();
+  }
 
   @override
   Widget build(BuildContext context) {
