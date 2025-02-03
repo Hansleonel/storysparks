@@ -6,6 +6,13 @@
             }
         }
     },
+    "@weeksAgo": {
+        "placeholders": {
+            "weeks": {
+                "type": "int"
+            }
+        }
+    },
     "about": "Acerca de",
     "accountSettings": "Cuenta",
     "alreadyHaveAccount": "¿Ya tienes una cuenta?",
@@ -31,6 +38,7 @@
     "exitWithoutSavingMessage": "Esta historia es única y se perderá si sales sin guardarla. ¿Estás seguro de que quieres salir?",
     "fillInformation": "Por favor, completa tu información para crear una cuenta",
     "forgotPassword": "¿Olvidaste tu contraseña?",
+    "friday": "Viernes",
     "fullName": "Nombre completo",
     "generateStory": "Generar historia",
     "generatedStory": "Historia Generada",
@@ -55,6 +63,7 @@
     "logout": "Cerrar sesión",
     "memory": "recuerdo",
     "memoryImage": "Imagen del recuerdo",
+    "monday": "Lunes",
     "newStories": "Nuevas Historias 🎁",
     "noStories": "No hay historias aún",
     "notifications": "Notificaciones",
@@ -79,6 +88,7 @@
     "register": "Registrarse",
     "registrationError": "Error en el registro",
     "rememberMe": "Recordarme",
+    "saturday": "Sábado",
     "searchSettings": "Buscar en configuración",
     "security": "Seguridad",
     "seeLess": "Ver menos",
@@ -96,10 +106,14 @@
     "storyDeleteError": "Error al eliminar la historia",
     "storyDeletedSuccess": "Historia eliminada correctamente",
     "storySavedSuccess": "Historia guardada correctamente",
+    "sunday": "Domingo",
     "takePhoto": "Tomar foto",
     "theme": "Tema",
     "theProtagonistWillBe": "El protagonista será...",
+    "thursday": "Jueves",
     "timeline": "Línea de tiempo",
+    "today": "Hoy",
+    "tuesday": "Martes",
     "unread": "Sin leer",
     "username": "Nombre de usuario",
     "usernameAvailable": "Nombre de usuario disponible",
@@ -111,6 +125,9 @@
     "usernameTooShort": "El nombre de usuario debe tener al menos 3 caracteres",
     "usernameUnavailable": "Nombre de usuario no disponible",
     "viewAll": "Ver todas",
+    "wednesday": "Miércoles",
+    "weeksAgo": "{weeks, plural, =1{hace 1 semana} other{hace {weeks} semanas}}",
     "welcomeBack": "¡Bienvenido de nuevo! 👋",
+    "yesterday": "Ayer",
     "yourStory": "Tu Historia"
 }

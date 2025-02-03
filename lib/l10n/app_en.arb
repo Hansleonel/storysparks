@@ -6,6 +6,13 @@
             }
         }
     },
+    "@weeksAgo": {
+        "placeholders": {
+            "weeks": {
+                "type": "int"
+            }
+        }
+    },
     "about": "About",
     "accountSettings": "Account",
     "alreadyHaveAccount": "Already have an account?",
@@ -31,6 +38,7 @@
     "exitWithoutSavingMessage": "This story is unique and will be lost if you exit without saving it. Are you sure you want to exit?",
     "fillInformation": "Please fill in your information to create an account",
     "forgotPassword": "Forgot password?",
+    "friday": "Friday",
     "fullName": "Full Name",
     "generateStory": "Generate story",
     "generatedStory": "Generated Story",
@@ -55,6 +63,7 @@
     "logout": "Logout",
     "memory": "memory",
     "memoryImage": "Memory image",
+    "monday": "Monday",
     "newStories": "New Stories 🎁",
     "noStories": "No stories yet",
     "notifications": "Notifications",
@@ -79,6 +88,7 @@
     "register": "Register",
     "registrationError": "Registration error",
     "rememberMe": "Remember me",
+    "saturday": "Saturday",
     "searchSettings": "Search settings",
     "security": "Security",
     "seeLess": "See less",
@@ -96,10 +106,14 @@
     "storyDeleteError": "Error deleting story",
     "storyDeletedSuccess": "Story successfully deleted",
     "storySavedSuccess": "Story saved successfully",
+    "sunday": "Sunday",
     "takePhoto": "Take a photo",
     "theme": "Theme",
     "theProtagonistWillBe": "The protagonist will be...",
+    "thursday": "Thursday",
     "timeline": "Timeline",
+    "today": "Today",
+    "tuesday": "Tuesday",
     "unread": "Unread",
     "username": "Username",
     "usernameAvailable": "Username is available",
@@ -111,6 +125,9 @@
     "usernameTooShort": "Username must be at least 3 characters",
     "usernameUnavailable": "Username is not available",
     "viewAll": "View all",
+    "wednesday": "Wednesday",
+    "weeksAgo": "{weeks, plural, =1{1 week ago} other{{weeks} weeks ago}}",
     "welcomeBack": "Welcome back 👋",
+    "yesterday": "Yesterday",
     "yourStory": "Your Story"
 }

@@ -459,7 +459,7 @@ class _TimelineView extends StatelessWidget {
     final groupedStories = <String, List<Story>>{};
 
     for (var story in stories) {
-      final dateKey = DateFormatter.getFormattedDate(story.createdAt);
+      final dateKey = DateFormatter.getFormattedDate(story.createdAt, context);
       groupedStories.putIfAbsent(dateKey, () => []).add(story);
     }
 
