@@ -25,6 +25,11 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
   - Eliminación de historias
   - Biblioteca personal de historias
   - Sistema de calificación de historias
+  - Contador de lecturas por historia
+  - Historias populares y recientes
+  - Continuación de historias con IA
+  - Gestión de estados de historia
+  - Sistema de sesiones de chat para continuaciones coherentes
 
 - ✅ **Creación de Historias**:
 
@@ -54,15 +59,22 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
   - Presentation Layer (providers, pages)
   - Domain Layer (usecases, repositories)
   - Data Layer (datasources, repositories implementations)
+  - Managers para gestión de sesiones de chat con Google Generative AI
 - **Almacenamiento Local**: SQLite con sqflite
-- **IA**: Google Generative AI
+- **IA**:
+  - Google Generative AI
+  - Gestión de sesiones de chat para continuidad narrativa
 - **Networking**: Dio
 - **Inyección de Dependencias**: GetIt + Injectable
-- **Manejo de Errores**: Dartz
+- **Manejo de Errores**:
+  - Dartz para Result Types
+  - Sistema de logging detallado
+  - Manejo de errores por capa
 - **Gestión de Assets**:
   - SVG Support (flutter_svg)
   - Audio (just_audio)
   - Image Picker
+  - Animaciones personalizadas
 
 ## 📂 Estructura del Proyecto Actual
 
@@ -167,21 +179,28 @@ dependencies:
 3. **Gestión de Historias**:
 
    - ✅ Generación de historias con StoryProvider
-   - ✅ Almacenamiento local de historias
-   - ✅ Visualización de historias en la biblioteca
-   - ✅ Eliminación de historias guardadas
+   - ✅ Sistema de continuación de historias con contexto
+   - ✅ Almacenamiento local de historias con estados
+   - ✅ Visualización animada de historias
+   - ✅ Sistema de calificación interactivo
+   - ✅ Contador de lecturas automático
+   - ✅ Limpieza automática de borradores antiguos
+   - ✅ Gestión de historias populares y recientes
 
 ## 🛡️ Seguridad
 
 - ✅ Implementación de autenticación segura
 - ✅ Almacenamiento local seguro de historias
 - ✅ Validación de entradas de usuario
+- ✅ Gestión segura de API keys
+- ✅ Manejo de sesiones de chat encapsulado
 
 ## 🔜 Próximas Características
 
 - [x] Integración con IA para generación de historias
 - [x] Modo offline con almacenamiento local
 - [x] Múltiples idiomas
+- [x] Sistema de continuación de historias
 - [ ] Compartir historias en redes sociales
 - [ ] Temas personalizables
 - [ ] Exportación de historias en diferentes formatos
