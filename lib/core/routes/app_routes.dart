@@ -34,24 +34,8 @@ class AppRoutes {
           builder: (_) => const SettingsPage(),
         );
       case paywall:
-        return PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const PaywallPage(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            const begin = Offset(0.0, 1.0);
-            const end = Offset.zero;
-            const curve = Curves.easeOutQuart;
-
-            var tween =
-                Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-            var offsetAnimation = animation.drive(tween);
-
-            return SlideTransition(
-              position: offsetAnimation,
-              child: child,
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 400),
+        return MaterialPageRoute(
+          builder: (_) => const PaywallPage(),
         );
       case generatedStory:
         if (routeSettings.arguments is! Map<String, dynamic>) {
