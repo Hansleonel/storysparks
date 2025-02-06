@@ -26,6 +26,7 @@ import 'package:storysparks/features/profile/presentation/providers/settings_pro
 import 'package:storysparks/features/story/data/services/story_cleanup_service.dart';
 import 'package:storysparks/features/story/domain/usecases/update_story_status_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/continue_story_usecase.dart';
+import 'package:storysparks/features/subscription/presentation/providers/subscription_provider.dart';
 
 final getIt = GetIt.instance;
 
@@ -96,6 +97,7 @@ void setupServiceLocator() {
         getIt<GenerateStoryUseCase>(),
       ));
   getIt.registerFactory(() => SettingsProvider(getIt()));
+  getIt.registerFactory(() => SubscriptionProvider());
 
   // Nota: Los providers globales están en main.dart ℹ️
   // - AuthProvider

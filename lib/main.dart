@@ -20,6 +20,7 @@ import 'package:storysparks/features/story/domain/usecases/save_story_usecase.da
 import 'package:storysparks/features/story/domain/usecases/update_story_rating_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/continue_story_usecase.dart';
 import 'package:storysparks/features/story/presentation/providers/story_provider.dart';
+import 'package:storysparks/features/subscription/presentation/providers/subscription_provider.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -54,6 +55,9 @@ void main() async {
             updateStoryStatusUseCase: getIt<UpdateStoryStatusUseCase>(),
             continueStoryUseCase: getIt<ContinueStoryUseCase>(),
           ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => getIt<SubscriptionProvider>(),
         ),
       ],
       child: const MyApp(),

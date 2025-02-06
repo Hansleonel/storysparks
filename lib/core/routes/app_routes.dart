@@ -5,6 +5,7 @@ import 'package:storysparks/features/navigation/presentation/pages/main_navigati
 import 'package:storysparks/features/profile/presentation/pages/settings_page.dart';
 import 'package:storysparks/features/story/domain/entities/story.dart';
 import 'package:storysparks/features/story/presentation/pages/generated_story_page.dart';
+import 'package:storysparks/features/subscription/presentation/pages/paywall_page.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -12,6 +13,7 @@ class AppRoutes {
   static const String main = '/main';
   static const String settingsProfile = '/settings-profile';
   static const String generatedStory = '/generated-story';
+  static const String paywall = '/paywall';
 
   static Route<dynamic> onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -30,6 +32,26 @@ class AppRoutes {
       case settingsProfile:
         return MaterialPageRoute(
           builder: (_) => const SettingsPage(),
+        );
+      case paywall:
+        return PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const PaywallPage(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(0.0, 1.0);
+            const end = Offset.zero;
+            const curve = Curves.easeOutQuart;
+
+            var tween =
+                Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            var offsetAnimation = animation.drive(tween);
+
+            return SlideTransition(
+              position: offsetAnimation,
+              child: child,
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 400),
         );
       case generatedStory:
         if (routeSettings.arguments is! Map<String, dynamic>) {
