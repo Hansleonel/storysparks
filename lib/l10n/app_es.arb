@@ -6,6 +6,13 @@
             }
         }
     },
+    "@paywallSavingsLabel": {
+        "placeholders": {
+            "percent": {
+                "type": "int"
+            }
+        }
+    },
     "@weeksAgo": {
         "placeholders": {
             "weeks": {
@@ -79,6 +86,21 @@
     "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
     "passwordUppercase": "La contraseña debe contener al menos una letra mayúscula",
     "passwordsDontMatch": "Las contraseñas no coinciden",
+    "paywallAnnualDescription": "Mejor valor",
+    "paywallAnnualPlan": "Anual",
+    "paywallBenefitEarlyAccess": "Acceso anticipado a nuevas funciones",
+    "paywallBenefitNoAds": "Sin anuncios ni interrupciones",
+    "paywallBenefitUnlimited": "Historias ilimitadas y personalizadas",
+    "paywallBestValueTag": "Mejor opción",
+    "paywallGetProButton": "Obtener PRO",
+    "paywallMonthlyDescription": "El plan más popular",
+    "paywallMonthlyPlan": "Mensual",
+    "paywallPopularTag": "Popular",
+    "paywallSavingsLabel": "Ahorra {percent}%",
+    "paywallTitle": "Obtén más con StorySparks PRO",
+    "paywallTrialText": "Prueba gratis por 3 días, cancela cuando quieras",
+    "paywallWeeklyDescription": "Para quienes quieran probar de forma intensiva a corto plazo",
+    "paywallWeeklyPlan": "Semanal",
     "personalInformation": "Información Personal",
     "popularStories": "Historias Populares 🔥",
     "preferences": "Preferencias",

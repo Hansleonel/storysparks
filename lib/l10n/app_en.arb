@@ -6,6 +6,13 @@
             }
         }
     },
+    "@paywallSavingsLabel": {
+        "placeholders": {
+            "percent": {
+                "type": "int"
+            }
+        }
+    },
     "@weeksAgo": {
         "placeholders": {
             "weeks": {
@@ -79,6 +86,21 @@
     "passwordTooShort": "Password must be at least 6 characters",
     "passwordUppercase": "Password must contain at least one uppercase letter",
     "passwordsDontMatch": "Passwords don't match",
+    "paywallAnnualDescription": "Best value",
+    "paywallAnnualPlan": "Yearly",
+    "paywallBenefitEarlyAccess": "Early access to new features",
+    "paywallBenefitNoAds": "No ads or interruptions",
+    "paywallBenefitUnlimited": "Unlimited and personalized stories",
+    "paywallBestValueTag": "Best value",
+    "paywallGetProButton": "Get PRO access",
+    "paywallMonthlyDescription": "Most popular plan",
+    "paywallMonthlyPlan": "Monthly",
+    "paywallPopularTag": "Popular",
+    "paywallSavingsLabel": "Save {percent}%",
+    "paywallTitle": "Get more with StorySparks PRO",
+    "paywallTrialText": "Try free for 3 days, cancel anytime",
+    "paywallWeeklyDescription": "For those who want to try intensively in the short term",
+    "paywallWeeklyPlan": "Weekly",
     "personalInformation": "Personal Information",
     "popularStories": "Popular Stories 🔥",
     "preferences": "Preferences",

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../providers/subscription_provider.dart';
 import '../../domain/entities/subscription_plan.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
@@ -10,6 +11,7 @@ class PaywallPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: Stack(
@@ -63,8 +65,8 @@ class PaywallPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Obtén más con\nStorySparks PRO',
-                            style: TextStyle(
+                            l10n.paywallTitle,
+                            style: const TextStyle(
                               fontFamily: 'Playfair',
                               fontSize: 32,
                               height: 1.2,
@@ -74,15 +76,15 @@ class PaywallPage extends StatelessWidget {
                           ),
                           SizedBox(height: screenHeight * 0.03),
                           _buildBenefitItem(
-                            'Historias ilimitadas y personalizadas',
+                            l10n.paywallBenefitUnlimited,
                             Icons.auto_awesome,
                           ),
                           _buildBenefitItem(
-                            'Sin anuncios ni interrupciones',
+                            l10n.paywallBenefitNoAds,
                             Icons.block,
                           ),
                           _buildBenefitItem(
-                            'Acceso anticipado a nuevas funciones',
+                            l10n.paywallBenefitEarlyAccess,
                             Icons.star_outline,
                           ),
                         ],
@@ -143,32 +145,25 @@ class PaywallPage extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-                              child: const Text(
-                                'Obtener PRO',
-                                style: TextStyle(
+                              child: Text(
+                                l10n.paywallGetProButton,
+                                style: const TextStyle(
                                   fontFamily: 'Urbanist',
                                   fontSize: 18,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
                           ),
                           const SizedBox(height: 12),
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: const TextSpan(
-                              style: TextStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 14,
-                                color: AppColors.textSecondary,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: 'Prueba gratis por 3 días, ',
-                                  style: TextStyle(fontWeight: FontWeight.w500),
-                                ),
-                              ],
+                          Text(
+                            l10n.paywallTrialText,
+                            style: const TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ],
                       ),
@@ -210,9 +205,29 @@ class PaywallPage extends StatelessWidget {
     final isSelected = context.select<SubscriptionProvider, bool>(
       (provider) => provider.selectedPlan == plan,
     );
+    final l10n = AppLocalizations.of(context)!;
 
-    // Definimos un color verde que combine mejor con nuestra paleta
-    const bestValueColor = Color(0xFF4CAF93);
+    String getPlanName() {
+      switch (plan.type) {
+        case PlanType.weekly:
+          return l10n.paywallWeeklyPlan;
+        case PlanType.monthly:
+          return l10n.paywallMonthlyPlan;
+        case PlanType.annual:
+          return l10n.paywallAnnualPlan;
+      }
+    }
+
+    String getPlanDescription() {
+      switch (plan.type) {
+        case PlanType.weekly:
+          return l10n.paywallWeeklyDescription;
+        case PlanType.monthly:
+          return l10n.paywallMonthlyDescription;
+        case PlanType.annual:
+          return l10n.paywallAnnualDescription;
+      }
+    }
 
     return GestureDetector(
       onTap: () => context.read<SubscriptionProvider>().selectPlan(plan),
@@ -241,9 +256,9 @@ class PaywallPage extends StatelessWidget {
                         color: AppColors.accent,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Text(
-                        'Popular',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.paywallPopularTag,
+                        style: const TextStyle(
                           fontFamily: 'Urbanist',
                           color: AppColors.white,
                           fontSize: 11,
@@ -256,12 +271,12 @@ class PaywallPage extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: bestValueColor,
+                            color: AppColors.greenVariant,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Text(
-                            'Mejor Opción',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.paywallBestValueTag,
+                            style: const TextStyle(
                               fontFamily: 'Urbanist',
                               color: AppColors.white,
                               fontSize: 11,
@@ -273,11 +288,7 @@ class PaywallPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              plan.type == PlanType.weekly
-                  ? 'semanal'
-                  : plan.type == PlanType.monthly
-                      ? 'mensual'
-                      : 'anual',
+              getPlanName(),
               style: TextStyle(
                 fontFamily: 'Urbanist',
                 color: isSelected ? AppColors.primary : AppColors.textSecondary,
@@ -300,14 +311,14 @@ class PaywallPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: bestValueColor.withOpacity(0.1),
+                  color: AppColors.greenVariant.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '-${plan.savings}%',
-                  style: TextStyle(
+                  l10n.paywallSavingsLabel(plan.savings.round()),
+                  style: const TextStyle(
                     fontFamily: 'Urbanist',
-                    color: bestValueColor,
+                    color: AppColors.greenVariant,
                     fontWeight: FontWeight.w600,
                     fontSize: 12,
                   ),

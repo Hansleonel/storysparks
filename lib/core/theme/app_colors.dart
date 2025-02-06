@@ -20,6 +20,8 @@ class AppColors {
   static const Color white = Color(0xFFFFFFFF);
 
   // Status colors
-  static const Color success =
-      Color(0xFF34D399); // Verde suave que combina con el esquema
+  static const Color success = Color(0xFF34D399);
+
+  // Green variant
+  static const Color greenVariant = Color(0xFF4CAF93);
 }
