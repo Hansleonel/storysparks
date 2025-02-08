@@ -123,7 +123,7 @@ class StoryLocalDatasource {
         memory: maps[i]['memory'],
         createdAt: DateTime.parse(maps[i]['created_at']),
         readCount: maps[i]['read_count'] ?? 0,
-        rating: maps[i]['rating'] ?? 0.0,
+        rating: maps[i]['rating'] ?? 5.0,
         userId: maps[i]['user_id'],
         title: maps[i]['title'] ?? 'Mi Historia',
         imageUrl: maps[i]['image_url'] ??
@@ -179,7 +179,7 @@ class StoryLocalDatasource {
         memory: maps[i]['memory'],
         createdAt: DateTime.parse(maps[i]['created_at']),
         readCount: maps[i]['read_count'] ?? 0,
-        rating: maps[i]['rating'] ?? 0.0,
+        rating: maps[i]['rating'] ?? 5.0,
         userId: maps[i]['user_id'],
         title: maps[i]['title'] ?? 'Mi Historia',
         imageUrl: maps[i]['image_url'] ??
@@ -207,7 +207,7 @@ class StoryLocalDatasource {
         memory: maps[i]['memory'],
         createdAt: DateTime.parse(maps[i]['created_at']),
         readCount: maps[i]['read_count'] ?? 0,
-        rating: maps[i]['rating'] ?? 0.0,
+        rating: maps[i]['rating'] ?? 5.0,
         userId: maps[i]['user_id'],
         title: maps[i]['title'] ?? 'Mi Historia',
         imageUrl: maps[i]['image_url'] ??

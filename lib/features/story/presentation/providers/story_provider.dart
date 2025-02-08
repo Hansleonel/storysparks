@@ -50,12 +50,22 @@ class StoryProvider extends ChangeNotifier {
   void setStory(Story story, {bool isFromLibrary = false}) {
     debugPrint(
         '🔄 StoryProvider: Setting story - ID: ${story.id}, isFromLibrary: $isFromLibrary');
+    debugPrint('📊 StoryProvider: Story rating from database: ${story.rating}');
+
     _story = story;
     _isSaved = isFromLibrary;
-    if (isFromLibrary) {
+
+    // Si la historia viene de la biblioteca o tiene un rating existente, usamos ese rating
+    if (isFromLibrary || story.rating > 0) {
       _rating = story.rating;
-      debugPrint('📊 StoryProvider: Setting rating from library: $_rating');
+      debugPrint('📊 StoryProvider: Using existing rating: $_rating');
+    } else {
+      // Si es una historia nueva, establecemos el rating inicial a 5.0
+      _rating = 5.0;
+      debugPrint(
+          '📊 StoryProvider: Setting initial rating for new story: $_rating');
     }
+
     _error = null;
     notifyListeners();
   }
@@ -81,19 +91,23 @@ class StoryProvider extends ChangeNotifier {
         notifyListeners();
 
         if (_story!.id != null) {
-          // Si la historia ya existe, solo actualizamos su estado
+          // Si la historia ya existe, actualizamos su estado y rating
           debugPrint(
-              '📊 StoryProvider: Updating story with ID: ${_story!.id} to status: saved');
+              '📊 StoryProvider: Updating existing story - ID: ${_story!.id}, Rating: $_rating');
           await _updateStoryStatusUseCase(_story!.id!, 'saved');
-          _story = _story!.copyWith(status: 'saved');
+          await _updateRatingUseCase(_story!.id!, _rating);
+          _story = _story!.copyWith(status: 'saved', rating: _rating);
         } else {
           // Si es una nueva historia, la guardamos completa
-          final storyToSave =
-              _story!.copyWith(rating: _rating, status: 'saved');
+          final storyToSave = _story!.copyWith(
+            rating: 5.0, // Siempre guardamos con 5 estrellas inicialmente
+            status: 'saved',
+          );
           debugPrint(
-              '📊 StoryProvider: Saving new story with rating: $_rating');
+              '📊 StoryProvider: Saving new story with rating: ${storyToSave.rating}');
           final id = await _saveStoryUseCase.execute(storyToSave);
           _story = storyToSave.copyWith(id: id);
+          _rating = 5.0; // Actualizamos el rating en el provider también
         }
 
         _isSaved = true;
