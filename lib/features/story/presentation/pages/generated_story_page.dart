@@ -10,6 +10,8 @@ import 'package:storysparks/features/story/domain/usecases/delete_story_usecase.
 import 'package:storysparks/features/story/domain/usecases/save_story_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/update_story_status_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/continue_story_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/generate_story_pdf_usecase.dart';
+import 'package:storysparks/features/auth/presentation/providers/auth_provider.dart';
 import '../../domain/entities/story.dart';
 import '../providers/story_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -55,6 +57,7 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
       saveStoryUseCase: getIt<SaveStoryUseCase>(),
       updateStoryStatusUseCase: getIt<UpdateStoryStatusUseCase>(),
       continueStoryUseCase: getIt<ContinueStoryUseCase>(),
+      generateStoryPdfUseCase: getIt<GenerateStoryPdfUseCase>(),
     )..setStory(widget.story, isFromLibrary: widget.isFromLibrary);
 
     _controller = AnimationController(
@@ -165,6 +168,90 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                 },
               ),
               actions: [
+                IconButton(
+                  icon: const Icon(Icons.picture_as_pdf_outlined,
+                      color: AppColors.textPrimary),
+                  onPressed: provider.isGeneratingPdf
+                      ? null
+                      : () async {
+                          final authProvider = context.read<AuthProvider>();
+                          final userName =
+                              authProvider.currentUser?.email ?? 'Anonymous';
+
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text(
+                                AppLocalizations.of(context)!.generatePdfTitle,
+                                style: const TextStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              content: Text(
+                                AppLocalizations.of(context)!
+                                    .generatePdfConfirmation,
+                                style: const TextStyle(
+                                  fontFamily: 'Urbanist',
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text(
+                                      AppLocalizations.of(context)!.cancel),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    final success =
+                                        await provider.generatePdf(userName);
+                                    if (success && mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            AppLocalizations.of(context)!
+                                                .pdfGeneratedSuccess,
+                                            style: const TextStyle(
+                                              color: AppColors.white,
+                                              fontFamily: 'Urbanist',
+                                            ),
+                                          ),
+                                          backgroundColor: AppColors.success,
+                                        ),
+                                      );
+                                    } else if (mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            provider.error ??
+                                                AppLocalizations.of(context)!
+                                                    .pdfGenerateError,
+                                            style: const TextStyle(
+                                              color: AppColors.white,
+                                              fontFamily: 'Urbanist',
+                                            ),
+                                          ),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: Text(
+                                    AppLocalizations.of(context)!.generate,
+                                    style: const TextStyle(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                ),
                 IconButton(
                   icon: const Icon(Icons.share_outlined,
                       color: AppColors.textPrimary),

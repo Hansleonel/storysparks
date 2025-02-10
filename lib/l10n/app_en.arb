@@ -151,5 +151,10 @@
     "weeksAgo": "{weeks, plural, =1{1 week ago} other{{weeks} weeks ago}}",
     "welcomeBack": "Welcome back 👋",
     "yesterday": "Yesterday",
-    "yourStory": "Your Story"
+    "yourStory": "Your Story",
+    "generatePdfTitle": "Generate PDF",
+    "generatePdfConfirmation": "Do you want to generate a PDF version of this story?",
+    "generate": "Generate",
+    "pdfGeneratedSuccess": "PDF generated successfully",
+    "pdfGenerateError": "Could not generate PDF. Please try again later."
 }

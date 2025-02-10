@@ -5,6 +5,7 @@ import '../../domain/usecases/update_story_rating_usecase.dart';
 import '../../domain/usecases/save_story_usecase.dart';
 import '../../domain/usecases/update_story_status_usecase.dart';
 import '../../domain/usecases/continue_story_usecase.dart';
+import '../../domain/usecases/generate_story_pdf_usecase.dart';
 
 class StoryProvider extends ChangeNotifier {
   final UpdateStoryRatingUseCase _updateRatingUseCase;
@@ -12,6 +13,7 @@ class StoryProvider extends ChangeNotifier {
   final SaveStoryUseCase _saveStoryUseCase;
   final UpdateStoryStatusUseCase _updateStoryStatusUseCase;
   final ContinueStoryUseCase _continueStoryUseCase;
+  final GenerateStoryPdfUseCase _generateStoryPdfUseCase;
 
   bool _isExpanded = false;
   bool _isMemoryExpanded = false;
@@ -21,6 +23,7 @@ class StoryProvider extends ChangeNotifier {
   bool _isSaving = false;
   bool _isSaved = false;
   bool _isContinuing = false;
+  bool _isGeneratingPdf = false;
   String? _error;
 
   StoryProvider({
@@ -29,11 +32,13 @@ class StoryProvider extends ChangeNotifier {
     required SaveStoryUseCase saveStoryUseCase,
     required UpdateStoryStatusUseCase updateStoryStatusUseCase,
     required ContinueStoryUseCase continueStoryUseCase,
+    required GenerateStoryPdfUseCase generateStoryPdfUseCase,
   })  : _updateRatingUseCase = updateRatingUseCase,
         _deleteStoryUseCase = deleteStoryUseCase,
         _saveStoryUseCase = saveStoryUseCase,
         _updateStoryStatusUseCase = updateStoryStatusUseCase,
-        _continueStoryUseCase = continueStoryUseCase {
+        _continueStoryUseCase = continueStoryUseCase,
+        _generateStoryPdfUseCase = generateStoryPdfUseCase {
     debugPrint('🔄 StoryProvider: Initializing...');
   }
 
@@ -46,6 +51,7 @@ class StoryProvider extends ChangeNotifier {
   bool get isSaved => _isSaved;
   String? get error => _error;
   bool get isContinuing => _isContinuing;
+  bool get isGeneratingPdf => _isGeneratingPdf;
 
   void setStory(Story story, {bool isFromLibrary = false}) {
     debugPrint(
@@ -250,6 +256,37 @@ class StoryProvider extends ChangeNotifier {
     }
     debugPrint(
         '⚠️ StoryProvider: Cannot continue - No story or story ID available');
+    return false;
+  }
+
+  Future<bool> generatePdf(String userName) async {
+    if (_story != null) {
+      try {
+        debugPrint('🔄 StoryProvider: Starting PDF generation');
+        _isGeneratingPdf = true;
+        _error = null;
+        notifyListeners();
+
+        final result =
+            await _generateStoryPdfUseCase.execute(_story!, userName);
+
+        return result.fold(
+          (failure) {
+            debugPrint('❌ StoryProvider: Error generating PDF - $failure');
+            _error = failure.toString();
+            notifyListeners();
+            return false;
+          },
+          (pdfFile) {
+            debugPrint('✅ StoryProvider: PDF generated successfully');
+            return true;
+          },
+        );
+      } finally {
+        _isGeneratingPdf = false;
+        notifyListeners();
+      }
+    }
     return false;
   }
 }

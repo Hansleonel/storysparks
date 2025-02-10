@@ -27,6 +27,9 @@ import 'package:storysparks/features/story/data/services/story_cleanup_service.d
 import 'package:storysparks/features/story/domain/usecases/update_story_status_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/continue_story_usecase.dart';
 import 'package:storysparks/features/subscription/presentation/providers/subscription_provider.dart';
+import 'package:storysparks/features/story/data/repositories/pdf_repository_impl.dart';
+import 'package:storysparks/features/story/domain/repositories/pdf_repository.dart';
+import 'package:storysparks/features/story/domain/usecases/generate_story_pdf_usecase.dart';
 
 final getIt = GetIt.instance;
 
@@ -53,6 +56,7 @@ void setupServiceLocator() {
       () => StoryLocalDatasource());
   getIt.registerLazySingleton<StoryRepository>(
       () => StoryRepositoryImpl(getIt<StoryLocalDatasource>()));
+  getIt.registerLazySingleton<PdfRepository>(() => PdfRepositoryImpl());
 
   // Services
   getIt.registerLazySingleton<StoryCleanupService>(
@@ -85,6 +89,8 @@ void setupServiceLocator() {
       () => UpdateStoryStatusUseCase(getIt<StoryRepository>()));
   getIt.registerLazySingleton(
       () => ContinueStoryUseCase(getIt<StoryRepository>()));
+  getIt.registerLazySingleton(
+      () => GenerateStoryPdfUseCase(getIt<PdfRepository>()));
 
   // Presentation Layer - Page Providers (Factory ✅)
   getIt.registerFactory(() => ProfileProvider(

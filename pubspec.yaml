@@ -66,6 +66,10 @@ dependencies:
   sign_in_with_apple: ^6.1.4
   supabase_flutter: ^2.8.3
   shared_preferences: ^2.3.5
+  pdf: ^3.11.2
+  path_provider: ^2.1.5
+  share_plus: ^10.1.4
+  cross_file: ^0.3.4+2
 
 dev_dependencies:
   flutter_test:
@@ -149,4 +153,10 @@ flutter:
           weight: 600
         - asset: assets/fonts/Urbanist-Bold.ttf
           weight: 700
+    - family: Pacifico
+      fonts:
+        - asset: assets/fonts/Pacifico-Regular.ttf
+    - family: Lora
+      fonts:
+        - asset: assets/fonts/Lora-Regular.ttf
   generate: true
