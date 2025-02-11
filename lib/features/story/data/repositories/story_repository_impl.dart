@@ -15,12 +15,12 @@ class StoryRepositoryImpl implements StoryRepository {
 
   StoryRepositoryImpl(this._localDatasource)
       : _model = GenerativeModel(
-          model: 'gemini-1.5-flash',
+          model: 'gemini-2.0-flash',
           apiKey: dotenv.env['GEMINI_API_KEY'] ?? '',
         ) {
     // TODO this line is used to create the session manager, need to check if it's working
     _sessionManager = ChatSessionManager(_model);
-    debugPrint('🗄️ StoryRepository: Inicializado con modelo gemini-1.5-flash');
+    debugPrint('🗄️ StoryRepository: Inicializado con modelo gemini-2.0-flash');
   }
 
   @override

@@ -30,6 +30,25 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
   - Continuación de historias con IA
   - Gestión de estados de historia
   - Sistema de sesiones de chat para continuaciones coherentes
+  - Limpieza automática de borradores antiguos
+  - Marcado de historias como eliminadas (soft delete)
+
+- ✅ **Sistema de Suscripción**:
+
+  - Planes de suscripción flexibles:
+    - Plan Semanal ($3.99)
+    - Plan Mensual ($9.99)
+    - Plan Anual ($59.99)
+  - Beneficios por nivel:
+    - Historias ilimitadas
+    - Sin publicidad
+    - Edición de personajes
+    - Continuación de historias
+    - Acceso anticipado (planes mensual y anual)
+    - Soporte prioritario (plan anual)
+  - Interfaz de pago moderna y atractiva
+  - Cálculo automático de ahorros por plan
+  - Período de prueba gratuito
 
 - ✅ **Creación de Historias**:
 
@@ -75,6 +94,9 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
   - Audio (just_audio)
   - Image Picker
   - Animaciones personalizadas
+- **Monetización**:
+  - Sistema de suscripciones in-app
+  - Gestión de planes y beneficios
 
 ## 📂 Estructura del Proyecto Actual
 
