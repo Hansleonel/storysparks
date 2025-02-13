@@ -16,13 +16,13 @@ class SubscriptionProvider extends ChangeNotifier {
         ((monthlyPrice * 12 - annualPrice) / (monthlyPrice * 12) * 100).round();
 
     return [
-      SubscriptionPlan(
+      const SubscriptionPlan(
         id: 'weekly',
         name: 'weekly',
         type: PlanType.weekly,
         price: weeklyPrice,
         description: 'weekly_description',
-        features: const [
+        features: [
           'unlimited_stories',
           'no_ads',
           'character_editing',
@@ -59,6 +59,10 @@ class SubscriptionProvider extends ChangeNotifier {
           'story_continuation',
           'early_access',
           'priority_support',
+          'ai_narration',
+        ],
+        highlightedFeatures: const [
+          'ai_narration',
         ],
       ),
     ];
@@ -68,11 +72,22 @@ class SubscriptionProvider extends ChangeNotifier {
   SubscriptionPlan? get selectedPlan => _selectedPlan;
 
   void selectPlan(SubscriptionPlan plan) {
+    debugPrint('\n🎯 ===== Plan Selection Debug Info ===== 🎯');
+    debugPrint('📝 Selected Plan: ${plan.name}');
+    debugPrint('💵 Price: \$${plan.price}');
+    debugPrint('✨ Features: ${plan.features.join(", ")}');
+    if (plan.highlightedFeatures.isNotEmpty) {
+      debugPrint(
+          '🌟 Highlighted Features: ${plan.highlightedFeatures.join(", ")}');
+    }
+    debugPrint('🏁 ================================== 🏁\n');
+
     _selectedPlan = plan;
     notifyListeners();
   }
 
   void clearSelection() {
+    debugPrint('\n🔄 Clearing plan selection');
     _selectedPlan = null;
     notifyListeners();
   }

@@ -45,6 +45,12 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
   @override
   void initState() {
     super.initState();
+    // Print story content for debugging
+    debugPrint('\n📚 ===== Story Debug Info ===== 📚\n');
+    debugPrint('📌 Title: ${widget.story.title}\n');
+    debugPrint('💭 Memory: ${widget.story.memory}\n');
+    debugPrint('📖 Content: ${widget.story.content}\n');
+    debugPrint('🏁 ========================== 🏁\n');
     _initializeProviderAndAnimations();
   }
 

@@ -11,6 +11,7 @@ class SubscriptionPlan extends Equatable {
   final bool isPopular;
   final double savings;
   final List<String> features;
+  final List<String> highlightedFeatures;
 
   const SubscriptionPlan({
     required this.id,
@@ -21,9 +22,19 @@ class SubscriptionPlan extends Equatable {
     this.isPopular = false,
     this.savings = 0,
     required this.features,
+    this.highlightedFeatures = const [],
   });
 
   @override
-  List<Object?> get props =>
-      [id, name, type, price, description, isPopular, savings, features];
+  List<Object?> get props => [
+        id,
+        name,
+        type,
+        price,
+        description,
+        isPopular,
+        savings,
+        features,
+        highlightedFeatures,
+      ];
 }

@@ -151,5 +151,7 @@
     "weeksAgo": "{weeks, plural, =1{hace 1 semana} other{hace {weeks} semanas}}",
     "welcomeBack": "¡Bienvenido de nuevo! 👋",
     "yesterday": "Ayer",
-    "yourStory": "Tu Historia"
+    "yourStory": "Tu Historia",
+    "paywallBenefitAiNarration": "Narración AI y Clonación de Voz para narrar tus historias.",
+    "paywallNewFeatureTag": "NUEVO"
 }
