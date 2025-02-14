@@ -527,6 +527,8 @@ class _Header extends StatelessWidget {
     final userName = context.select<HomeProvider, String?>(
       (provider) => provider.userName,
     );
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -554,7 +556,7 @@ class _Header extends StatelessWidget {
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 200),
                   child: Text(
-                    AppLocalizations.of(context)!.hello(userName ?? '...'),
+                    l10n.hello(userName ?? '...'),
                     style: const TextStyle(
                       fontFamily: 'Playfair',
                       fontSize: 24,
@@ -566,7 +568,7 @@ class _Header extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  AppLocalizations.of(context)!.goodMorning,
+                  l10n.goodMorning,
                   style: const TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 14,
@@ -578,39 +580,48 @@ class _Header extends StatelessWidget {
             ),
           ],
         ),
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.white,
-            border: Border.all(
-              color: AppColors.border,
-              width: 1,
-            ),
-          ),
-          child: Stack(
-            children: [
-              const Center(
-                child: Icon(
-                  Icons.notifications_outlined,
-                  color: AppColors.textPrimary,
-                  size: 24,
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              debugPrint('🔔 Notifications tapped');
+            },
+            borderRadius: BorderRadius.circular(24),
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.white,
+                border: Border.all(
+                  color: AppColors.border,
+                  width: 1,
                 ),
               ),
-              Positioned(
-                top: 14,
-                right: 14,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
+              child: Stack(
+                children: [
+                  const Center(
+                    child: Icon(
+                      Icons.notifications_outlined,
+                      color: AppColors.textPrimary,
+                      size: 24,
+                    ),
                   ),
-                ),
+                  Positioned(
+                    top: 14,
+                    right: 14,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ],

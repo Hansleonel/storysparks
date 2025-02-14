@@ -50,6 +50,7 @@ class PaywallPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Close button
+                    const SizedBox(height: 56),
                     Align(
                       alignment: Alignment.topLeft,
                       child: IconButton(
