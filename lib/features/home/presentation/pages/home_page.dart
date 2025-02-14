@@ -49,6 +49,7 @@ class _MemoryInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.read<HomeProvider>();
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -63,7 +64,7 @@ class _MemoryInput extends StatelessWidget {
             color: AppColors.textPrimary,
           ),
           decoration: InputDecoration(
-            hintText: AppLocalizations.of(context)!.shareMemoryHint,
+            hintText: l10n.shareMemoryHint,
             hintStyle: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 16,
@@ -136,10 +137,10 @@ class _MemoryInput extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'Imagen del recuerdo',
-                              style: TextStyle(
+                              l10n.memoryImage,
+                              style: const TextStyle(
                                 fontFamily: 'Urbanist',
                                 fontSize: 14,
                                 color: AppColors.textSecondary,
@@ -168,6 +169,7 @@ class _MemoryInput extends StatelessWidget {
 class _ImagePickerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: 56,
       height: 56,
@@ -207,9 +209,9 @@ class _ImagePickerButton extends StatelessWidget {
                     const SizedBox(height: 24),
                     ListTile(
                       leading: const Icon(Icons.photo_library_outlined),
-                      title: const Text(
-                        'Seleccionar de la galería',
-                        style: TextStyle(
+                      title: Text(
+                        l10n.selectFromGallery,
+                        style: const TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -234,9 +236,9 @@ class _ImagePickerButton extends StatelessWidget {
                     ),
                     ListTile(
                       leading: const Icon(Icons.camera_alt_outlined),
-                      title: const Text(
-                        'Tomar una foto',
-                        style: TextStyle(
+                      title: Text(
+                        l10n.takePhoto,
+                        style: const TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
