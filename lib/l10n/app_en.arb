@@ -88,6 +88,7 @@
     "passwordsDontMatch": "Passwords don't match",
     "paywallAnnualDescription": "Best value",
     "paywallAnnualPlan": "Yearly",
+    "paywallBenefitAiNarration": "AI Story Narration & Voice Cloning to narrate your stories.",
     "paywallBenefitEarlyAccess": "Early access to new features",
     "paywallBenefitNoAds": "No ads or interruptions",
     "paywallBenefitUnlimited": "Unlimited and personalized stories",
@@ -95,6 +96,7 @@
     "paywallGetProButton": "Get PRO access",
     "paywallMonthlyDescription": "Most popular plan",
     "paywallMonthlyPlan": "Monthly",
+    "paywallNewFeatureTag": "NEW",
     "paywallPopularTag": "Popular",
     "paywallSavingsLabel": "Save {percent}%",
     "paywallTitle": "Unlock your memories without limits with StorySparks PRO",
@@ -151,7 +153,5 @@
     "weeksAgo": "{weeks, plural, =1{1 week ago} other{{weeks} weeks ago}}",
     "welcomeBack": "Welcome back 👋",
     "yesterday": "Yesterday",
-    "yourStory": "Your Story",
-    "paywallBenefitAiNarration": "AI Story Narration & Voice Cloning to narrate your stories.",
-    "paywallNewFeatureTag": "NEW"
+    "yourStory": "Your Story"
 }
