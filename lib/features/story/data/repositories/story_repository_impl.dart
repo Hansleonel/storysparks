@@ -37,10 +37,16 @@ class StoryRepositoryImpl implements StoryRepository {
 
     try {
       final prompt = '''
-Genera una historia cautivadora basada en este recuerdo personal: "$memory"
-El género de la historia debe ser $genre.
-La historia debe ser emotiva, detallada y mantener la esencia del recuerdo original.
-Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
+Genera una historia cautivadora inspirada en el siguiente recuerdo personal: “$memory”.
+El género de la historia será $genre.
+Instrucciones específicas:
+
+Comienza con una frase breve y poderosa que despierte el interés, ya sea presentando un detalle sensorial, una pregunta intrigante o situando la acción.
+A lo largo del relato, mantén un tono emotivo y describe escenas con detalles vívidos, conservando la esencia del recuerdo original.
+Evita comenzar siempre de la misma forma; varía entre descripciones sensoriales, preguntas directas, diálogos o metáforas.
+Asegura que la historia se mantenga coherente con el género ($genre), sin perder el matiz personal del recuerdo.
+Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la historia.
+
 ''';
 
       debugPrint('🤖 StoryRepository: Enviando prompt a Gemini...');
@@ -100,7 +106,7 @@ Escribe la historia en español y usa un lenguaje narrativo y descriptivo.
           _sessionManager.getOrCreateSession(story.id.toString(), story);
 
       const prompt =
-          'Continúa la narración de forma natural y coherente. La continuación debe mantener el mismo tono y estilo.';
+          'Continúa la narración de forma natural y coherente. La continuación debe mantener el mismo tono y estilo y dale un desenlace abierto para que el usuario pueda continuar la historia.';
 
       debugPrint('🤖 StoryRepository: Solicitando continuación...');
       final response = await chatSession.sendMessage(Content.text(prompt));
