@@ -20,6 +20,8 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
 - ✅ **Gestión de Historias**:
 
   - Generación de historias con IA usando Google Generative AI
+  - Integración de descripciones de imágenes en la narrativa
+  - Procesamiento automático de imágenes para enriquecer historias
   - Guardado local de historias con SQLite
   - Visualización de historias generadas
   - Eliminación de historias
@@ -53,7 +55,11 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
 - ✅ **Creación de Historias**:
 
   - Campo de texto para compartir recuerdos
-  - Soporte para añadir imágenes (galería o cámara)
+  - Sistema avanzado de procesamiento de imágenes:
+    - Soporte para múltiples formatos (JPEG, PNG, WEBP, HEIC)
+    - Análisis automático de imágenes con IA
+    - Integración de descripciones visuales en la narrativa
+    - Validación de tamaño y formato de imágenes
   - Selección de géneros narrativos:
     - Feliz
     - Nostálgico
@@ -81,7 +87,8 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
   - Managers para gestión de sesiones de chat con Google Generative AI
 - **Almacenamiento Local**: SQLite con sqflite
 - **IA**:
-  - Google Generative AI
+  - Google Generative AI para generación de historias
+  - Procesamiento de imágenes y generación de descripciones
   - Gestión de sesiones de chat para continuidad narrativa
 - **Networking**: Dio
 - **Inyección de Dependencias**: GetIt + Injectable
@@ -92,7 +99,7 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
 - **Gestión de Assets**:
   - SVG Support (flutter_svg)
   - Audio (just_audio)
-  - Image Picker
+  - Image Picker con soporte multiformat
   - Animaciones personalizadas
 - **Monetización**:
   - Sistema de suscripciones in-app
@@ -120,6 +127,7 @@ lib/
 │   ├── story/
 │   │   ├── data/
 │   │   │   ├── datasources/
+│   │   │   ├── managers/
 │   │   │   └── repositories/
 │   │   ├── domain/
 │   │   │   ├── repositories/
@@ -147,6 +155,7 @@ lib/
    - Flutter SDK
    - Dart SDK
    - Android Studio / Xcode
+   - API Key de Google Generative AI
 
 2. **Instalación**:
 
@@ -156,7 +165,14 @@ lib/
    flutter pub get
    ```
 
-3. **Ejecutar el Proyecto**:
+3. **Configuración de Variables de Entorno**:
+   Crea un archivo `.env` en la raíz del proyecto:
+
+   ```
+   GEMINI_API_KEY=tu_api_key_aqui
+   ```
+
+4. **Ejecutar el Proyecto**:
    ```bash
    flutter run
    ```
@@ -177,11 +193,12 @@ dependencies:
   dartz: ^0.10.1
   get_it: ^7.6.4
   injectable: ^2.3.2
-  google_generative_ai: ^0.2.0
+  google_generative_ai: ^0.3.3
   flutter_dotenv: ^5.1.0
   flutter_rating_bar: ^4.0.1
   sign_in_with_apple: ^6.1.4
   supabase_flutter: ^2.8.3
+  mime: ^1.0.6
 ```
 
 ## 🔄 Flujo de la Aplicación Implementado
@@ -201,6 +218,7 @@ dependencies:
 3. **Gestión de Historias**:
 
    - ✅ Generación de historias con StoryProvider
+   - ✅ Procesamiento y análisis de imágenes
    - ✅ Sistema de continuación de historias con contexto
    - ✅ Almacenamiento local de historias con estados
    - ✅ Visualización animada de historias
@@ -216,6 +234,7 @@ dependencies:
 - ✅ Validación de entradas de usuario
 - ✅ Gestión segura de API keys
 - ✅ Manejo de sesiones de chat encapsulado
+- ✅ Validación de imágenes y archivos
 
 ## 🔜 Próximas Características
 
@@ -223,6 +242,7 @@ dependencies:
 - [x] Modo offline con almacenamiento local
 - [x] Múltiples idiomas
 - [x] Sistema de continuación de historias
+- [x] Procesamiento de imágenes con IA
 - [ ] Compartir historias en redes sociales
 - [ ] Temas personalizables
 - [ ] Exportación de historias en diferentes formatos
