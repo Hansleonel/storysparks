@@ -109,42 +109,90 @@ class _MemoryInput extends StatelessWidget {
                             borderRadius: const BorderRadius.horizontal(
                               left: Radius.circular(11),
                             ),
-                            child: Builder(
-                              builder: (context) {
-                                final file = File(provider.selectedImagePath!);
-                                debugPrint(
-                                    'Loading image from path: ${file.path}');
-                                debugPrint('File exists: ${file.existsSync()}');
-                                return Image.file(
-                                  file,
-                                  fit: BoxFit.cover,
-                                  width: 56,
-                                  height: 56,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    debugPrint('Error loading image: $error');
-                                    return Container(
+                            child: Stack(
+                              children: [
+                                Builder(
+                                  builder: (context) {
+                                    final file =
+                                        File(provider.selectedImagePath!);
+                                    debugPrint(
+                                        'Loading image from path: ${file.path}');
+                                    debugPrint(
+                                        'File exists: ${file.existsSync()}');
+                                    return Image.file(
+                                      file,
+                                      fit: BoxFit.cover,
                                       width: 56,
                                       height: 56,
-                                      color: AppColors.border,
-                                      child: const Icon(
-                                        Icons.error_outline,
-                                        color: AppColors.textSecondary,
-                                      ),
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        debugPrint(
+                                            'Error loading image: $error');
+                                        return Container(
+                                          width: 56,
+                                          height: 56,
+                                          color: AppColors.border,
+                                          child: const Icon(
+                                            Icons.error_outline,
+                                            color: AppColors.textSecondary,
+                                          ),
+                                        );
+                                      },
                                     );
                                   },
-                                );
-                              },
+                                ),
+                                if (provider.isProcessingImage)
+                                  Container(
+                                    width: 56,
+                                    height: 56,
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: const Center(
+                                      child: SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  AppColors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Text(
-                              l10n.memoryImage,
-                              style: const TextStyle(
-                                fontFamily: 'Urbanist',
-                                fontSize: 14,
-                                color: AppColors.textSecondary,
-                              ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  l10n.memoryImage,
+                                  style: const TextStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontSize: 14,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                                if (provider.isProcessingImage)
+                                  Text(
+                                    'Analizando imagen...',
+                                    style: TextStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: 12,
+                                      color: AppColors.textSecondary
+                                          .withOpacity(0.7),
+                                    ),
+                                  ),
+                                if (provider.imageDescription != null)
+                                  Icon(
+                                    Icons.check_circle,
+                                    size: 14,
+                                    color: Colors.green,
+                                  ),
+                              ],
                             ),
                           ),
                           IconButton(

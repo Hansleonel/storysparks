@@ -6,6 +6,7 @@ import 'package:storysparks/features/home/domain/usecases/get_user_name_usecase.
 import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
 import 'package:storysparks/features/story/domain/entities/story.dart';
 import 'package:storysparks/features/story/domain/usecases/generate_story_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/get_image_description_usecase.dart';
 
 class HomeProvider extends ChangeNotifier {
   final TextEditingController memoryController = TextEditingController();
@@ -18,11 +19,18 @@ class HomeProvider extends ChangeNotifier {
   final GetUserNameUseCase _getUserNameUseCase;
   final AuthRepository _authRepository;
   final GenerateStoryUseCase _generateStoryUseCase;
+  final GetImageDescriptionUseCase _getImageDescriptionUseCase;
+
+  String? _imageDescription;
+  String? get imageDescription => _imageDescription;
+  bool _isProcessingImage = false;
+  bool get isProcessingImage => _isProcessingImage;
 
   HomeProvider(
     this._getUserNameUseCase,
     this._authRepository,
     this._generateStoryUseCase,
+    this._getImageDescriptionUseCase,
   ) {
     debugPrint('🏠 HomeProvider: Inicializando...');
     memoryController.addListener(_updateGenerateButton);
@@ -65,21 +73,45 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setSelectedImage(String path) {
-    debugPrint('🏠 HomeProvider: Imagen seleccionada: $path');
+  void setSelectedImage(String path) async {
     selectedImagePath = path;
     notifyListeners();
+
+    // Procesar la imagen automáticamente
+    await processImage(path);
   }
 
   void removeSelectedImage() {
-    debugPrint('🏠 HomeProvider: Imagen removida');
     selectedImagePath = null;
+    _imageDescription = null;
     notifyListeners();
   }
 
   void unfocusMemoryInput() {
     debugPrint('🏠 HomeProvider: Input de memoria perdió el foco');
     memoryFocusNode.unfocus();
+  }
+
+  Future<void> processImage(String imagePath) async {
+    _isProcessingImage = true;
+    notifyListeners();
+
+    final result = await _getImageDescriptionUseCase(imagePath);
+
+    result.fold((failure) {
+      debugPrint(
+          '❌ HomeProvider: Error al procesar imagen - ${failure.message}');
+      _imageDescription = null;
+    }, (description) {
+      debugPrint('✅ HomeProvider: Imagen procesada exitosamente');
+      debugPrint(
+          '   Longitud de la descripción: ${description.length} caracteres');
+      debugPrint('   Descripción: $description');
+      _imageDescription = description;
+    });
+
+    _isProcessingImage = false;
+    notifyListeners();
   }
 
   Future<Story> generateStory() async {
@@ -106,7 +138,6 @@ class HomeProvider extends ChangeNotifier {
 
     isLoading = true;
     notifyListeners();
-    debugPrint('🏠 HomeProvider: Estado de carga activado');
 
     try {
       debugPrint('🏠 HomeProvider: Llamando a GenerateStoryUseCase...');
@@ -114,11 +145,15 @@ class HomeProvider extends ChangeNotifier {
       debugPrint('   - Memoria: ${memoryController.text}');
       debugPrint('   - Género: $selectedGenre');
       debugPrint('   - Usuario ID: ${currentUser.id}');
+      if (_imageDescription != null) {
+        debugPrint('   - Descripción de imagen: $_imageDescription');
+      }
 
       final result = await _generateStoryUseCase.execute(
         memory: memoryController.text,
         genre: selectedGenre,
         userId: currentUser.id,
+        imageDescription: _imageDescription,
       );
 
       return result.fold(
@@ -162,7 +197,6 @@ class HomeProvider extends ChangeNotifier {
             'Ocurrió un error inesperado al generar la historia. Por favor, intenta de nuevo.');
       }
     } finally {
-      debugPrint('🏠 HomeProvider: Finalizando generación de historia');
       isLoading = false;
       notifyListeners();
     }

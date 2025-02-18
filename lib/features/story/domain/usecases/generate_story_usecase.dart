@@ -13,12 +13,16 @@ class GenerateStoryUseCase {
     required String memory,
     required String genre,
     required String userId,
+    String? imageDescription,
   }) async {
     debugPrint('📖 GenerateStoryUseCase: Iniciando generación de historia');
     debugPrint('📖 GenerateStoryUseCase: Parámetros recibidos:');
     debugPrint('   - Memoria (longitud): ${memory.length} caracteres');
     debugPrint('   - Género: $genre');
     debugPrint('   - ID de usuario: $userId');
+    if (imageDescription != null) {
+      debugPrint('   - Descripción de imagen disponible: $imageDescription');
+    }
 
     try {
       debugPrint('📖 GenerateStoryUseCase: Llamando al repositorio...');
@@ -26,6 +30,7 @@ class GenerateStoryUseCase {
         memory: memory,
         genre: genre,
         userId: userId,
+        imageDescription: imageDescription,
       );
       debugPrint('✅ GenerateStoryUseCase: Historia generada exitosamente');
       debugPrint('   - ID: ${story.id}');

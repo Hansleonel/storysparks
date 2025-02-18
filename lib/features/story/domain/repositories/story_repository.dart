@@ -5,7 +5,10 @@ abstract class StoryRepository {
     required String memory,
     required String genre,
     required String userId,
+    String? imageDescription,
   });
+
+  Future<String> getImageDescription(String imagePath);
 
   Future<Story> continueStory(Story story);
 

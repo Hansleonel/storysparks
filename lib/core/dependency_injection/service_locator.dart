@@ -27,6 +27,7 @@ import 'package:storysparks/features/story/data/services/story_cleanup_service.d
 import 'package:storysparks/features/story/domain/usecases/update_story_status_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/continue_story_usecase.dart';
 import 'package:storysparks/features/subscription/presentation/providers/subscription_provider.dart';
+import 'package:storysparks/features/story/domain/usecases/get_image_description_usecase.dart';
 
 final getIt = GetIt.instance;
 
@@ -85,6 +86,8 @@ void setupServiceLocator() {
       () => UpdateStoryStatusUseCase(getIt<StoryRepository>()));
   getIt.registerLazySingleton(
       () => ContinueStoryUseCase(getIt<StoryRepository>()));
+  getIt.registerLazySingleton(
+      () => GetImageDescriptionUseCase(getIt<StoryRepository>()));
 
   // Presentation Layer - Page Providers (Factory ✅)
   getIt.registerFactory(() => ProfileProvider(
@@ -95,6 +98,7 @@ void setupServiceLocator() {
         getIt<GetUserNameUseCase>(),
         getIt<AuthRepository>(),
         getIt<GenerateStoryUseCase>(),
+        getIt<GetImageDescriptionUseCase>(),
       ));
   getIt.registerFactory(() => SettingsProvider(getIt()));
   getIt.registerFactory(() => SubscriptionProvider());

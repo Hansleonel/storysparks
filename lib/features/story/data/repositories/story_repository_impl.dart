@@ -2,6 +2,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:storysparks/core/utils/cover_image_helper.dart';
+import 'dart:io';
+import 'dart:convert';
+import 'package:mime/mime.dart';
+import 'package:dio/dio.dart';
 import '../../domain/entities/story.dart';
 import '../../domain/repositories/story_repository.dart';
 import '../datasources/story_local_datasource.dart';
@@ -28,6 +32,7 @@ class StoryRepositoryImpl implements StoryRepository {
     required String memory,
     required String genre,
     required String userId,
+    String? imageDescription,
   }) async {
     debugPrint('🗄️ StoryRepository: Iniciando generación de historia');
     debugPrint('🗄️ StoryRepository: Preparando prompt con:');
@@ -35,9 +40,14 @@ class StoryRepositoryImpl implements StoryRepository {
     debugPrint('   - Género solicitado: $genre');
     debugPrint('   - ID de usuario: $userId');
 
+    if (imageDescription != null) {
+      debugPrint('📸 StoryRepository: Descripción de imagen disponible:');
+      debugPrint(imageDescription);
+    }
+
     try {
       final prompt = '''
-Genera una historia cautivadora inspirada en el siguiente recuerdo personal: “$memory”.
+Genera una historia cautivadora inspirada en el siguiente recuerdo personal: " $memory ".${imageDescription != null ? '\nTeniendo en cuenta esta descripción de la imagen relacionada: "$imageDescription".' : ''}
 El género de la historia será $genre.
 Instrucciones específicas:
 
@@ -202,5 +212,98 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
   @override
   Future<void> cleanupOldDraftStories() async {
     await _localDatasource.cleanupOldDraftStories();
+  }
+
+  @override
+  Future<String> getImageDescription(String imagePath) async {
+    debugPrint('🖼️ StoryRepository: Iniciando análisis de imagen');
+    debugPrint('   Ruta de la imagen: $imagePath');
+
+    try {
+      final File imageFile = File(imagePath);
+      if (!imageFile.existsSync()) {
+        debugPrint('❌ StoryRepository: Archivo de imagen no encontrado');
+        throw Exception('file not found');
+      }
+
+      final int fileSize = await imageFile.length();
+      if (fileSize > 20 * 1024 * 1024) {
+        // 20MB en bytes
+        debugPrint(
+            '❌ StoryRepository: Imagen demasiado grande (${(fileSize / 1024 / 1024).toStringAsFixed(2)}MB)');
+        throw Exception('too large');
+      }
+
+      final List<int> imageBytes = await imageFile.readAsBytes();
+      final String mimeType = lookupMimeType(imagePath) ?? 'image/jpeg';
+
+      if (!['image/jpeg', 'image/png', 'image/webp', 'image/heic']
+          .contains(mimeType)) {
+        debugPrint(
+            '❌ StoryRepository: Formato de imagen no soportado ($mimeType)');
+        throw Exception('invalid format');
+      }
+
+      debugPrint('🤖 StoryRepository: Enviando imagen a Gemini para análisis');
+      debugPrint('   Tipo MIME: $mimeType');
+      debugPrint('   Tamaño: ${(fileSize / 1024).toStringAsFixed(2)}KB');
+
+      final prompt = '''
+Analiza esta imagen y proporciona una descripción detallada enfocándote en:
+1. Las emociones y el ambiente que transmite
+2. Los elementos principales y su significado
+3. Los detalles que podrían ser relevantes para una historia
+4. El contexto temporal y espacial si es evidente
+
+Mantén la descripción concisa pero rica en detalles significativos.
+''';
+
+      final dio = Dio();
+      final response = await dio.post(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+        queryParameters: {
+          'key': dotenv.env['GEMINI_API_KEY'],
+        },
+        data: {
+          'contents': [
+            {
+              'parts': [
+                {'text': prompt},
+                {
+                  'inline_data': {
+                    'mime_type': mimeType,
+                    'data': base64.encode(imageBytes)
+                  }
+                }
+              ]
+            }
+          ]
+        },
+      );
+
+      if (response.statusCode != 200) {
+        debugPrint('❌ StoryRepository: Error en la respuesta de Gemini');
+        debugPrint('   Código: ${response.statusCode}');
+        debugPrint('   Respuesta: ${response.data}');
+        throw Exception('Error en la respuesta de Gemini');
+      }
+
+      final text =
+          response.data['candidates'][0]['content']['parts'][0]['text'];
+      if (text == null) {
+        debugPrint('❌ StoryRepository: Gemini no generó descripción');
+        throw Exception('No se pudo generar la descripción de la imagen');
+      }
+
+      debugPrint(
+          '✅ StoryRepository: Descripción de imagen generada exitosamente');
+      debugPrint('   Longitud de la descripción: ${text.length} caracteres');
+
+      return text;
+    } catch (e) {
+      debugPrint('❌ StoryRepository: Error durante el análisis de imagen');
+      debugPrint('   Error detallado: $e');
+      rethrow;
+    }
   }
 }
