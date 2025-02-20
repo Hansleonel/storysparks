@@ -9,8 +9,9 @@ import 'package:storysparks/features/story/domain/usecases/generate_story_usecas
 import 'package:storysparks/features/story/domain/usecases/get_image_description_usecase.dart';
 
 class HomeProvider extends ChangeNotifier {
-  final TextEditingController memoryController = TextEditingController();
-  final FocusNode memoryFocusNode = FocusNode();
+  final TextEditingController memoryController;
+  final TextEditingController authorController;
+  final FocusNode memoryFocusNode;
   String selectedGenre = '';
   bool isGenerateEnabled = false;
   String? selectedImagePath;
@@ -31,7 +32,9 @@ class HomeProvider extends ChangeNotifier {
     this._authRepository,
     this._generateStoryUseCase,
     this._getImageDescriptionUseCase,
-  ) {
+  )   : memoryController = TextEditingController(),
+        authorController = TextEditingController(),
+        memoryFocusNode = FocusNode() {
     debugPrint('🏠 HomeProvider: Inicializando...');
     memoryController.addListener(_updateGenerateButton);
     _loadUserName();
@@ -207,6 +210,7 @@ class HomeProvider extends ChangeNotifier {
   void dispose() {
     debugPrint('🏠 HomeProvider: Limpiando recursos...');
     memoryController.dispose();
+    authorController.dispose();
     memoryFocusNode.dispose();
     super.dispose();
   }
