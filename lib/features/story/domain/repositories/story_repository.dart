@@ -6,6 +6,7 @@ abstract class StoryRepository {
     required String genre,
     required String userId,
     String? imageDescription,
+    String? imagePath,
   });
 
   Future<String> getImageDescription(String imagePath);

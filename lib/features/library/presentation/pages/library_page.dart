@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
-import 'package:storysparks/core/utils/cover_image_helper.dart';
 import 'package:storysparks/core/utils/date_formatter.dart';
 import 'package:storysparks/features/story/domain/entities/story.dart';
 import 'package:storysparks/core/widgets/empty_state.dart';
 import '../providers/library_provider.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
+import 'dart:io';
 
 class LibraryPage extends StatefulWidget {
   const LibraryPage({super.key});
@@ -372,8 +372,9 @@ class _StoryCard extends StatelessWidget {
                     top: Radius.circular(16),
                   ),
                   image: DecorationImage(
-                    image:
-                        AssetImage(CoverImageHelper.getCoverImage(story.genre)),
+                    image: story.customImagePath != null
+                        ? FileImage(File(story.customImagePath!))
+                        : AssetImage(story.imageUrl) as ImageProvider,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -559,10 +560,15 @@ class _TimelineCard extends StatelessWidget {
                   const BorderRadius.horizontal(left: Radius.circular(16)),
               child: SizedBox(
                 width: imageWidth,
-                child: Image.asset(
-                  CoverImageHelper.getCoverImage(story.genre),
-                  fit: BoxFit.cover,
-                ),
+                child: story.customImagePath != null
+                    ? Image.file(
+                        File(story.customImagePath!),
+                        fit: BoxFit.cover,
+                      )
+                    : Image.asset(
+                        story.imageUrl,
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             Expanded(

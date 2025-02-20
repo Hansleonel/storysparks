@@ -28,6 +28,7 @@ import 'package:storysparks/features/story/domain/usecases/update_story_status_u
 import 'package:storysparks/features/story/domain/usecases/continue_story_usecase.dart';
 import 'package:storysparks/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:storysparks/features/story/domain/usecases/get_image_description_usecase.dart';
+import 'package:storysparks/features/story/data/services/image_service.dart';
 
 final getIt = GetIt.instance;
 
@@ -52,8 +53,11 @@ void setupServiceLocator() {
   // Story
   getIt.registerLazySingleton<StoryLocalDatasource>(
       () => StoryLocalDatasource());
-  getIt.registerLazySingleton<StoryRepository>(
-      () => StoryRepositoryImpl(getIt<StoryLocalDatasource>()));
+  getIt.registerLazySingleton<ImageService>(() => ImageService());
+  getIt.registerLazySingleton<StoryRepository>(() => StoryRepositoryImpl(
+        getIt<StoryLocalDatasource>(),
+        getIt<ImageService>(),
+      ));
 
   // Services
   getIt.registerLazySingleton<StoryCleanupService>(

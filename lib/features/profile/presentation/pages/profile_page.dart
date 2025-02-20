@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
-import 'package:storysparks/core/utils/cover_image_helper.dart';
 import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
 import 'package:storysparks/features/profile/presentation/providers/profile_provider.dart';
 import 'package:storysparks/features/profile/presentation/widgets/review_card.dart';
 import 'package:storysparks/features/story/domain/entities/story.dart';
+import 'dart:io';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -388,8 +388,9 @@ class _StoryGridItemState extends State<_StoryGridItem> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           image: DecorationImage(
-            image:
-                AssetImage(CoverImageHelper.getCoverImage(widget.story.genre)),
+            image: widget.story.customImagePath != null
+                ? FileImage(File(widget.story.customImagePath!))
+                : AssetImage(widget.story.imageUrl) as ImageProvider,
             fit: BoxFit.cover,
           ),
         ),

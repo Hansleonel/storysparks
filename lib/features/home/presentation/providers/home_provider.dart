@@ -154,6 +154,7 @@ class HomeProvider extends ChangeNotifier {
         genre: selectedGenre,
         userId: currentUser.id,
         imageDescription: _imageDescription,
+        imagePath: selectedImagePath,
       );
 
       return result.fold(

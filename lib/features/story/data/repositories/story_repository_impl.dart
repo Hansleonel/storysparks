@@ -10,15 +10,19 @@ import '../../domain/entities/story.dart';
 import '../../domain/repositories/story_repository.dart';
 import '../datasources/story_local_datasource.dart';
 import '../managers/chat_session_manager.dart';
+import '../services/image_service.dart';
 
 class StoryRepositoryImpl implements StoryRepository {
   final StoryLocalDatasource _localDatasource;
   final GenerativeModel _model;
+  final ImageService _imageService;
   // TODO this line is used to create the session manager, need to check if it's working
   late final ChatSessionManager _sessionManager;
 
-  StoryRepositoryImpl(this._localDatasource)
-      : _model = GenerativeModel(
+  StoryRepositoryImpl(
+    this._localDatasource,
+    this._imageService,
+  ) : _model = GenerativeModel(
           model: 'gemini-2.0-flash',
           apiKey: dotenv.env['GEMINI_API_KEY'] ?? '',
         ) {
@@ -33,19 +37,31 @@ class StoryRepositoryImpl implements StoryRepository {
     required String genre,
     required String userId,
     String? imageDescription,
+    String? imagePath,
   }) async {
     debugPrint('🗄️ StoryRepository: Iniciando generación de historia');
-    debugPrint('🗄️ StoryRepository: Preparando prompt con:');
-    debugPrint('   - Memoria (longitud): ${memory.length} caracteres');
-    debugPrint('   - Género solicitado: $genre');
-    debugPrint('   - ID de usuario: $userId');
+    String? processedImagePath;
 
-    if (imageDescription != null) {
-      debugPrint('📸 StoryRepository: Descripción de imagen disponible:');
-      debugPrint(imageDescription);
+    if (imagePath != null) {
+      processedImagePath =
+          await _imageService.processAndSaveStoryImage(imagePath);
+      if (processedImagePath == null) {
+        debugPrint(
+            '⚠️ StoryRepository: No se pudo procesar la imagen, se usará la imagen por defecto');
+      }
     }
 
     try {
+      debugPrint('🗄️ StoryRepository: Preparando prompt con:');
+      debugPrint('   - Memoria (longitud): ${memory.length} caracteres');
+      debugPrint('   - Género solicitado: $genre');
+      debugPrint('   - ID de usuario: $userId');
+
+      if (imageDescription != null) {
+        debugPrint('📸 StoryRepository: Descripción de imagen disponible:');
+        debugPrint(imageDescription);
+      }
+
       final prompt = '''
 Genera una historia cautivadora inspirada en el siguiente recuerdo personal: " $memory ".${imageDescription != null ? '\nTeniendo en cuenta esta descripción de la imagen relacionada: "$imageDescription".' : ''}
 El género de la historia será $genre.
@@ -82,6 +98,7 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
         userId: userId,
         title: 'Mi Historia de ${genre.toLowerCase()}',
         imageUrl: CoverImageHelper.getCoverImage(genre),
+        customImagePath: processedImagePath,
         status: 'draft',
       );
 
@@ -89,13 +106,17 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
       debugPrint('   - Título: ${story.title}');
       debugPrint('   - Fecha: ${story.createdAt}');
       debugPrint('   - URL de imagen: ${story.imageUrl}');
+      if (processedImagePath != null) {
+        debugPrint('   - Imagen personalizada: $processedImagePath');
+      }
 
-      // Guardar automáticamente como draft
       final id = await _localDatasource.saveStory(story);
       debugPrint('✅ StoryRepository: Historia guardada como draft con ID: $id');
-
       return story.copyWith(id: id);
     } catch (e) {
+      if (processedImagePath != null) {
+        await _imageService.deleteStoryImage(processedImagePath);
+      }
       debugPrint('❌ StoryRepository: Error durante la generación');
       debugPrint('   Error detallado: $e');
       _handleError(e);
@@ -191,6 +212,10 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
 
   @override
   Future<void> deleteStory(int storyId) async {
+    final story = await _localDatasource.getStoryById(storyId);
+    if (story != null && story.customImagePath != null) {
+      await _imageService.deleteStoryImage(story.customImagePath);
+    }
     await _localDatasource.deleteStory(storyId);
   }
 

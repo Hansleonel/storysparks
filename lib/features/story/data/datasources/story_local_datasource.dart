@@ -20,25 +20,10 @@ class StoryLocalDatasource {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: (db, version) async {
         debugPrint('📦 Database: Creando base de datos versión $version');
-        await db.execute('''
-          CREATE TABLE $tableName (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            content TEXT NOT NULL,
-            genre TEXT NOT NULL,
-            memory TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            read_count INTEGER DEFAULT 0,
-            rating REAL DEFAULT 0.0,
-            user_id TEXT NOT NULL,
-            title TEXT NOT NULL,
-            image_url TEXT NOT NULL,
-            status TEXT DEFAULT 'draft'
-          )
-        ''');
-        debugPrint('✅ Database: Tabla creada exitosamente');
+        await _onCreate(db, version);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         debugPrint('🔄 Database: Actualizando de v$oldVersion a v$newVersion');
@@ -73,28 +58,56 @@ class StoryLocalDatasource {
           await db.update(tableName, {'status': 'saved'});
           debugPrint('✅ Database: v4 - Agregada columna status');
         }
+
+        if (oldVersion < 5) {
+          await db.execute(
+              'ALTER TABLE $tableName ADD COLUMN custom_image_path TEXT');
+          debugPrint('✅ Database: v5 - Agregada columna custom_image_path');
+        }
       },
     );
   }
 
+  Future<void> _onCreate(Database db, int version) async {
+    await db.execute('''
+      CREATE TABLE $tableName (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content TEXT NOT NULL,
+        genre TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        memory TEXT NOT NULL,
+        read_count INTEGER DEFAULT 0,
+        rating REAL DEFAULT 5.0,
+        user_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        image_url TEXT NOT NULL,
+        custom_image_path TEXT,
+        status TEXT DEFAULT 'draft'
+      )
+    ''');
+    debugPrint('✅ StoryLocalDatasource: Tabla creada exitosamente');
+  }
+
   Future<int> saveStory(Story story) async {
     final db = await database;
-    return await db.insert(
-      tableName,
-      {
-        'content': story.content,
-        'genre': story.genre,
-        'memory': story.memory,
-        'created_at': story.createdAt.toIso8601String(),
-        'read_count': story.readCount,
-        'rating': story.rating,
-        'user_id': story.userId,
-        'title': story.title,
-        'image_url': story.imageUrl,
-        'status': story.status,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    final values = {
+      'content': story.content,
+      'genre': story.genre,
+      'memory': story.memory,
+      'created_at': story.createdAt.toIso8601String(),
+      'read_count': story.readCount,
+      'rating': story.rating,
+      'user_id': story.userId,
+      'title': story.title,
+      'image_url': story.imageUrl,
+      'custom_image_path': story.customImagePath,
+      'status': story.status,
+    };
+    debugPrint(
+        '📝 StoryLocalDatasource: Guardando historia en la base de datos');
+    final id = await db.insert(tableName, values);
+    debugPrint('✅ StoryLocalDatasource: Historia guardada con id: $id');
+    return id;
   }
 
   Future<void> updateStoryStatus(int storyId, String status) async {
@@ -116,19 +129,20 @@ class StoryLocalDatasource {
     );
 
     return List.generate(maps.length, (i) {
+      final customImagePath = maps[i]['custom_image_path'] as String?;
       return Story(
-        id: maps[i]['id'],
-        content: maps[i]['content'],
-        genre: maps[i]['genre'],
-        memory: maps[i]['memory'],
-        createdAt: DateTime.parse(maps[i]['created_at']),
-        readCount: maps[i]['read_count'] ?? 0,
-        rating: maps[i]['rating'] ?? 5.0,
-        userId: maps[i]['user_id'],
-        title: maps[i]['title'] ?? 'Mi Historia',
-        imageUrl: maps[i]['image_url'] ??
-            CoverImageHelper.getCoverImage(maps[i]['genre']),
-        status: maps[i]['status'] ?? 'draft',
+        id: maps[i]['id'] as int,
+        content: maps[i]['content'] as String,
+        genre: maps[i]['genre'] as String,
+        memory: maps[i]['memory'] as String,
+        createdAt: DateTime.parse(maps[i]['created_at'] as String),
+        readCount: maps[i]['read_count'] as int? ?? 0,
+        rating: maps[i]['rating'] as double? ?? 5.0,
+        userId: maps[i]['user_id'] as String,
+        title: maps[i]['title'] as String? ?? 'Mi Historia',
+        imageUrl: maps[i]['image_url'] as String,
+        customImagePath: customImagePath,
+        status: maps[i]['status'] as String? ?? 'draft',
       );
     });
   }
@@ -172,19 +186,20 @@ class StoryLocalDatasource {
     );
 
     return List.generate(maps.length, (i) {
+      final customImagePath = maps[i]['custom_image_path'] as String?;
       return Story(
-        id: maps[i]['id'],
-        content: maps[i]['content'],
-        genre: maps[i]['genre'],
-        memory: maps[i]['memory'],
-        createdAt: DateTime.parse(maps[i]['created_at']),
-        readCount: maps[i]['read_count'] ?? 0,
-        rating: maps[i]['rating'] ?? 5.0,
-        userId: maps[i]['user_id'],
-        title: maps[i]['title'] ?? 'Mi Historia',
-        imageUrl: maps[i]['image_url'] ??
-            CoverImageHelper.getCoverImage(maps[i]['genre']),
-        status: maps[i]['status'] ?? 'draft',
+        id: maps[i]['id'] as int,
+        content: maps[i]['content'] as String,
+        genre: maps[i]['genre'] as String,
+        memory: maps[i]['memory'] as String,
+        createdAt: DateTime.parse(maps[i]['created_at'] as String),
+        readCount: maps[i]['read_count'] as int? ?? 0,
+        rating: maps[i]['rating'] as double? ?? 5.0,
+        userId: maps[i]['user_id'] as String,
+        title: maps[i]['title'] as String? ?? 'Mi Historia',
+        imageUrl: maps[i]['image_url'] as String,
+        customImagePath: customImagePath,
+        status: maps[i]['status'] as String? ?? 'draft',
       );
     });
   }
@@ -200,19 +215,20 @@ class StoryLocalDatasource {
     );
 
     return List.generate(maps.length, (i) {
+      final customImagePath = maps[i]['custom_image_path'] as String?;
       return Story(
-        id: maps[i]['id'],
-        content: maps[i]['content'],
-        genre: maps[i]['genre'],
-        memory: maps[i]['memory'],
-        createdAt: DateTime.parse(maps[i]['created_at']),
-        readCount: maps[i]['read_count'] ?? 0,
-        rating: maps[i]['rating'] ?? 5.0,
-        userId: maps[i]['user_id'],
-        title: maps[i]['title'] ?? 'Mi Historia',
-        imageUrl: maps[i]['image_url'] ??
-            CoverImageHelper.getCoverImage(maps[i]['genre']),
-        status: maps[i]['status'] ?? 'draft',
+        id: maps[i]['id'] as int,
+        content: maps[i]['content'] as String,
+        genre: maps[i]['genre'] as String,
+        memory: maps[i]['memory'] as String,
+        createdAt: DateTime.parse(maps[i]['created_at'] as String),
+        readCount: maps[i]['read_count'] as int? ?? 0,
+        rating: maps[i]['rating'] as double? ?? 5.0,
+        userId: maps[i]['user_id'] as String,
+        title: maps[i]['title'] as String? ?? 'Mi Historia',
+        imageUrl: maps[i]['image_url'] as String,
+        customImagePath: customImagePath,
+        status: maps[i]['status'] as String? ?? 'draft',
       );
     });
   }
@@ -249,6 +265,7 @@ class StoryLocalDatasource {
         'status': story.status,
         'title': story.title,
         'image_url': story.imageUrl,
+        'custom_image_path': story.customImagePath,
       },
       where: 'id = ?',
       whereArgs: [story.id],
@@ -256,5 +273,57 @@ class StoryLocalDatasource {
     debugPrint(
         '✅ StoryLocalDatasource: Historia actualizada con ID: ${story.id}');
     debugPrint('   Rating: ${story.rating > 0 ? story.rating : 5.0}');
+  }
+
+  Future<Story?> getStoryById(int storyId) async {
+    final db = await database;
+    final results = await db.query(
+      tableName,
+      where: 'id = ?',
+      whereArgs: [storyId],
+    );
+
+    if (results.isEmpty) {
+      return null;
+    }
+
+    final map = results.first;
+    final customImagePath = map['custom_image_path'] as String?;
+    return Story(
+      id: map['id'] as int,
+      content: map['content'] as String,
+      genre: map['genre'] as String,
+      memory: map['memory'] as String,
+      createdAt: DateTime.parse(map['created_at'] as String),
+      readCount: map['read_count'] as int,
+      rating: map['rating'] as double,
+      userId: map['user_id'] as String,
+      title: map['title'] as String,
+      imageUrl: map['image_url'] as String,
+      customImagePath: customImagePath,
+      status: map['status'] as String,
+    );
+  }
+
+  Future<List<Story>> getAllStories() async {
+    final db = await database;
+    final results = await db.query(tableName, orderBy: 'created_at DESC');
+
+    return results
+        .map((map) => Story(
+              id: map['id'] as int,
+              content: map['content'] as String,
+              genre: map['genre'] as String,
+              memory: map['memory'] as String,
+              createdAt: DateTime.parse(map['created_at'] as String),
+              readCount: map['read_count'] as int,
+              rating: map['rating'] as double,
+              userId: map['user_id'] as String,
+              title: map['title'] as String,
+              imageUrl: map['image_url'] as String,
+              customImagePath: map['custom_image_path'] as String?,
+              status: map['status'] as String,
+            ))
+        .toList();
   }
 }

@@ -9,6 +9,7 @@ class Story {
   final String userId;
   final String title;
   final String imageUrl;
+  final String? customImagePath;
   final String status;
 
   Story({
@@ -22,6 +23,7 @@ class Story {
     required this.userId,
     required this.title,
     required this.imageUrl,
+    this.customImagePath,
     this.status = 'draft',
   });
 
@@ -36,6 +38,7 @@ class Story {
     String? userId,
     String? title,
     String? imageUrl,
+    String? customImagePath,
     String? status,
   }) {
     return Story(
@@ -49,6 +52,7 @@ class Story {
       userId: userId ?? this.userId,
       title: title ?? this.title,
       imageUrl: imageUrl ?? this.imageUrl,
+      customImagePath: customImagePath ?? this.customImagePath,
       status: status ?? this.status,
     );
   }

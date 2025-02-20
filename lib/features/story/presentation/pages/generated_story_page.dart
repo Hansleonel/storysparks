@@ -3,7 +3,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
-import 'package:storysparks/core/utils/cover_image_helper.dart';
 import 'package:storysparks/core/constants/genre_constants.dart';
 import 'package:storysparks/features/story/domain/usecases/update_story_rating_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/delete_story_usecase.dart';
@@ -14,6 +13,7 @@ import '../../domain/entities/story.dart';
 import '../providers/story_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
 
 class GeneratedStoryPage extends StatefulWidget {
   final Story story;
@@ -329,10 +329,17 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                                     ),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(16),
-                                      child: Image.asset(
-                                        _getHeaderImage(widget.story.genre),
-                                        fit: BoxFit.cover,
-                                      ),
+                                      child:
+                                          widget.story.customImagePath != null
+                                              ? Image.file(
+                                                  File(widget
+                                                      .story.customImagePath!),
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.asset(
+                                                  widget.story.imageUrl,
+                                                  fit: BoxFit.cover,
+                                                ),
                                     ),
                                   ),
                                 ),
@@ -445,10 +452,6 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
         },
       ),
     );
-  }
-
-  String _getHeaderImage(String genre) {
-    return CoverImageHelper.getCoverImage(genre);
   }
 }
 

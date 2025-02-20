@@ -69,6 +69,10 @@ dependencies:
 
   mime: ^1.0.4
 
+  image: ^4.1.7
+  path_provider: ^2.1.2
+  uuid: ^4.3.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
