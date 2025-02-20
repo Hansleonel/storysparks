@@ -91,6 +91,7 @@ class _MemoryInput extends StatelessWidget {
         Consumer<HomeProvider>(
           builder: (context, provider, child) {
             return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _ImagePickerButton(),
                 const SizedBox(width: 12),
@@ -201,6 +202,21 @@ class _MemoryInput extends StatelessWidget {
                             color: AppColors.textSecondary,
                           ),
                         ],
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text(
+                        'Puedes agregarle una foto a tu recuerdo, pero no es obligatorio.',
+                        style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 14,
+                          color: AppColors.textSecondary.withOpacity(0.7),
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ),
                   ),
