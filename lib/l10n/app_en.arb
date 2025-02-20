@@ -75,6 +75,7 @@
     "noStories": "No stories yet",
     "notifications": "Notifications",
     "optional": "Optional",
+    "optionalPhotoMessage": "You can add a photo to your memory, but it's not mandatory.",
     "originalMemory": "Original Memory",
     "password": "Password",
     "passwordHelperText": "• At least 8 characters\n• At least one uppercase letter\n• At least one lowercase letter\n• At least one number\n• At least one special character",
@@ -153,6 +154,5 @@
     "weeksAgo": "{weeks, plural, =1{1 week ago} other{{weeks} weeks ago}}",
     "welcomeBack": "Welcome back 👋",
     "yesterday": "Yesterday",
-    "yourStory": "Your Story",
-    "optionalPhotoMessage": "You can add a photo to your memory, but it's not mandatory."
+    "yourStory": "Your Story"
 }

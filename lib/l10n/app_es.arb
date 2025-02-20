@@ -75,6 +75,7 @@
     "noStories": "No hay historias aún",
     "notifications": "Notificaciones",
     "optional": "Opcional",
+    "optionalPhotoMessage": "Puedes agregarle una foto a tu recuerdo, pero no es obligatorio.",
     "originalMemory": "Recuerdo Original",
     "password": "Contraseña",
     "passwordHelperText": "• Mínimo 8 caracteres\n• Al menos una letra mayúscula\n• Al menos una letra minúscula\n• Al menos un número\n• Al menos un carácter especial",
@@ -153,6 +154,5 @@
     "weeksAgo": "{weeks, plural, =1{hace 1 semana} other{hace {weeks} semanas}}",
     "welcomeBack": "¡Bienvenido de nuevo! 👋",
     "yesterday": "Ayer",
-    "yourStory": "Tu Historia",
-    "optionalPhotoMessage": "Puedes agregarle una foto a tu recuerdo, pero no es obligatorio."
+    "yourStory": "Tu Historia"
 }
