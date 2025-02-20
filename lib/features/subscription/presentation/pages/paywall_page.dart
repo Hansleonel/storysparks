@@ -280,17 +280,6 @@ Widget _buildPlanOption(BuildContext context, SubscriptionPlan plan) {
     }
   }
 
-  String getPlanDescription() {
-    switch (plan.type) {
-      case PlanType.weekly:
-        return l10n.paywallWeeklyDescription;
-      case PlanType.monthly:
-        return l10n.paywallMonthlyDescription;
-      case PlanType.annual:
-        return l10n.paywallAnnualDescription;
-    }
-  }
-
   return GestureDetector(
     onTap: () => context.read<SubscriptionProvider>().selectPlan(plan),
     child: Container(
