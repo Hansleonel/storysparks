@@ -153,5 +153,6 @@
     "weeksAgo": "{weeks, plural, =1{1 week ago} other{{weeks} weeks ago}}",
     "welcomeBack": "Welcome back 👋",
     "yesterday": "Yesterday",
-    "yourStory": "Your Story"
+    "yourStory": "Your Story",
+    "optionalPhotoMessage": "You can add a photo to your memory, but it's not mandatory."
 }

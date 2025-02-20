@@ -210,7 +210,7 @@ class _MemoryInput extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
-                        'Puedes agregarle una foto a tu recuerdo, pero no es obligatorio.',
+                        l10n.optionalPhotoMessage,
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 14,
