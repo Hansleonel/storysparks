@@ -6,6 +6,7 @@ import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -83,6 +84,12 @@ class _LoginPageState extends State<LoginPage> {
     return TextField(
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
+      autocorrect: false,
+      enableSuggestions: false,
+      textCapitalization: TextCapitalization.none,
+      inputFormatters: [
+        FilteringTextInputFormatter.deny(RegExp(r'[^a-zA-Z0-9@._-]')),
+      ],
       style: const TextStyle(
         fontFamily: 'Urbanist',
         fontWeight: FontWeight.w500,
