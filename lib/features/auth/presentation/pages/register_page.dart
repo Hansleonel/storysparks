@@ -5,6 +5,7 @@ import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
 import 'package:storysparks/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter/services.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -193,6 +194,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   keyboardType: TextInputType.emailAddress,
                   validator: _validateEmail,
                   helperText: l10n.emailHelperText,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  textCapitalization: TextCapitalization.none,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(
+                        RegExp(r'[^a-zA-Z0-9@._-]')),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
@@ -218,6 +226,12 @@ class _RegisterPageState extends State<RegisterPage> {
                         )
                       : null,
                   errorText: _usernameError,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  textCapitalization: TextCapitalization.none,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_]')),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
@@ -227,6 +241,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   obscureText: !_isPasswordVisible,
                   validator: _validatePassword,
                   helperText: l10n.passwordHelperText,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  textCapitalization: TextCapitalization.none,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isPasswordVisible
@@ -253,6 +270,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     }
                     return null;
                   },
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  textCapitalization: TextCapitalization.none,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isConfirmPasswordVisible
@@ -270,6 +290,10 @@ class _RegisterPageState extends State<RegisterPage> {
                   label: l10n.fullName,
                   prefixIcon: Icons.badge_outlined,
                   helperText: l10n.optional,
+                  textCapitalization: TextCapitalization.words,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-ZÀ-ÿ\s]')),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
@@ -278,6 +302,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   prefixIcon: Icons.edit_note_outlined,
                   maxLines: 3,
                   helperText: l10n.optional,
+                  textCapitalization: TextCapitalization.sentences,
                 ),
                 const SizedBox(height: 32),
                 if (authProvider.error != null)
@@ -369,6 +394,10 @@ class _RegisterPageState extends State<RegisterPage> {
     int? maxLines,
     String? helperText,
     String? errorText,
+    bool autocorrect = true,
+    bool enableSuggestions = true,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return TextFormField(
       controller: controller,
@@ -419,6 +448,10 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
       onChanged: onChanged,
+      autocorrect: autocorrect,
+      enableSuggestions: enableSuggestions,
+      textCapitalization: textCapitalization,
+      inputFormatters: inputFormatters,
     );
   }
 }
