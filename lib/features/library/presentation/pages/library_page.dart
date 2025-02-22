@@ -109,7 +109,7 @@ class _LibraryPageContent extends StatelessWidget {
                                 provider.viewType == LibraryViewType.grid
                                     ? Icons.view_agenda_outlined
                                     : Icons.grid_view_outlined,
-                                color: AppColors.textPrimary,
+                                color: AppColors.primary,
                               ),
                             ),
                           ],
