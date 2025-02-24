@@ -95,24 +95,6 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
     super.dispose();
   }
 
-  void _scrollToStory() {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-
-      final context = _storyKey.currentContext;
-      if (context != null) {
-        final box = context.findRenderObject() as RenderBox;
-        final offset = box.localToGlobal(Offset.zero);
-
-        _scrollController.animateTo(
-          offset.dy - MediaQuery.of(context).size.height * 0.1,
-          duration: const Duration(milliseconds: 800),
-          curve: Curves.easeOutCubic,
-        );
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(

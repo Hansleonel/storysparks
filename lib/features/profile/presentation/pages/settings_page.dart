@@ -254,13 +254,14 @@ class _SettingsItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final VoidCallback onTap;
-  final Widget? trailing;
+  // If you want to add a trailing icon, uncomment the following line
+  // final Widget? trailing;
 
   const _SettingsItem({
     required this.icon,
     required this.title,
     required this.onTap,
-    this.trailing,
+    // this.trailing,
   });
 
   @override
@@ -283,11 +284,11 @@ class _SettingsItem extends StatelessWidget {
                 ),
               ),
             ),
-            trailing ??
-                const Icon(
-                  Icons.chevron_right,
-                  color: AppColors.textSecondary,
-                ),
+            // trailing ??
+            const Icon(
+              Icons.chevron_right,
+              color: AppColors.textSecondary,
+            ),
           ],
         ),
       ),
