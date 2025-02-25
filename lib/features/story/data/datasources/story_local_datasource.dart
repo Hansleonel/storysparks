@@ -259,7 +259,6 @@ class StoryLocalDatasource {
       tableName,
       {
         'content': story.content,
-        'created_at': story.createdAt.toIso8601String(),
         'read_count': story.readCount,
         'rating': story.rating > 0 ? story.rating : 5.0,
         'status': story.status,

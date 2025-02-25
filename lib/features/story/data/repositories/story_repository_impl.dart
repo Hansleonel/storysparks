@@ -151,7 +151,6 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
       // Crear una versión actualizada de la historia con la continuación
       final updatedStory = story.copyWith(
         content: '${story.content}\n\n--- Continuación ---\n\n${response.text}',
-        createdAt: DateTime.now(),
         rating: story.rating > 0
             ? story.rating
             : 5.0, // Mantener el rating existente o usar 5.0 si es 0
