@@ -92,6 +92,16 @@ class HomeProvider extends ChangeNotifier {
     memoryFocusNode.unfocus();
   }
 
+  void resetState() {
+    debugPrint('🏠 HomeProvider: Reseteando estados...');
+    memoryController.clear();
+    selectedGenre = '';
+    selectedImagePath = null;
+    _imageDescription = null;
+    isGenerateEnabled = false;
+    notifyListeners();
+  }
+
   Future<void> processImage(String imagePath) async {
     _isProcessingImage = true;
     notifyListeners();

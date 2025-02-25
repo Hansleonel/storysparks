@@ -4,9 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
+// import 'package:storysparks/core/utils/modal_utils.dart';
+// import 'package:storysparks/features/subscription/presentation/pages/paywall_page.dart';
 import '../providers/home_provider.dart';
 import 'package:storysparks/core/constants/genre_constants.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:storysparks/core/widgets/loading_lottie.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -30,8 +33,8 @@ class HomePage extends StatelessWidget {
                   SizedBox(height: 32),
                   _GenreSection(),
                   SizedBox(height: 32),
-                  _ProtagonistSection(),
-                  SizedBox(height: 40),
+                  // _ProtagonistSection(),
+                  //SizedBox(height: 40),
                   _GenerateButton(),
                 ],
               ),
@@ -444,7 +447,8 @@ class _GenreChip extends StatelessWidget {
   }
 }
 
-class _ProtagonistSection extends StatelessWidget {
+// TODO: in case we want to add a protagonist section
+/* class _ProtagonistSection extends StatelessWidget {
   const _ProtagonistSection();
 
   @override
@@ -513,7 +517,7 @@ class _ProtagonistSection extends StatelessWidget {
       ],
     );
   }
-}
+}*/
 
 class _GenerateButton extends StatelessWidget {
   const _GenerateButton();
@@ -525,10 +529,8 @@ class _GenerateButton extends StatelessWidget {
       child: Consumer<HomeProvider>(
         builder: (context, provider, _) {
           if (provider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: AppColors.primary,
-              ),
+            return LoadingLottie(
+              message: AppLocalizations.of(context)!.generatingStory,
             );
           }
 
@@ -538,6 +540,7 @@ class _GenerateButton extends StatelessWidget {
                     try {
                       final story = await provider.generateStory();
                       if (context.mounted) {
+                        provider.resetState();
                         Navigator.pushNamed(
                           context,
                           AppRoutes.generatedStory,
@@ -649,6 +652,11 @@ class _Header extends StatelessWidget {
           child: InkWell(
             onTap: () {
               debugPrint('🔔 Notifications tapped');
+              // TODO: in case we want to see the paywall using a modal
+              /* ModalUtils.showFullScreenModal(
+                context: context,
+                child: const PaywallPage(),
+              ); */
             },
             borderRadius: BorderRadius.circular(24),
             child: Container(

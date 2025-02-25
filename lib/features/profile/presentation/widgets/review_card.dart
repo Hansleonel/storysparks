@@ -70,7 +70,7 @@ class ReviewCard extends StatelessWidget {
                     children: [
                       Text(
                         rating,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -80,7 +80,7 @@ class ReviewCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         date,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 14,
                           color: AppColors.textSecondary,
@@ -91,7 +91,7 @@ class ReviewCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     review,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 14,
                       color: AppColors.textPrimary,
