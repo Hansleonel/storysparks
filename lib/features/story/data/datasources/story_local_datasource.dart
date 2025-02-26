@@ -20,7 +20,7 @@ class StoryLocalDatasource {
 
     return await openDatabase(
       path,
-      version: 5,
+      version: 7,
       onCreate: (db, version) async {
         debugPrint('📦 Database: Creando base de datos versión $version');
         await _onCreate(db, version);
@@ -64,6 +64,29 @@ class StoryLocalDatasource {
               'ALTER TABLE $tableName ADD COLUMN custom_image_path TEXT');
           debugPrint('✅ Database: v5 - Agregada columna custom_image_path');
         }
+
+        if (oldVersion < 6) {
+          await db.execute(
+              'ALTER TABLE $tableName ADD COLUMN continuation_count INTEGER DEFAULT 0');
+          debugPrint('✅ Database: v6 - Agregada columna continuation_count');
+        }
+
+        if (oldVersion < 7) {
+          // Verificar si la columna continuation_count existe
+          final List<Map<String, dynamic>> columns =
+              await db.rawQuery("PRAGMA table_info($tableName)");
+          final bool columnExists =
+              columns.any((column) => column['name'] == 'continuation_count');
+
+          if (!columnExists) {
+            await db.execute(
+                'ALTER TABLE $tableName ADD COLUMN continuation_count INTEGER DEFAULT 0');
+            debugPrint('✅ Database: v7 - Asegurada columna continuation_count');
+          } else {
+            debugPrint(
+                '✅ Database: v7 - La columna continuation_count ya existe');
+          }
+        }
       },
     );
   }
@@ -82,7 +105,8 @@ class StoryLocalDatasource {
         title TEXT NOT NULL,
         image_url TEXT NOT NULL,
         custom_image_path TEXT,
-        status TEXT DEFAULT 'draft'
+        status TEXT DEFAULT 'draft',
+        continuation_count INTEGER DEFAULT 0
       )
     ''');
     debugPrint('✅ StoryLocalDatasource: Tabla creada exitosamente');
@@ -102,6 +126,7 @@ class StoryLocalDatasource {
       'image_url': story.imageUrl,
       'custom_image_path': story.customImagePath,
       'status': story.status,
+      'continuation_count': story.continuationCount,
     };
     debugPrint(
         '📝 StoryLocalDatasource: Guardando historia en la base de datos');
@@ -143,6 +168,7 @@ class StoryLocalDatasource {
         imageUrl: maps[i]['image_url'] as String,
         customImagePath: customImagePath,
         status: maps[i]['status'] as String? ?? 'draft',
+        continuationCount: maps[i]['continuation_count'] as int? ?? 0,
       );
     });
   }
@@ -254,6 +280,11 @@ class StoryLocalDatasource {
       throw Exception('Cannot update a story without an ID');
     }
 
+    debugPrint('🔄 StoryLocalDatasource: Iniciando actualización de historia');
+    debugPrint('📊 StoryLocalDatasource: ID de historia: ${story.id}');
+    debugPrint(
+        '🔢 StoryLocalDatasource: Contador de continuaciones a guardar: ${story.continuationCount}');
+
     final db = await database;
     await db.update(
       tableName,
@@ -265,13 +296,45 @@ class StoryLocalDatasource {
         'title': story.title,
         'image_url': story.imageUrl,
         'custom_image_path': story.customImagePath,
+        'continuation_count': story.continuationCount,
       },
       where: 'id = ?',
       whereArgs: [story.id],
     );
+
+    // Verificar que el contador se haya actualizado correctamente
+    final updatedStory = await getStoryById(story.id!);
+
     debugPrint(
         '✅ StoryLocalDatasource: Historia actualizada con ID: ${story.id}');
     debugPrint('   Rating: ${story.rating > 0 ? story.rating : 5.0}');
+    debugPrint('   Continuaciones guardadas: ${story.continuationCount}');
+    debugPrint(
+        '   Continuaciones verificadas en BD: ${updatedStory?.continuationCount ?? "no disponible"}');
+  }
+
+  Future<void> incrementContinuationCount(int id) async {
+    debugPrint(
+        '🔄 StoryLocalDatasource: Incrementando contador de continuaciones para ID: $id');
+
+    // Obtener el valor actual antes de incrementar
+    final storyBefore = await getStoryById(id);
+    debugPrint(
+        '🔢 StoryLocalDatasource: Contador actual antes de incrementar: ${storyBefore?.continuationCount ?? "no disponible"}');
+
+    final db = await database;
+    await db.rawUpdate('''
+      UPDATE $tableName 
+      SET continuation_count = continuation_count + 1 
+      WHERE id = ?
+    ''', [id]);
+
+    // Verificar el nuevo valor después de incrementar
+    final storyAfter = await getStoryById(id);
+    debugPrint(
+        '✅ StoryLocalDatasource: Incrementado contador de continuaciones para ID: $id');
+    debugPrint(
+        '🔢 StoryLocalDatasource: Contador después de incrementar: ${storyAfter?.continuationCount ?? "no disponible"}');
   }
 
   Future<Story?> getStoryById(int storyId) async {
@@ -301,6 +364,7 @@ class StoryLocalDatasource {
       imageUrl: map['image_url'] as String,
       customImagePath: customImagePath,
       status: map['status'] as String,
+      continuationCount: map['continuation_count'] as int? ?? 0,
     );
   }
 
@@ -322,6 +386,7 @@ class StoryLocalDatasource {
               imageUrl: map['image_url'] as String,
               customImagePath: map['custom_image_path'] as String?,
               status: map['status'] as String,
+              continuationCount: map['continuation_count'] as int? ?? 0,
             ))
         .toList();
   }

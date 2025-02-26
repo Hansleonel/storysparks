@@ -11,6 +11,7 @@ class Story {
   final String imageUrl;
   final String? customImagePath;
   final String status;
+  final int continuationCount;
 
   Story({
     this.id,
@@ -25,6 +26,7 @@ class Story {
     required this.imageUrl,
     this.customImagePath,
     this.status = 'draft',
+    this.continuationCount = 0,
   });
 
   Story copyWith({
@@ -40,6 +42,7 @@ class Story {
     String? imageUrl,
     String? customImagePath,
     String? status,
+    int? continuationCount,
   }) {
     return Story(
       id: id ?? this.id,
@@ -54,6 +57,7 @@ class Story {
       imageUrl: imageUrl ?? this.imageUrl,
       customImagePath: customImagePath ?? this.customImagePath,
       status: status ?? this.status,
+      continuationCount: continuationCount ?? this.continuationCount,
     );
   }
 }

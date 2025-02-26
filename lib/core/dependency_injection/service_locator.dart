@@ -29,6 +29,8 @@ import 'package:storysparks/features/story/domain/usecases/continue_story_usecas
 import 'package:storysparks/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:storysparks/features/story/domain/usecases/get_image_description_usecase.dart';
 import 'package:storysparks/features/story/data/services/image_service.dart';
+import 'package:storysparks/features/story/domain/usecases/increment_continuation_count_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/get_story_by_id_usecase.dart';
 
 final getIt = GetIt.instance;
 
@@ -92,6 +94,10 @@ void setupServiceLocator() {
       () => ContinueStoryUseCase(getIt<StoryRepository>()));
   getIt.registerLazySingleton(
       () => GetImageDescriptionUseCase(getIt<StoryRepository>()));
+  getIt.registerLazySingleton(
+      () => IncrementContinuationCountUseCase(getIt<StoryRepository>()));
+  getIt.registerLazySingleton(
+      () => GetStoryByIdUseCase(getIt<StoryRepository>()));
 
   // Presentation Layer - Page Providers (Factory ✅)
   getIt.registerFactory(() => ProfileProvider(

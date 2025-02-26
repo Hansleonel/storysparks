@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../domain/entities/story.dart';
 import '../../domain/usecases/delete_story_usecase.dart';
 import '../../domain/usecases/update_story_rating_usecase.dart';
 import '../../domain/usecases/save_story_usecase.dart';
 import '../../domain/usecases/update_story_status_usecase.dart';
 import '../../domain/usecases/continue_story_usecase.dart';
+import '../../domain/usecases/get_story_by_id_usecase.dart';
 
 class StoryProvider extends ChangeNotifier {
   final UpdateStoryRatingUseCase _updateRatingUseCase;
@@ -12,6 +14,7 @@ class StoryProvider extends ChangeNotifier {
   final SaveStoryUseCase _saveStoryUseCase;
   final UpdateStoryStatusUseCase _updateStoryStatusUseCase;
   final ContinueStoryUseCase _continueStoryUseCase;
+  final GetStoryByIdUseCase _getStoryByIdUseCase;
 
   bool _isExpanded = false;
   bool _isMemoryExpanded = false;
@@ -22,6 +25,7 @@ class StoryProvider extends ChangeNotifier {
   bool _isSaved = false;
   bool _isContinuing = false;
   String? _error;
+  bool _isCopied = false;
 
   StoryProvider({
     required UpdateStoryRatingUseCase updateRatingUseCase,
@@ -29,11 +33,13 @@ class StoryProvider extends ChangeNotifier {
     required SaveStoryUseCase saveStoryUseCase,
     required UpdateStoryStatusUseCase updateStoryStatusUseCase,
     required ContinueStoryUseCase continueStoryUseCase,
+    required GetStoryByIdUseCase getStoryByIdUseCase,
   })  : _updateRatingUseCase = updateRatingUseCase,
         _deleteStoryUseCase = deleteStoryUseCase,
         _saveStoryUseCase = saveStoryUseCase,
         _updateStoryStatusUseCase = updateStoryStatusUseCase,
-        _continueStoryUseCase = continueStoryUseCase {
+        _continueStoryUseCase = continueStoryUseCase,
+        _getStoryByIdUseCase = getStoryByIdUseCase {
     debugPrint('🔄 StoryProvider: Initializing...');
   }
 
@@ -46,6 +52,7 @@ class StoryProvider extends ChangeNotifier {
   bool get isSaved => _isSaved;
   String? get error => _error;
   bool get isContinuing => _isContinuing;
+  bool get isCopied => _isCopied;
 
   void setStory(Story story, {bool isFromLibrary = false}) {
     debugPrint(
@@ -221,6 +228,11 @@ class StoryProvider extends ChangeNotifier {
     if (_story != null && _story!.id != null) {
       try {
         debugPrint('🔄 StoryProvider: Starting story continuation process...');
+        debugPrint(
+            '📊 StoryProvider: Before continuation - Story ID: ${_story!.id}');
+        debugPrint(
+            '🔢 StoryProvider: Before continuation - Continuation Count: ${_story!.continuationCount}');
+
         _isContinuing = true;
         _error = null;
         notifyListeners();
@@ -234,11 +246,20 @@ class StoryProvider extends ChangeNotifier {
             notifyListeners();
             return false;
           },
-          (updatedStory) {
+          (updatedStory) async {
+            debugPrint(
+                '📊 StoryProvider: After continuation - Story ID: ${updatedStory.id}');
+            debugPrint(
+                '🔢 StoryProvider: After continuation - Continuation Count: ${updatedStory.continuationCount}');
+
             _story = updatedStory;
             _error = null;
             debugPrint(
                 '✅ StoryProvider: Story continuation completed successfully');
+
+            // El contador de continuaciones ya se incrementa en el repositorio
+            // No es necesario llamar al caso de uso aquí
+
             notifyListeners();
             return true;
           },
@@ -251,5 +272,55 @@ class StoryProvider extends ChangeNotifier {
     debugPrint(
         '⚠️ StoryProvider: Cannot continue - No story or story ID available');
     return false;
+  }
+
+  Future<void> copyStoryToClipboard() async {
+    try {
+      if (_story != null) {
+        await Clipboard.setData(ClipboardData(text: _story!.content));
+        _isCopied = true;
+        notifyListeners();
+
+        // Reset copied state after 2 seconds
+        await Future.delayed(const Duration(seconds: 2));
+        _isCopied = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Error copying to clipboard: $e');
+      _error = 'Error al copiar la historia';
+      notifyListeners();
+    }
+  }
+
+  Future<void> reloadStoryFromDatabase() async {
+    if (_story != null && _story!.id != null) {
+      try {
+        debugPrint(
+            '🔄 StoryProvider: Recargando historia desde la base de datos');
+        debugPrint('📊 StoryProvider: ID de historia: ${_story!.id}');
+
+        final updatedStory = await _getStoryByIdUseCase.execute(_story!.id!);
+
+        if (updatedStory != null) {
+          debugPrint('✅ StoryProvider: Historia recargada exitosamente');
+          debugPrint(
+              '🔢 StoryProvider: Contador de continuaciones actualizado: ${updatedStory.continuationCount}');
+
+          _story = updatedStory;
+          _rating = updatedStory.rating;
+          notifyListeners();
+        } else {
+          debugPrint(
+              '⚠️ StoryProvider: No se pudo encontrar la historia en la base de datos');
+        }
+      } catch (e) {
+        debugPrint('❌ StoryProvider: Error recargando historia - $e');
+        _error = e.toString();
+      }
+    } else {
+      debugPrint(
+          '⚠️ StoryProvider: No se puede recargar - No hay historia o ID');
+    }
   }
 }

@@ -19,6 +19,7 @@ import 'package:storysparks/features/story/domain/usecases/delete_story_usecase.
 import 'package:storysparks/features/story/domain/usecases/save_story_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/update_story_rating_usecase.dart';
 import 'package:storysparks/features/story/domain/usecases/continue_story_usecase.dart';
+import 'package:storysparks/features/story/domain/usecases/get_story_by_id_usecase.dart';
 import 'package:storysparks/features/story/presentation/providers/story_provider.dart';
 import 'package:storysparks/features/subscription/presentation/providers/subscription_provider.dart';
 
@@ -54,6 +55,7 @@ void main() async {
             saveStoryUseCase: getIt<SaveStoryUseCase>(),
             updateStoryStatusUseCase: getIt<UpdateStoryStatusUseCase>(),
             continueStoryUseCase: getIt<ContinueStoryUseCase>(),
+            getStoryByIdUseCase: getIt<GetStoryByIdUseCase>(),
           ),
         ),
         ChangeNotifierProvider(

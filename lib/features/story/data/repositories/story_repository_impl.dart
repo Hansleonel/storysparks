@@ -127,6 +127,9 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
   @override
   Future<Story> continueStory(Story story) async {
     debugPrint('🗄️ StoryRepository: Iniciando continuación de historia');
+    debugPrint('📊 StoryRepository: ID de historia: ${story.id}');
+    debugPrint(
+        '🔢 StoryRepository: Contador de continuaciones actual: ${story.continuationCount}');
 
     if (story.id == null) {
       throw Exception('No se puede continuar una historia sin ID');
@@ -151,14 +154,23 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
       // Crear una versión actualizada de la historia con la continuación
       final updatedStory = story.copyWith(
         content: '${story.content}\n\n--- Continuación ---\n\n${response.text}',
-        rating: story.rating > 0
-            ? story.rating
-            : 5.0, // Mantener el rating existente o usar 5.0 si es 0
+        rating: story.rating > 0 ? story.rating : 5.0,
+        continuationCount: story.continuationCount + 1,
       );
+
+      debugPrint(
+          '🔢 StoryRepository: Nuevo contador de continuaciones: ${updatedStory.continuationCount}');
+      debugPrint(
+          '📏 StoryRepository: Longitud original: ${story.content.length} caracteres');
+      debugPrint(
+          '📏 StoryRepository: Longitud nueva: ${updatedStory.content.length} caracteres');
+      debugPrint(
+          '📏 StoryRepository: Incremento: ${updatedStory.content.length - story.content.length} caracteres');
 
       // Actualizar la historia existente en la base de datos
       await _localDatasource.updateStoryContent(updatedStory);
       debugPrint('✅ StoryRepository: Historia actualizada en base de datos');
+      debugPrint('   Continuaciones: ${updatedStory.continuationCount}');
 
       return updatedStory;
     } catch (e) {
@@ -224,6 +236,11 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
   }
 
   @override
+  Future<void> incrementContinuationCount(int storyId) async {
+    await _localDatasource.incrementContinuationCount(storyId);
+  }
+
+  @override
   Future<List<Story>> getPopularStories(String userId) async {
     return await _localDatasource.getPopularStories(userId);
   }
@@ -236,6 +253,12 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
   @override
   Future<void> cleanupOldDraftStories() async {
     await _localDatasource.cleanupOldDraftStories();
+  }
+
+  @override
+  Future<Story?> getStoryById(int storyId) async {
+    debugPrint('🔍 StoryRepository: Obteniendo historia con ID: $storyId');
+    return await _localDatasource.getStoryById(storyId);
   }
 
   @override

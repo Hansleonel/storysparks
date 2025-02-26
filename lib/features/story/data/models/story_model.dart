@@ -13,6 +13,9 @@ class StoryModel extends Story {
     required super.userId,
     required super.title,
     required super.imageUrl,
+    super.customImagePath,
+    super.status = 'draft',
+    super.continuationCount = 0,
   });
 
   factory StoryModel.fromJson(Map<String, dynamic> json) {
@@ -28,6 +31,9 @@ class StoryModel extends Story {
       title: json['title'] as String? ?? 'Mi Historia',
       imageUrl: json['image_url'] as String? ??
           CoverImageHelper.getCoverImage(json['genre'] as String),
+      customImagePath: json['custom_image_path'] as String?,
+      status: json['status'] as String? ?? 'draft',
+      continuationCount: json['continuation_count'] as int? ?? 0,
     );
   }
 
@@ -43,6 +49,9 @@ class StoryModel extends Story {
       'user_id': userId,
       'title': title,
       'image_url': imageUrl,
+      'custom_image_path': customImagePath,
+      'status': status,
+      'continuation_count': continuationCount,
     };
   }
 }
