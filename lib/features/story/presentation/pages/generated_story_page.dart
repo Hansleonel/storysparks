@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:storysparks/core/dependency_injection/service_locator.dart';
 import 'package:storysparks/core/theme/app_colors.dart';
@@ -85,6 +84,55 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
       _scrollController.position.maxScrollExtent,
       _scrollController.offset,
     );
+  }
+
+  // Método para realizar scroll automático después de una continuación
+  void _scrollAfterContinuation() {
+    debugPrint('🔄 Scrolling after continuation');
+    if (!_scrollController.hasClients) return;
+
+    // Añadir un retraso mayor para asegurar que el contenido se haya renderizado completamente
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (!mounted || !_scrollController.hasClients) return;
+
+      // Obtener información sobre la posición actual y el tamaño del contenido
+      final currentOffset = _scrollController.offset;
+      final maxOffset = _scrollController.position.maxScrollExtent;
+      final viewportHeight = _scrollController.position.viewportDimension;
+
+      // Calcular un punto de destino que muestre la nueva continuación
+      // Intentamos posicionar el scroll para que muestre el separador de continuación
+      // y parte del nuevo contenido
+
+      // Si estamos muy cerca del final, no es necesario hacer scroll
+      if (maxOffset - currentOffset < viewportHeight * 0.2) {
+        debugPrint('⚠️ Already at the end of content, no scroll needed');
+        return;
+      }
+
+      // Calcular un desplazamiento adaptativo basado en el tamaño de la pantalla
+      // y la posición actual
+      final screenHeight = MediaQuery.of(context).size.height;
+      final scrollAmount =
+          screenHeight * 0.4; // 40% de la altura de la pantalla
+
+      final targetOffset = currentOffset + scrollAmount;
+      final safeOffset = targetOffset.clamp(0.0, maxOffset);
+
+      debugPrint(
+          '📏 Current: $currentOffset, Max: $maxOffset, Target: $safeOffset');
+      debugPrint('📱 Screen height: $screenHeight, Viewport: $viewportHeight');
+
+      // Realizar el scroll con animación
+      _scrollController.animateTo(
+        safeOffset,
+        duration: const Duration(milliseconds: 1000),
+        curve: Curves.easeOutCubic,
+      );
+
+      debugPrint(
+          '🔄 Scrolling after continuation: $currentOffset -> $safeOffset');
+    });
   }
 
   @override
@@ -373,6 +421,8 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                                 debugPrint('🔘 FAB pressed - Continuing story');
                                 final success = await provider.continueStory();
                                 if (success && mounted) {
+                                  // Realizar scroll automático después de la continuación
+                                  _scrollAfterContinuation();
                                   widget.onStoryStateChanged?.call();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -737,19 +787,129 @@ class _StoryContentState extends State<_StoryContent> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.border),
               ),
-              child: Text(
-                story.content,
-                style: const TextStyle(
-                  fontFamily: 'Urbanist',
-                  fontSize: 16,
-                  height: 1.6,
-                  color: AppColors.textPrimary,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _StoryContentText(content: story.content),
+                ],
               ),
             ),
           ],
         ],
       ),
+    );
+  }
+}
+
+class _StoryContentText extends StatelessWidget {
+  final String content;
+
+  const _StoryContentText({required this.content});
+
+  @override
+  Widget build(BuildContext context) {
+    // Obtener las partes procesadas del provider
+    final provider = context.watch<StoryProvider>();
+    final parts = provider.storyParts;
+
+    if (parts.isEmpty) {
+      // Si no hay partes procesadas (caso improbable), mostrar el texto completo
+      return Text(
+        content,
+        style: const TextStyle(
+          fontFamily: 'Urbanist',
+          fontSize: 16,
+          height: 1.6,
+          color: AppColors.textPrimary,
+        ),
+      );
+    }
+
+    // Si solo hay una parte (sin continuaciones), mostrar el texto normal
+    if (parts.length == 1) {
+      return Text(
+        parts[0],
+        style: const TextStyle(
+          fontFamily: 'Urbanist',
+          fontSize: 16,
+          height: 1.6,
+          color: AppColors.textPrimary,
+        ),
+      );
+    }
+
+    // Si hay continuaciones, construir un widget con separadores
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Primera parte (historia original)
+        Text(
+          parts[0],
+          style: const TextStyle(
+            fontFamily: 'Urbanist',
+            fontSize: 16,
+            height: 1.6,
+            color: AppColors.textPrimary,
+          ),
+        ),
+
+        // Por cada continuación, agregar un separador y el texto
+        for (int i = 1; i < parts.length; i++) ...[
+          const SizedBox(height: 16),
+
+          // Separador visual
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: AppColors.accent.withOpacity(0.3),
+                  width: 1,
+                ),
+                bottom: BorderSide(
+                  color: AppColors.accent.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              color: AppColors.accent.withOpacity(0.05),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.auto_stories,
+                  size: 16,
+                  color: AppColors.accent,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Continuación ${i}',
+                  style: const TextStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.accent,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Texto de la continuación
+          Text(
+            parts[i],
+            style: const TextStyle(
+              fontFamily: 'Urbanist',
+              fontSize: 16,
+              height: 1.6,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

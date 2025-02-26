@@ -5,6 +5,7 @@ import '../../domain/usecases/update_story_rating_usecase.dart';
 import '../../domain/usecases/save_story_usecase.dart';
 import '../../domain/usecases/update_story_status_usecase.dart';
 import '../../domain/usecases/continue_story_usecase.dart';
+import 'dart:math';
 
 class StoryProvider extends ChangeNotifier {
   final UpdateStoryRatingUseCase _updateRatingUseCase;
@@ -22,6 +23,7 @@ class StoryProvider extends ChangeNotifier {
   bool _isSaved = false;
   bool _isContinuing = false;
   String? _error;
+  List<String> _storyParts = [];
 
   StoryProvider({
     required UpdateStoryRatingUseCase updateRatingUseCase,
@@ -46,6 +48,7 @@ class StoryProvider extends ChangeNotifier {
   bool get isSaved => _isSaved;
   String? get error => _error;
   bool get isContinuing => _isContinuing;
+  List<String> get storyParts => _storyParts;
 
   void setStory(Story story, {bool isFromLibrary = false}) {
     debugPrint(
@@ -66,8 +69,76 @@ class StoryProvider extends ChangeNotifier {
           '📊 StoryProvider: Setting initial rating for new story: $_rating');
     }
 
+    // Procesar el contenido de la historia para separar las partes
+    _processStoryContent();
+
     _error = null;
     notifyListeners();
+  }
+
+  void _processStoryContent() {
+    if (_story == null) return;
+
+    debugPrint('🔄 StoryProvider: Processing story content');
+    final content = _story!.content;
+    _storyParts = [];
+
+    // Marcadores de continuación en diferentes idiomas
+    final spanishMarker = '\n\n--- Continuación ---\n\n';
+    final englishMarker = '\n\n--- Continuation ---\n\n';
+
+    // Extraer la primera parte (historia original)
+    int spanishIndex = content.indexOf(spanishMarker);
+    int englishIndex = content.indexOf(englishMarker);
+
+    if (spanishIndex == -1 && englishIndex == -1) {
+      // No hay marcadores, usar el contenido completo
+      _storyParts = [content];
+      debugPrint('📄 StoryProvider: No continuation markers found');
+      return;
+    }
+
+    // Dividir el contenido en partes basado en los marcadores
+    String remainingContent = content;
+    _storyParts
+        .add(remainingContent.split(spanishMarker)[0].split(englishMarker)[0]);
+    remainingContent = remainingContent.substring(_storyParts[0].length);
+
+    // Procesar el resto del contenido buscando marcadores
+    while (remainingContent.isNotEmpty) {
+      if (remainingContent.startsWith(spanishMarker)) {
+        remainingContent = remainingContent.substring(spanishMarker.length);
+      } else if (remainingContent.startsWith(englishMarker)) {
+        remainingContent = remainingContent.substring(englishMarker.length);
+      } else {
+        // Esto no debería ocurrir, pero por seguridad
+        debugPrint('⚠️ StoryProvider: Unexpected content format');
+        break;
+      }
+
+      // Buscar el próximo marcador
+      spanishIndex = remainingContent.indexOf(spanishMarker);
+      englishIndex = remainingContent.indexOf(englishMarker);
+
+      if (spanishIndex == -1 && englishIndex == -1) {
+        // No hay más marcadores, agregar el resto del contenido
+        _storyParts.add(remainingContent);
+        remainingContent = "";
+      } else {
+        // Encontrar el marcador más cercano
+        int nextMarkerIndex = (spanishIndex == -1)
+            ? englishIndex
+            : (englishIndex == -1)
+                ? spanishIndex
+                : min(spanishIndex, englishIndex);
+
+        // Agregar el contenido hasta el próximo marcador
+        _storyParts.add(remainingContent.substring(0, nextMarkerIndex));
+        remainingContent = remainingContent.substring(nextMarkerIndex);
+      }
+    }
+
+    debugPrint('📄 StoryProvider: Processed ${_storyParts.length} story parts');
   }
 
   void toggleExpanded() {
@@ -236,6 +307,8 @@ class StoryProvider extends ChangeNotifier {
           },
           (updatedStory) {
             _story = updatedStory;
+            // Procesar el contenido actualizado
+            _processStoryContent();
             _error = null;
             debugPrint(
                 '✅ StoryProvider: Story continuation completed successfully');
