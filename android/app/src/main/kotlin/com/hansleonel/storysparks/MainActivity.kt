@@ -1,4 +1,4 @@
-package com.example.storysparks
+package com.hansleonel.storysparks
 
 import io.flutter.embedding.android.FlutterActivity
 

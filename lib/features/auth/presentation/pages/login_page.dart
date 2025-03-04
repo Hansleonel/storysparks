@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
           FocusScope.of(context).unfocus();
         },
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -61,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
                       fontWeight: FontWeight.w400,
                     ),
               ),
-              const SizedBox(height: 60),
+              const SizedBox(height: 32),
               _buildEmailField(),
               const SizedBox(height: 20),
               _buildPasswordField(),
@@ -73,6 +73,8 @@ class _LoginPageState extends State<LoginPage> {
               _buildSignUpLink(),
               const SizedBox(height: 20),
               _buildAppleSignInButton(),
+              const SizedBox(height: 20),
+              _buildGoogleSignInButton(),
             ],
           ),
         ),
@@ -306,6 +308,7 @@ class _LoginPageState extends State<LoginPage> {
 
         return SignInWithAppleButton(
           text: l10n.signInWithApple,
+          height: 48,
           style: SignInWithAppleButtonStyle.black,
           onPressed: () async {
             await provider.signInWithApple();
@@ -326,6 +329,65 @@ class _LoginPageState extends State<LoginPage> {
               Navigator.pushReplacementNamed(context, AppRoutes.main);
             }
           },
+        );
+      },
+    );
+  }
+
+  Widget _buildGoogleSignInButton() {
+    final l10n = AppLocalizations.of(context)!;
+    return Consumer<AuthProvider>(
+      builder: (context, provider, _) {
+        if (provider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            icon: Image.asset(
+              'assets/images/google_icon.png',
+              height: 24,
+              width: 24,
+            ),
+            label: Text(
+              l10n.signInWithGoogle,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 16,
+                fontFamily: 'Urbanist',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            onPressed: () async {
+              final success = await provider.signInWithGoogle();
+
+              if (provider.error != null) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(provider.error!),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+                return;
+              }
+
+              if (success && mounted) {
+                Navigator.pushReplacementNamed(context, AppRoutes.main);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              minimumSize: const Size(double.infinity, 56),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(color: Colors.grey.shade300),
+              ),
+            ),
+          ),
         );
       },
     );

@@ -60,5 +60,16 @@
 			</array>
 		</dict>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.467956107078-jghm8u9tjkcgcsmfpvfg70avge7phpei</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

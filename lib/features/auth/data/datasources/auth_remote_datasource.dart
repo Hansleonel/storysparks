@@ -5,6 +5,7 @@ abstract class AuthRemoteDataSource {
   Future<AuthResponse> login(String email, String password);
   Future<AuthResponse> signInWithApple(String idToken, String accessToken,
       {String? givenName, String? familyName});
+  Future<AuthResponse> signInWithGoogle(String idToken, String accessToken);
   Future<void> signOut();
   Future<User?> getCurrentUser();
   Future<Profile> updateProfile(Profile profile);
@@ -28,10 +29,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       {String? givenName, String? familyName}) async {
     if (givenName == null && familyName == null) return;
 
-    final fullName = [givenName, familyName].where((e) => e != null).join(' ');
+    String fullName;
+
+    // Si solo tenemos givenName y parece ser un nombre completo (contiene espacio)
+    // lo usamos directamente (caso común con Google)
+    if (givenName != null && familyName == null && givenName.contains(' ')) {
+      fullName = givenName;
+    } else {
+      // Caso de Apple o cuando tenemos nombre y apellido separados
+      fullName = [givenName, familyName].where((e) => e != null).join(' ');
+    }
+
     if (fullName.isEmpty) return;
 
     try {
+      print('Updating user metadata with full_name: $fullName');
       await supabaseClient.auth.updateUser(
         UserAttributes(data: {'full_name': fullName}),
       );
@@ -124,6 +136,93 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         print('Message: ${error.message}');
       }
       throw Exception('Error signing in with Apple: $error');
+    }
+  }
+
+  @override
+  Future<AuthResponse> signInWithGoogle(
+      String idToken, String accessToken) async {
+    try {
+      print('Attempting to sign in with Google...');
+      print('ID Token: ${idToken.substring(0, 50)}...');
+      print('Access Token: ${accessToken.substring(0, 20)}...');
+
+      final response = await supabaseClient.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+
+      final user = response.user;
+      if (user != null) {
+        // Obtener información del usuario desde los metadatos
+        final userData = user.userMetadata;
+        final fullName = userData?['full_name'] as String?;
+        final email = user.email;
+        final givenName = userData?['name'] as String?;
+
+        // Actualizar metadatos del usuario en auth.users
+        await _updateUserMetadata(givenName: givenName);
+
+        // Verificar si el usuario ya tiene un perfil
+        final existingProfile = await getProfile(user.id);
+
+        if (existingProfile != null) {
+          // Si el perfil existe, solo actualizamos lastSignIn manteniendo todos los demás datos
+          await updateProfile(Profile(
+            id: existingProfile.id,
+            username: existingProfile.username,
+            fullName: existingProfile.fullName,
+            email: existingProfile.email,
+            bio: existingProfile.bio,
+            provider: existingProfile.provider,
+            avatarUrl: existingProfile.avatarUrl,
+            createdAt: existingProfile.createdAt,
+            updatedAt: DateTime.now(),
+            lastSignIn: DateTime.now(),
+            storiesGenerated: existingProfile.storiesGenerated,
+            storiesShared: existingProfile.storiesShared,
+            followersCount: existingProfile.followersCount,
+            followingCount: existingProfile.followingCount,
+            isPrivate: existingProfile.isPrivate,
+            isVerified: existingProfile.isVerified,
+          ));
+        } else {
+          // Si es un nuevo usuario, generamos username y creamos perfil
+          final username =
+              await _generateUniqueUsername(givenName, null, email ?? '');
+
+          // Determinar el nombre completo a usar
+          String? userFullName;
+          if (fullName != null) {
+            userFullName = fullName;
+          } else if (givenName != null) {
+            userFullName = givenName;
+          }
+
+          await updateProfile(Profile(
+            id: user.id,
+            username: username,
+            fullName: userFullName,
+            email: email,
+            provider: 'google',
+            avatarUrl: userData?['avatar_url'] as String?,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+            lastSignIn: DateTime.now(),
+          ));
+        }
+      }
+
+      print('Sign in successful: ${response.user?.email}');
+      return response;
+    } catch (error) {
+      print('Error details: $error');
+      if (error is AuthException) {
+        print('Status Code: ${error.statusCode}');
+        print('Message: ${error.message}');
+      }
+      throw Exception('Error signing in with Google: $error');
     }
   }
 

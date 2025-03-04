@@ -8,14 +8,19 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
 
   - Sistema de login seguro implementado con AuthProvider y AuthRepository
   - Integración con Sign in with Apple
+  - Integración con Google Sign-In
   - Manejo de errores en autenticación con mensajes de usuario
   - Persistencia de sesión
+  - Actualización automática de metadatos de usuario
+  - Validación de credenciales en tiempo real
 
 - ✅ **Navegación Intuitiva**: Barra de navegación implementada con MainNavigation:
 
   - 🏠 Home: Creación de nuevas historias
   - 📚 Biblioteca: Colección de historias guardadas
   - 👤 Perfil: Gestión de cuenta y preferencias
+  - 🔄 Transiciones fluidas entre pantallas
+  - 💾 Persistencia de estado entre navegaciones
 
 - ✅ **Gestión de Historias**:
 
@@ -34,6 +39,8 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
   - Sistema de sesiones de chat para continuaciones coherentes
   - Limpieza automática de borradores antiguos
   - Marcado de historias como eliminadas (soft delete)
+  - Optimización de almacenamiento de imágenes
+  - Análisis semántico de imágenes con IA
 
 - ✅ **Sistema de Suscripción**:
 
@@ -51,6 +58,7 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
   - Interfaz de pago moderna y atractiva
   - Cálculo automático de ahorros por plan
   - Período de prueba gratuito
+  - Gestión de beneficios por tipo de suscripción
 
 - ✅ **Creación de Historias**:
 
@@ -60,6 +68,9 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
     - Análisis automático de imágenes con IA
     - Integración de descripciones visuales en la narrativa
     - Validación de tamaño y formato de imágenes
+    - Compresión inteligente de imágenes
+    - Redimensionamiento adaptativo
+    - Generación de nombres únicos para archivos
   - Selección de géneros narrativos:
     - Feliz
     - Nostálgico
@@ -68,9 +79,17 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
     - Divertido
   - Personalización del protagonista
 
+- ✅ **Modo Offline**:
+
+  - Almacenamiento local de historias generadas
+  - Acceso a historias guardadas sin conexión
+  - Sincronización automática cuando se restablece la conexión
+  - Gestión eficiente del almacenamiento local
+
 - ✅ **Internacionalización**:
   - Soporte multiidioma (Español e Inglés)
   - Localización de textos y mensajes
+  - Adaptación de contenido según región
 
 ## 🛠️ Tecnologías Implementadas
 
@@ -80,30 +99,45 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
 - **Backend y Autenticación**:
   - Supabase para autenticación y almacenamiento
   - Sign in with Apple integration
+  - Google Sign-In integration
+  - Gestión segura de tokens
 - **Arquitectura**: Clean Architecture implementada con:
   - Presentation Layer (providers, pages)
   - Domain Layer (usecases, repositories)
   - Data Layer (datasources, repositories implementations)
   - Managers para gestión de sesiones de chat con Google Generative AI
-- **Almacenamiento Local**: SQLite con sqflite
+  - Principios SOLID aplicados
+- **Almacenamiento Local**:
+  - SQLite con sqflite
+  - Gestión eficiente de consultas
+  - Optimización de transacciones
 - **IA**:
   - Google Generative AI para generación de historias
   - Procesamiento de imágenes y generación de descripciones
   - Gestión de sesiones de chat para continuidad narrativa
-- **Networking**: Dio
-- **Inyección de Dependencias**: GetIt + Injectable
+  - Análisis semántico de contenido visual
+- **Networking**:
+  - Dio para peticiones HTTP
+  - Manejo de timeouts y reintentos
+  - Interceptores personalizados
+- **Inyección de Dependencias**:
+  - GetIt + Injectable
+  - Configuración modular
 - **Manejo de Errores**:
   - Dartz para Result Types
   - Sistema de logging detallado
   - Manejo de errores por capa
+  - Feedback visual al usuario
 - **Gestión de Assets**:
   - SVG Support (flutter_svg)
   - Audio (just_audio)
   - Image Picker con soporte multiformat
   - Animaciones personalizadas
+  - Optimización de carga de recursos
 - **Monetización**:
   - Sistema de suscripciones in-app
   - Gestión de planes y beneficios
+  - Cálculo de descuentos
 
 ## 📂 Estructura del Proyecto Actual
 
@@ -170,6 +204,35 @@ lib/
 
    ```
    GEMINI_API_KEY=tu_api_key_aqui
+   SUPABASE_URL=tu_url_de_supabase
+   SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
+   GOOGLE_WEB_CLIENT_ID=tu_web_client_id.apps.googleusercontent.com
+   GOOGLE_IOS_CLIENT_ID=tu_ios_client_id.apps.googleusercontent.com
+   ```
+
+   Para obtener los IDs de cliente de Google:
+
+   - Ve a la [Consola de Google Cloud](https://console.cloud.google.com/)
+   - Selecciona tu proyecto o crea uno nuevo
+   - Ve a "APIs y servicios" > "Credenciales"
+   - Crea o edita un ID de cliente OAuth 2.0
+   - Configura los orígenes autorizados y las URIs de redirección
+   - Copia los IDs de cliente para Web e iOS
+
+   Además, para iOS, actualiza el archivo `ios/Runner/Info.plist` con el esquema URL de Google:
+
+   ```xml
+   <key>CFBundleURLTypes</key>
+   <array>
+     <dict>
+       <key>CFBundleTypeRole</key>
+       <string>Editor</string>
+       <key>CFBundleURLSchemes</key>
+       <array>
+         <string>com.googleusercontent.apps.TU_IOS_CLIENT_ID</string>
+       </array>
+     </dict>
+   </array>
    ```
 
 4. **Ejecutar el Proyecto**:
@@ -197,6 +260,7 @@ dependencies:
   flutter_dotenv: ^5.1.0
   flutter_rating_bar: ^4.0.1
   sign_in_with_apple: ^6.1.4
+  google_sign_in: ^6.2.2
   supabase_flutter: ^2.8.3
   mime: ^1.0.6
 ```
@@ -207,6 +271,7 @@ dependencies:
 
    - ✅ Autenticación implementada con AuthProvider y AuthRepository
    - ✅ Integración con Sign in with Apple
+   - ✅ Integración con Google Sign-In
    - ✅ Manejo de errores y feedback al usuario
    - ✅ Redirección a la navegación principal tras autenticación exitosa
 
@@ -235,6 +300,11 @@ dependencies:
 - ✅ Gestión segura de API keys
 - ✅ Manejo de sesiones de chat encapsulado
 - ✅ Validación de imágenes y archivos
+- ✅ Protección de datos sensibles con variables de entorno
+- ✅ Sanitización de entradas de usuario
+- ✅ Prevención de inyección SQL
+- ✅ Manejo seguro de tokens de autenticación
+- ✅ Verificación de integridad de datos
 
 ## 🔜 Próximas Características
 

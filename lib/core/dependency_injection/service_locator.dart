@@ -7,6 +7,7 @@ import 'package:storysparks/features/auth/domain/repositories/auth_repository.da
 import 'package:storysparks/features/auth/domain/usecases/login_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/register_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_in_with_apple_usecase.dart';
+import 'package:storysparks/features/auth/domain/usecases/sign_in_with_google_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:storysparks/features/home/domain/usecases/get_user_name_usecase.dart';
 import 'package:storysparks/features/home/presentation/providers/home_provider.dart';
@@ -69,6 +70,8 @@ void setupServiceLocator() {
   getIt.registerLazySingleton(() => LoginUseCase(getIt<AuthRepository>()));
   getIt.registerLazySingleton(
       () => SignInWithAppleUseCase(getIt<AuthRepository>()));
+  getIt.registerLazySingleton(
+      () => SignInWithGoogleUseCase(getIt<AuthRepository>()));
   getIt.registerLazySingleton(() => SignOutUseCase(getIt<AuthRepository>()));
   getIt.registerLazySingleton(() => RegisterUseCase(getIt<AuthRepository>()));
   getIt

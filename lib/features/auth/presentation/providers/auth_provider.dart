@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:storysparks/features/auth/domain/entities/profile.dart';
 import 'package:storysparks/features/auth/domain/usecases/login_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/register_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_in_with_apple_usecase.dart';
+import 'package:storysparks/features/auth/domain/usecases/sign_in_with_google_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AuthProvider extends ChangeNotifier {
   final LoginUseCase _loginUseCase;
   final SignInWithAppleUseCase _signInWithAppleUseCase;
+  final SignInWithGoogleUseCase _signInWithGoogleUseCase;
   final SignOutUseCase _signOutUseCase;
   final RegisterUseCase _registerUseCase;
 
@@ -23,6 +27,7 @@ class AuthProvider extends ChangeNotifier {
   AuthProvider(
     this._loginUseCase,
     this._signInWithAppleUseCase,
+    this._signInWithGoogleUseCase,
     this._signOutUseCase,
     this._registerUseCase,
   );
@@ -168,6 +173,83 @@ class AuthProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<bool> signInWithGoogle() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final webClientId = dotenv.env['GOOGLE_WEB_CLIENT_ID'] ?? '';
+      final iosClientId = dotenv.env['GOOGLE_IOS_CLIENT_ID'] ?? '';
+
+      // Google sign in on Android will work without providing the Android
+      // Client ID registered on Google Cloud.
+
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        clientId: iosClientId,
+        serverClientId: webClientId,
+        scopes: [
+          'email',
+          'profile',
+          'openid',
+        ],
+      );
+
+      // Primero desconectamos por si hay una sesión previa
+      await googleSignIn.signOut();
+
+      final googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        throw 'Sign in was cancelled by the user';
+      }
+
+      final googleAuth = await googleUser.authentication;
+      final accessToken = googleAuth.accessToken;
+      final idToken = googleAuth.idToken;
+
+      if (accessToken == null) {
+        throw 'No Access Token found.';
+      }
+      if (idToken == null) {
+        throw 'No ID Token found.';
+      }
+
+      final result = await _signInWithGoogleUseCase(
+        SignInWithGoogleParams(
+          idToken: idToken,
+          accessToken: accessToken,
+        ),
+      );
+
+      return result.fold(
+        (failure) {
+          _error = failure.message;
+          _isAuthenticated = false;
+          _currentUser = null;
+          _isLoading = false;
+          notifyListeners();
+          return false;
+        },
+        (response) {
+          _currentUser = response.user;
+          _isAuthenticated = true;
+          _error = null;
+          _isLoading = false;
+          notifyListeners();
+          return true;
+        },
+      );
+    } catch (e) {
+      _error = e.toString();
+      _isAuthenticated = false;
+      _currentUser = null;
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 

@@ -8,6 +8,8 @@ abstract class AuthRepository {
   Future<Either<Failure, AuthResponse>> signInWithApple(
       String idToken, String accessToken,
       {String? givenName, String? familyName});
+  Future<Either<Failure, AuthResponse>> signInWithGoogle(
+      String idToken, String accessToken);
   Future<Either<Failure, void>> signOut();
   Future<User?> getCurrentUser();
   Future<Either<Failure, Profile>> updateProfile(Profile profile);

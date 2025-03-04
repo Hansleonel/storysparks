@@ -12,6 +12,7 @@ import 'package:storysparks/features/auth/domain/usecases/login_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/register_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_in_with_apple_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_out_usecase.dart';
+import 'package:storysparks/features/auth/domain/usecases/sign_in_with_google_usecase.dart';
 import 'package:storysparks/features/auth/presentation/pages/login_page.dart';
 import 'package:storysparks/features/auth/presentation/providers/auth_provider.dart';
 import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
@@ -40,6 +41,7 @@ void main() async {
           create: (_) => AuthProvider(
             getIt<LoginUseCase>(),
             getIt<SignInWithAppleUseCase>(),
+            getIt<SignInWithGoogleUseCase>(),
             getIt<SignOutUseCase>(),
             getIt<RegisterUseCase>(),
           ),
