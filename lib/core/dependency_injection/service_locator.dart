@@ -11,6 +11,7 @@ import 'package:storysparks/features/auth/domain/usecases/sign_in_with_google_us
 import 'package:storysparks/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:storysparks/features/home/domain/usecases/get_user_name_usecase.dart';
 import 'package:storysparks/features/home/presentation/providers/home_provider.dart';
+import 'package:storysparks/features/onboarding/presentation/providers/onboarding_provider.dart';
 import 'package:storysparks/features/profile/domain/usecases/get_profile_usecase.dart';
 import 'package:storysparks/features/profile/presentation/providers/profile_provider.dart';
 import 'package:storysparks/features/story/data/datasources/story_local_datasource.dart';
@@ -110,8 +111,12 @@ void setupServiceLocator() {
   getIt.registerFactory(() => SettingsProvider(getIt()));
   getIt.registerFactory(() => SubscriptionProvider());
 
+  // Onboarding Provider
+  getIt.registerLazySingleton(() => OnboardingProvider());
+
   // Nota: Los providers globales están en main.dart ℹ️
   // - AuthProvider
   // - LibraryProvider
   // - StoryProvider
+  // - OnboardingProvider (ahora también se registra aquí)
 }

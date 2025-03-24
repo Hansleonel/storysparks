@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:storysparks/features/auth/presentation/pages/login_page.dart';
 import 'package:storysparks/features/auth/presentation/pages/register_page.dart';
 import 'package:storysparks/features/navigation/presentation/pages/main_navigation.dart';
+import 'package:storysparks/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:storysparks/features/profile/presentation/pages/settings_page.dart';
 import 'package:storysparks/features/story/domain/entities/story.dart';
 import 'package:storysparks/features/story/presentation/pages/generated_story_page.dart';
@@ -14,6 +15,7 @@ class AppRoutes {
   static const String settingsProfile = '/settings-profile';
   static const String generatedStory = '/generated-story';
   static const String paywall = '/paywall';
+  static const String onboarding = '/onboarding';
 
   static Route<dynamic> onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -36,6 +38,10 @@ class AppRoutes {
       case paywall:
         return MaterialPageRoute(
           builder: (_) => const PaywallPage(),
+        );
+      case onboarding:
+        return MaterialPageRoute(
+          builder: (_) => const OnboardingPage(),
         );
       case generatedStory:
         if (routeSettings.arguments is! Map<String, dynamic>) {

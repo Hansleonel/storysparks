@@ -3,17 +3,19 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:storysparks/core/routes/app_routes.dart';
+import 'package:storysparks/features/navigation/presentation/widgets/app_navigator.dart';
+import 'package:storysparks/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:storysparks/features/onboarding/presentation/providers/onboarding_provider.dart';
 import 'package:storysparks/features/story/domain/usecases/update_story_status_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:storysparks/core/dependency_injection/service_locator.dart';
-import 'package:storysparks/core/routes/app_routes.dart';
 import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
 import 'package:storysparks/features/auth/domain/usecases/login_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/register_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_in_with_apple_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:storysparks/features/auth/domain/usecases/sign_in_with_google_usecase.dart';
-import 'package:storysparks/features/auth/presentation/pages/login_page.dart';
 import 'package:storysparks/features/auth/presentation/providers/auth_provider.dart';
 import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
 import 'package:storysparks/features/story/domain/usecases/delete_story_usecase.dart';
@@ -24,15 +26,22 @@ import 'package:storysparks/features/story/presentation/providers/story_provider
 import 'package:storysparks/features/subscription/presentation/providers/subscription_provider.dart';
 
 void main() async {
-  await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Cargar variables de entorno
+  await dotenv.load(fileName: ".env");
+
+  // Inicializar Supabase
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
+  // Configurar el service locator
   setupServiceLocator();
+
+  // Inicializar servicios que requieren operaciones asíncronas
+  await initializeServices();
 
   runApp(
     MultiProvider(
@@ -61,10 +70,21 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => getIt<SubscriptionProvider>(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => getIt<OnboardingProvider>(),
+        ),
       ],
       child: const MyApp(),
     ),
   );
+}
+
+Future<void> initializeServices() async {
+  // Inicializar el OnboardingProvider
+  final onboardingProvider = getIt<OnboardingProvider>();
+  await onboardingProvider.initializeFromPrefs();
+
+  // Aquí podrías inicializar otros servicios que requieran operaciones asíncronas
 }
 
 class MyApp extends StatelessWidget {
@@ -80,7 +100,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: const OnboardingPage(),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

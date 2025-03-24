@@ -43,6 +43,7 @@ dependencies:
   # Local Storage
   sqflite: ^2.3.0
   path: ^1.8.3
+  shared_preferences: ^2.2.2
 
   # SVG Support
   flutter_svg: ^2.0.9
@@ -65,7 +66,6 @@ dependencies:
   # Auth
   sign_in_with_apple: ^6.1.4
   supabase_flutter: ^2.8.3
-  shared_preferences: ^2.3.5
 
   mime: ^1.0.4
 
