@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:storysparks/core/error/failures.dart';
-import 'package:storysparks/core/usecases/usecase.dart';
-import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
+import 'package:memorysparks/core/error/failures.dart';
+import 'package:memorysparks/core/usecases/usecase.dart';
+import 'package:memorysparks/features/auth/domain/repositories/auth_repository.dart';
 
 class SignOutUseCase implements UseCase<void, NoParams> {
   final AuthRepository repository;

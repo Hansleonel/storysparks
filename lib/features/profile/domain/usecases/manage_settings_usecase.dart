@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:storysparks/core/error/failures.dart';
-import 'package:storysparks/core/usecases/usecase.dart';
+import 'package:memorysparks/core/error/failures.dart';
+import 'package:memorysparks/core/usecases/usecase.dart';
 import '../repositories/settings_repository.dart';
 
 class ManageSettingsUseCase implements UseCase<Map<String, dynamic>, NoParams> {

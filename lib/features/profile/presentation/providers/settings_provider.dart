@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:storysparks/core/usecases/usecase.dart';
-import 'package:storysparks/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:memorysparks/core/usecases/usecase.dart';
+import 'package:memorysparks/features/auth/domain/usecases/logout_usecase.dart';
 
 class SettingsProvider extends ChangeNotifier {
   final LogoutUseCase _logoutUseCase;

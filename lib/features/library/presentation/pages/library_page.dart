@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:storysparks/core/theme/app_colors.dart';
-import 'package:storysparks/core/utils/date_formatter.dart';
-import 'package:storysparks/features/story/domain/entities/story.dart';
-import 'package:storysparks/core/widgets/empty_state.dart';
+import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/utils/date_formatter.dart';
+import 'package:memorysparks/features/story/domain/entities/story.dart';
+import 'package:memorysparks/core/widgets/empty_state.dart';
 import '../providers/library_provider.dart';
-import 'package:storysparks/core/routes/app_routes.dart';
+import 'package:memorysparks/core/routes/app_routes.dart';
 import 'dart:io';
 
 class LibraryPage extends StatefulWidget {

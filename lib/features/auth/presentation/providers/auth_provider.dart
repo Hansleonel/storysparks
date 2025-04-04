@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:storysparks/features/auth/domain/entities/profile.dart';
-import 'package:storysparks/features/auth/domain/usecases/login_usecase.dart';
-import 'package:storysparks/features/auth/domain/usecases/register_usecase.dart';
-import 'package:storysparks/features/auth/domain/usecases/sign_in_with_apple_usecase.dart';
-import 'package:storysparks/features/auth/domain/usecases/sign_in_with_google_usecase.dart';
-import 'package:storysparks/features/auth/domain/usecases/sign_out_usecase.dart';
+import 'package:memorysparks/features/auth/domain/entities/profile.dart';
+import 'package:memorysparks/features/auth/domain/usecases/login_usecase.dart';
+import 'package:memorysparks/features/auth/domain/usecases/register_usecase.dart';
+import 'package:memorysparks/features/auth/domain/usecases/sign_in_with_apple_usecase.dart';
+import 'package:memorysparks/features/auth/domain/usecases/sign_in_with_google_usecase.dart';
+import 'package:memorysparks/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 

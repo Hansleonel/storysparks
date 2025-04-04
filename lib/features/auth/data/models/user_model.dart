@@ -1,4 +1,4 @@
-import 'package:storysparks/features/auth/domain/entities/user.dart';
+import 'package:memorysparks/features/auth/domain/entities/user.dart';
 
 class UserModel extends User {
   const UserModel({

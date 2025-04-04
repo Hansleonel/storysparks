@@ -1,12 +1,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:storysparks/core/usecases/usecase.dart';
-import 'package:storysparks/features/home/domain/usecases/get_user_name_usecase.dart';
-import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
-import 'package:storysparks/features/story/domain/entities/story.dart';
-import 'package:storysparks/features/story/domain/usecases/generate_story_usecase.dart';
-import 'package:storysparks/features/story/domain/usecases/get_image_description_usecase.dart';
+import 'package:memorysparks/core/usecases/usecase.dart';
+import 'package:memorysparks/features/home/domain/usecases/get_user_name_usecase.dart';
+import 'package:memorysparks/features/auth/domain/repositories/auth_repository.dart';
+import 'package:memorysparks/features/story/domain/entities/story.dart';
+import 'package:memorysparks/features/story/domain/usecases/generate_story_usecase.dart';
+import 'package:memorysparks/features/story/domain/usecases/get_image_description_usecase.dart';
 
 class HomeProvider extends ChangeNotifier {
   final TextEditingController memoryController = TextEditingController();

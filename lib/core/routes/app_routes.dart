@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:storysparks/features/auth/presentation/pages/login_page.dart';
-import 'package:storysparks/features/auth/presentation/pages/register_page.dart';
-import 'package:storysparks/features/navigation/presentation/pages/main_navigation.dart';
-import 'package:storysparks/features/profile/presentation/pages/settings_page.dart';
-import 'package:storysparks/features/story/domain/entities/story.dart';
-import 'package:storysparks/features/story/presentation/pages/generated_story_page.dart';
-import 'package:storysparks/features/subscription/presentation/pages/paywall_page.dart';
+import 'package:memorysparks/features/auth/presentation/pages/login_page.dart';
+import 'package:memorysparks/features/auth/presentation/pages/register_page.dart';
+import 'package:memorysparks/features/navigation/presentation/pages/main_navigation.dart';
+import 'package:memorysparks/features/profile/presentation/pages/settings_page.dart';
+import 'package:memorysparks/features/story/domain/entities/story.dart';
+import 'package:memorysparks/features/story/presentation/pages/generated_story_page.dart';
+import 'package:memorysparks/features/subscription/presentation/pages/paywall_page.dart';
 
 class AppRoutes {
   static const String login = '/login';

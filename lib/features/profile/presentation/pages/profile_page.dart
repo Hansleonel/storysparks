@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:storysparks/core/routes/app_routes.dart';
-import 'package:storysparks/core/theme/app_colors.dart';
-import 'package:storysparks/features/library/presentation/providers/library_provider.dart';
-import 'package:storysparks/features/profile/presentation/providers/profile_provider.dart';
-import 'package:storysparks/features/profile/presentation/widgets/review_card.dart';
-import 'package:storysparks/features/story/domain/entities/story.dart';
+import 'package:memorysparks/core/routes/app_routes.dart';
+import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/features/library/presentation/providers/library_provider.dart';
+import 'package:memorysparks/features/profile/presentation/providers/profile_provider.dart';
+import 'package:memorysparks/features/profile/presentation/widgets/review_card.dart';
+import 'package:memorysparks/features/story/domain/entities/story.dart';
 import 'dart:io';
 
 class ProfilePage extends StatelessWidget {

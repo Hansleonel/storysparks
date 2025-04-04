@@ -1,5 +1,5 @@
-import 'package:storysparks/core/utils/cover_image_helper.dart';
-import 'package:storysparks/features/story/domain/entities/story.dart';
+import 'package:memorysparks/core/utils/cover_image_helper.dart';
+import 'package:memorysparks/features/story/domain/entities/story.dart';
 
 class StoryModel extends Story {
   StoryModel({

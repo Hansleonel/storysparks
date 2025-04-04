@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:storysparks/features/story/data/datasources/story_local_datasource.dart';
-import 'package:storysparks/features/story/domain/entities/story.dart';
-import 'package:storysparks/features/auth/domain/repositories/auth_repository.dart';
+import 'package:memorysparks/features/story/data/datasources/story_local_datasource.dart';
+import 'package:memorysparks/features/story/domain/entities/story.dart';
+import 'package:memorysparks/features/auth/domain/repositories/auth_repository.dart';
 
 enum LibraryViewType {
   grid, // Vista actual con scroll horizontal

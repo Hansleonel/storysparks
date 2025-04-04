@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:storysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_colors.dart';
 
 class EmptyState extends StatelessWidget {
   final String message;

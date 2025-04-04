@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
-import 'package:storysparks/core/error/failures.dart';
+import 'package:memorysparks/core/error/failures.dart';
 import '../entities/story.dart';
 import '../repositories/story_repository.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import 'package:storysparks/core/utils/cover_image_helper.dart';
+import 'package:memorysparks/core/utils/cover_image_helper.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:mime/mime.dart';

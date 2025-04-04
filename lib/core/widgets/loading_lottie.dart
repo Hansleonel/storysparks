@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:storysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_colors.dart';
 
 class LoadingLottie extends StatelessWidget {
   final String? message;

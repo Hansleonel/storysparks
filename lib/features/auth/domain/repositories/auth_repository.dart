@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:storysparks/core/error/failures.dart';
-import 'package:storysparks/features/auth/domain/entities/profile.dart';
+import 'package:memorysparks/core/error/failures.dart';
+import 'package:memorysparks/features/auth/domain/entities/profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AuthRepository {

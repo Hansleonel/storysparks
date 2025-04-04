@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:storysparks/features/auth/domain/entities/profile.dart';
+import 'package:memorysparks/features/auth/domain/entities/profile.dart';
 
 abstract class AuthRemoteDataSource {
   Future<AuthResponse> login(String email, String password);

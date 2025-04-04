@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../providers/subscription_provider.dart';
 import '../../domain/entities/subscription_plan.dart';
-import 'package:storysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_colors.dart';
 
 class PaywallPage extends StatelessWidget {
   const PaywallPage({super.key});

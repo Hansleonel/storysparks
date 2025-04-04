@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:storysparks/core/usecases/usecase.dart';
-import 'package:storysparks/features/auth/domain/entities/profile.dart';
-import 'package:storysparks/features/profile/domain/usecases/get_profile_usecase.dart';
-import 'package:storysparks/features/story/domain/entities/story.dart';
-import 'package:storysparks/features/story/domain/usecases/get_user_stories_usecase.dart';
+import 'package:memorysparks/core/usecases/usecase.dart';
+import 'package:memorysparks/features/auth/domain/entities/profile.dart';
+import 'package:memorysparks/features/profile/domain/usecases/get_profile_usecase.dart';
+import 'package:memorysparks/features/story/domain/entities/story.dart';
+import 'package:memorysparks/features/story/domain/usecases/get_user_stories_usecase.dart';
 
 class ProfileProvider extends ChangeNotifier {
   final GetProfileUseCase _getProfileUseCase;

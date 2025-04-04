@@ -1,6 +1,6 @@
 class ApiConstants {
   static const String baseUrl =
-      'https://api.storysparks.com/api/v1'; // Ajusta esta URL a tu API
+      'https://api.memorysparks.com/api/v1'; // Ajusta esta URL a tu API
 
   // Auth endpoints
   static const String login = '/auth/login';

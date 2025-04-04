@@ -2,14 +2,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:storysparks/core/routes/app_routes.dart';
-import 'package:storysparks/core/theme/app_colors.dart';
-// import 'package:storysparks/core/utils/modal_utils.dart';
-// import 'package:storysparks/features/subscription/presentation/pages/paywall_page.dart';
+import 'package:memorysparks/core/routes/app_routes.dart';
+import 'package:memorysparks/core/theme/app_colors.dart';
+// import 'package:memorysparks/core/utils/modal_utils.dart';
+// import 'package:memorysparks/features/subscription/presentation/pages/paywall_page.dart';
 import '../providers/home_provider.dart';
-import 'package:storysparks/core/constants/genre_constants.dart';
+import 'package:memorysparks/core/constants/genre_constants.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:storysparks/core/widgets/loading_lottie.dart';
+import 'package:memorysparks/core/widgets/loading_lottie.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

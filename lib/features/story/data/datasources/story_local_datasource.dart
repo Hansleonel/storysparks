@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:storysparks/core/utils/cover_image_helper.dart';
+import 'package:memorysparks/core/utils/cover_image_helper.dart';
 import '../../domain/entities/story.dart';
 import 'package:flutter/foundation.dart';
 
