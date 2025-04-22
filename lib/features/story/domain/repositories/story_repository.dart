@@ -1,12 +1,10 @@
 import '../entities/story.dart';
+import '../entities/story_params.dart';
 
 abstract class StoryRepository {
   Future<Story> generateStory({
-    required String memory,
-    required String genre,
+    required StoryParams params,
     required String userId,
-    String? imageDescription,
-    String? imagePath,
   });
 
   Future<String> getImageDescription(String imagePath);

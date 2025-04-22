@@ -30,6 +30,8 @@ import 'package:memorysparks/features/story/domain/usecases/continue_story_useca
 import 'package:memorysparks/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:memorysparks/features/story/domain/usecases/get_image_description_usecase.dart';
 import 'package:memorysparks/features/story/data/services/image_service.dart';
+import '../data/repositories/locale_repository_impl.dart';
+import '../domain/repositories/locale_repository.dart';
 
 final getIt = GetIt.instance;
 
@@ -60,6 +62,9 @@ void setupServiceLocator() {
         getIt<ImageService>(),
       ));
 
+  // Core
+  getIt.registerLazySingleton<LocaleRepository>(() => LocaleRepositoryImpl());
+
   // Services
   getIt.registerLazySingleton<StoryCleanupService>(
     () => StoryCleanupService(getIt<StoryRepository>()),
@@ -87,8 +92,11 @@ void setupServiceLocator() {
   getIt.registerLazySingleton(() => SaveStoryUseCase(getIt<StoryRepository>()));
   getIt.registerLazySingleton(
       () => GetUserStoriesUseCase(getIt<StoryRepository>()));
-  getIt.registerLazySingleton(
-      () => GenerateStoryUseCase(getIt<StoryRepository>()));
+  getIt.registerLazySingleton(() => GenerateStoryUseCase(
+        repository: getIt<StoryRepository>(),
+        localeRepository: getIt<LocaleRepository>(),
+      ));
+
   getIt.registerLazySingleton(
       () => UpdateStoryStatusUseCase(getIt<StoryRepository>()));
   getIt.registerLazySingleton(

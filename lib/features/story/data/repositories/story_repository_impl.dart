@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:mime/mime.dart';
 import 'package:dio/dio.dart';
 import '../../domain/entities/story.dart';
+import '../../domain/entities/story_params.dart';
 import '../../domain/repositories/story_repository.dart';
 import '../datasources/story_local_datasource.dart';
 import '../managers/chat_session_manager.dart';
@@ -33,18 +34,18 @@ class StoryRepositoryImpl implements StoryRepository {
 
   @override
   Future<Story> generateStory({
-    required String memory,
-    required String genre,
+    required StoryParams params,
     required String userId,
-    String? imageDescription,
-    String? imagePath,
   }) async {
     debugPrint('🗄️ StoryRepository: Iniciando generación de historia');
+    debugPrint(
+        '   - Idioma solicitado: ${params.targetLanguage ?? 'No especificado (usará español por defecto)'}');
+
     String? processedImagePath;
 
-    if (imagePath != null) {
+    if (params.imagePath != null && params.imagePath!.isNotEmpty) {
       processedImagePath =
-          await _imageService.processAndSaveStoryImage(imagePath);
+          await _imageService.processAndSaveStoryImage(params.imagePath!);
       if (processedImagePath == null) {
         debugPrint(
             '⚠️ StoryRepository: No se pudo procesar la imagen, se usará la imagen por defecto');
@@ -53,26 +54,28 @@ class StoryRepositoryImpl implements StoryRepository {
 
     try {
       debugPrint('🗄️ StoryRepository: Preparando prompt con:');
-      debugPrint('   - Memoria (longitud): ${memory.length} caracteres');
-      debugPrint('   - Género solicitado: $genre');
+      debugPrint(
+          '   - Memoria (longitud): ${params.memoryText.length} caracteres');
+      debugPrint('   - Género solicitado: ${params.genre}');
       debugPrint('   - ID de usuario: $userId');
 
-      if (imageDescription != null) {
+      if (params.imageDescription != null) {
         debugPrint('📸 StoryRepository: Descripción de imagen disponible:');
-        debugPrint(imageDescription);
+        debugPrint(params.imageDescription!);
       }
 
+      final languageName = _getLanguageName(params.targetLanguage);
+
       final prompt = '''
-Genera una historia cautivadora inspirada en el siguiente recuerdo personal: " $memory ".${imageDescription != null ? '\nTeniendo en cuenta esta descripción de la imagen relacionada: "$imageDescription".' : ''}
-El género de la historia será $genre.
+Genera una historia cautivadora inspirada en el siguiente recuerdo personal: "${params.memoryText}".${params.imageDescription != null ? '\nTeniendo en cuenta esta descripción de la imagen relacionada: "${params.imageDescription}".' : ''}
+El género de la historia será ${params.genre}. Por favor, genera la historia en $languageName
 Instrucciones específicas:
 
 Comienza con una frase breve y poderosa que despierte el interés, ya sea presentando un detalle sensorial, una pregunta intrigante o situando la acción.
 A lo largo del relato, mantén un tono emotivo y describe escenas con detalles vívidos, conservando la esencia del recuerdo original.
 Evita comenzar siempre de la misma forma; varía entre descripciones sensoriales, preguntas directas, diálogos o metáforas.
-Asegura que la historia se mantenga coherente con el género ($genre), sin perder el matiz personal del recuerdo.
-Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la historia.
-
+Asegura que la historia se mantenga coherente con el género (${params.genre}), sin perder el matiz personal del recuerdo.
+Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la historia, recuerda generar la historia en el idioma $languageName, recuerda empezar directamente con la historia, no con una respuesta como aqui esta la historia, o cosas que no sean parte de la historia.
 ''';
 
       debugPrint('🤖 StoryRepository: Enviando prompt a Gemini...');
@@ -92,12 +95,12 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
 
       final story = Story(
         content: response.text!,
-        genre: genre,
+        genre: params.genre,
         createdAt: DateTime.now(),
-        memory: memory,
+        memory: params.memoryText,
         userId: userId,
-        title: 'Mi Historia de ${genre.toLowerCase()}',
-        imageUrl: CoverImageHelper.getCoverImage(genre),
+        title: 'Mi Historia de ${params.genre.toLowerCase()}',
+        imageUrl: CoverImageHelper.getCoverImage(params.genre),
         customImagePath: processedImagePath,
         status: 'draft',
       );
@@ -328,6 +331,19 @@ Mantén la descripción concisa pero rica en detalles significativos.
       debugPrint('❌ StoryRepository: Error durante el análisis de imagen');
       debugPrint('   Error detallado: $e');
       rethrow;
+    }
+  }
+
+  String _getLanguageName(String? languageCode) {
+    switch (languageCode?.toLowerCase()) {
+      case 'es':
+        return 'español';
+      case 'en':
+        return 'inglés';
+      default:
+        debugPrint(
+            "⚠️ StoryRepository: Código de idioma no reconocido o nulo ('$languageCode'), usando español por defecto.");
+        return 'español';
     }
   }
 }

@@ -5,6 +5,7 @@ import 'package:memorysparks/core/usecases/usecase.dart';
 import 'package:memorysparks/features/home/domain/usecases/get_user_name_usecase.dart';
 import 'package:memorysparks/features/auth/domain/repositories/auth_repository.dart';
 import 'package:memorysparks/features/story/domain/entities/story.dart';
+import 'package:memorysparks/features/story/domain/entities/story_params.dart';
 import 'package:memorysparks/features/story/domain/usecases/generate_story_usecase.dart';
 import 'package:memorysparks/features/story/domain/usecases/get_image_description_usecase.dart';
 
@@ -160,11 +161,13 @@ class HomeProvider extends ChangeNotifier {
       }
 
       final result = await _generateStoryUseCase.execute(
-        memory: memoryController.text,
-        genre: selectedGenre,
+        params: StoryParams(
+          memoryText: memoryController.text,
+          genre: selectedGenre,
+          imageDescription: _imageDescription,
+          imagePath: selectedImagePath,
+        ),
         userId: currentUser.id,
-        imageDescription: _imageDescription,
-        imagePath: selectedImagePath,
       );
 
       return result.fold(

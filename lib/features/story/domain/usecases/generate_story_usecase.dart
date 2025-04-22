@@ -1,41 +1,50 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:memorysparks/core/error/failures.dart';
+import 'package:memorysparks/core/domain/repositories/locale_repository.dart';
 import '../entities/story.dart';
+import '../entities/story_params.dart';
 import '../repositories/story_repository.dart';
 
 class GenerateStoryUseCase {
   final StoryRepository repository;
+  final LocaleRepository localeRepository;
 
-  GenerateStoryUseCase(this.repository);
+  GenerateStoryUseCase({
+    required this.repository,
+    required this.localeRepository,
+  });
 
   Future<Either<Failure, Story>> execute({
-    required String memory,
-    required String genre,
+    required StoryParams params,
     required String userId,
-    String? imageDescription,
-    String? imagePath,
   }) async {
     debugPrint('📖 GenerateStoryUseCase: Iniciando generación de historia');
     debugPrint('📖 GenerateStoryUseCase: Parámetros recibidos:');
-    debugPrint('   - Memoria (longitud): ${memory.length} caracteres');
-    debugPrint('   - Género: $genre');
+    debugPrint(
+        '   - Memoria (longitud): ${params.memoryText.length} caracteres');
+    debugPrint('   - Género: ${params.genre}');
     debugPrint('   - ID de usuario: $userId');
-    if (imageDescription != null) {
-      debugPrint('   - Descripción de imagen disponible: $imageDescription');
+    if (params.imageDescription != null) {
+      debugPrint(
+          '   - Descripción de imagen disponible: ${params.imageDescription}');
     }
-    if (imagePath != null) {
-      debugPrint('   - Ruta de la imagen: $imagePath');
+    if (params.imagePath != null) {
+      debugPrint('   - Ruta de la imagen: ${params.imagePath}');
     }
 
     try {
+      // 1. Obtener el locale actual
+      final locale = await localeRepository.getCurrentLocale();
+      final languageCode = locale.languageCode;
+
+      // 2. Crear nuevos parámetros con el idioma incluido
+      final paramsWithLanguage = params.copyWith(targetLanguage: languageCode);
+
       debugPrint('📖 GenerateStoryUseCase: Llamando al repositorio...');
       final story = await repository.generateStory(
-        memory: memory,
-        genre: genre,
+        params: paramsWithLanguage,
         userId: userId,
-        imageDescription: imageDescription,
-        imagePath: imagePath,
       );
       debugPrint('✅ GenerateStoryUseCase: Historia generada exitosamente');
       debugPrint('   - ID: ${story.id}');
