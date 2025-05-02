@@ -75,6 +75,48 @@ class _SettingsView extends StatelessWidget {
                       // TODO: Navigate to privacy page
                     },
                   ),
+                  _SettingsItem(
+                    icon: Icons.delete_forever_outlined,
+                    title: AppLocalizations.of(context)?.deleteAccount ??
+                        'Delete Account',
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(
+                            AppLocalizations.of(context)?.deleteAccountTitle ??
+                                'Delete Account',
+                          ),
+                          content: Text(
+                            AppLocalizations.of(context)
+                                    ?.deleteAccountConfirmation ??
+                                'Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently deleted.',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                AppLocalizations.of(context)?.cancel ??
+                                    'Cancel',
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // TODO: Implement delete account logic
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                AppLocalizations.of(context)?.delete ??
+                                    'Delete',
+                                style: const TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    textColor: Colors.red,
+                  ),
                 ],
               ),
               _buildSection(
@@ -254,6 +296,7 @@ class _SettingsItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final VoidCallback onTap;
+  final Color? textColor;
   // If you want to add a trailing icon, uncomment the following line
   // final Widget? trailing;
 
@@ -261,6 +304,7 @@ class _SettingsItem extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.onTap,
+    this.textColor,
     // this.trailing,
   });
 
@@ -272,22 +316,22 @@ class _SettingsItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.textPrimary),
+            Icon(icon, color: textColor ?? AppColors.textPrimary),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 16,
-                  color: AppColors.textPrimary,
+                  color: textColor ?? AppColors.textPrimary,
                 ),
               ),
             ),
             // trailing ??
-            const Icon(
+            Icon(
               Icons.chevron_right,
-              color: AppColors.textSecondary,
+              color: textColor ?? AppColors.textSecondary,
             ),
           ],
         ),
