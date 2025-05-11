@@ -6,90 +6,66 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
 
 - ✅ **Autenticación de Usuarios**:
 
-  - Sistema de login seguro implementado con AuthProvider y AuthRepository
-  - Integración con Sign in with Apple
-  - Integración con Google Sign-In
-  - Manejo de errores en autenticación con mensajes de usuario
-  - Persistencia de sesión
-  - Actualización automática de metadatos de usuario
+  - Sistema de login seguro con AuthProvider y AuthRepository
+  - Integración con Sign in with Apple y Google Sign-In
+  - Manejo avanzado de errores y feedback al usuario
+  - Persistencia de sesión y actualización automática de metadatos
   - Validación de credenciales en tiempo real
 
-- ✅ **Navegación Intuitiva**: Barra de navegación implementada con MainNavigation:
+- ✅ **Navegación Intuitiva**:
 
-  - 🏠 Home: Creación de nuevas historias
-  - 📚 Biblioteca: Colección de historias guardadas
-  - 👤 Perfil: Gestión de cuenta y preferencias
-  - 🔄 Transiciones fluidas entre pantallas
-  - 💾 Persistencia de estado entre navegaciones
+  - Barra de navegación inferior (MainNavigation) con Home, Biblioteca y Perfil
+  - Transiciones fluidas y persistencia de estado entre pantallas
+  - Soporte para múltiples vistas en la biblioteca: grid y timeline
 
 - ✅ **Gestión de Historias**:
 
-  - Generación de historias con IA usando Google Generative AI
+  - Generación de historias con IA (Google Generative AI)
   - Integración de descripciones de imágenes en la narrativa
-  - Procesamiento automático de imágenes para enriquecer historias
-  - Guardado local de historias con SQLite
-  - Visualización de historias generadas
-  - Eliminación de historias
-  - Biblioteca personal de historias
-  - Sistema de calificación de historias
-  - Contador de lecturas por historia
-  - Historias populares y recientes
-  - Continuación de historias con IA
-  - Gestión de estados de historia
-  - Sistema de sesiones de chat para continuaciones coherentes
+  - Procesamiento automático y optimizado de imágenes (compresión, redimensionamiento, validación de formato y tamaño)
+  - Guardado local de historias con SQLite y gestión eficiente de almacenamiento
+  - Visualización animada de historias y sistema de calificación interactivo
+  - Eliminación y soft delete de historias
+  - Biblioteca personal con historias populares y recientes
+  - Contador de lecturas automático y gestión de estados de historia
+  - Continuación de historias con IA y sesiones de chat coherentes
   - Limpieza automática de borradores antiguos
-  - Marcado de historias como eliminadas (soft delete)
-  - Optimización de almacenamiento de imágenes
   - Análisis semántico de imágenes con IA
 
 - ✅ **Sistema de Suscripción**:
 
-  - Planes de suscripción flexibles:
-    - Plan Semanal ($3.99)
-    - Plan Mensual ($9.99)
-    - Plan Anual ($59.99)
-  - Beneficios por nivel:
-    - Historias ilimitadas
-    - Sin publicidad
-    - Edición de personajes
-    - Continuación de historias
-    - Acceso anticipado (planes mensual y anual)
-    - Soporte prioritario (plan anual)
-  - Interfaz de pago moderna y atractiva
-  - Cálculo automático de ahorros por plan
-  - Período de prueba gratuito
-  - Gestión de beneficios por tipo de suscripción
+  - Planes flexibles: Semanal, Mensual, Anual
+  - Beneficios por nivel: historias ilimitadas, sin publicidad, edición de personajes, continuación de historias, acceso anticipado, soporte prioritario
+  - Interfaz de pago moderna y atractiva, cálculo automático de ahorros y período de prueba gratuito
+  - Gestión de beneficios y control de acceso según suscripción
 
-- ✅ **Creación de Historias**:
+- ✅ **Creación y Personalización de Historias**:
 
   - Campo de texto para compartir recuerdos
-  - Sistema avanzado de procesamiento de imágenes:
-    - Soporte para múltiples formatos (JPEG, PNG, WEBP, HEIC)
-    - Análisis automático de imágenes con IA
-    - Integración de descripciones visuales en la narrativa
-    - Validación de tamaño y formato de imágenes
-    - Compresión inteligente de imágenes
-    - Redimensionamiento adaptativo
-    - Generación de nombres únicos para archivos
-  - Selección de géneros narrativos:
-    - Feliz
-    - Nostálgico
-    - Aventura
-    - Familiar
-    - Divertido
-  - Personalización del protagonista
+  - Procesamiento avanzado de imágenes (JPEG, PNG, WEBP, HEIC)
+  - Análisis automático de imágenes y generación de descripciones visuales
+  - Personalización básica de portadas mediante selección de imagen propia
+  - Selección de géneros narrativos: Feliz, Nostálgico, Aventura, Familiar, Divertido
+  - Personalización del protagonista (estructura lista para expansión)
 
 - ✅ **Modo Offline**:
 
-  - Almacenamiento local de historias generadas
-  - Acceso a historias guardadas sin conexión
-  - Sincronización automática cuando se restablece la conexión
+  - Almacenamiento local y acceso sin conexión a historias
+  - Sincronización automática al recuperar conexión
   - Gestión eficiente del almacenamiento local
 
-- ✅ **Internacionalización**:
+- ✅ **Internacionalización y Accesibilidad**:
+
   - Soporte multiidioma (Español e Inglés)
   - Localización de textos y mensajes
   - Adaptación de contenido según región
+
+- ✅ **Otras funcionalidades destacadas**:
+  - Vista de biblioteca en grid y timeline
+  - Limpieza automática de borradores antiguos
+  - Gestión de historias populares y recientes
+  - Calificación de historias
+  - Gestión de imágenes personalizadas para portadas
 
 ## 🛠️ Tecnologías Implementadas
 
@@ -306,18 +282,13 @@ dependencies:
 - ✅ Manejo seguro de tokens de autenticación
 - ✅ Verificación de integridad de datos
 
-## 🔜 Próximas Características
+## 🔜 Próximas Características y Mejoras
 
-- [x] Integración con IA para generación de historias
-- [x] Modo offline con almacenamiento local
-- [x] Múltiples idiomas
-- [x] Sistema de continuación de historias
-- [x] Procesamiento de imágenes con IA
-- [ ] Compartir historias en redes sociales
-- [ ] Temas personalizables
-- [ ] Exportación de historias en diferentes formatos
-- [ ] Generación de audiolibros
-- [ ] Personalización avanzada de portadas
+- [ ] **Compartir historias en redes sociales** _(estructura en UI, pendiente implementación)_
+- [ ] **Temas personalizables (oscuro/claro)** _(estructura en settings, pendiente implementación)_
+- [ ] **Exportación de historias en diferentes formatos** _(planeado)_
+- [ ] **Generación de audiolibros** _(botón en UI, pendiente implementación)_
+- [ ] **Personalización avanzada de portadas** _(actualmente solo selección de imagen, edición avanzada pendiente)_
 
 ## 👥 Contribución
 
