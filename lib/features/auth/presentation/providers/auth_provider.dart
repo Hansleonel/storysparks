@@ -9,6 +9,9 @@ import 'package:memorysparks/features/auth/domain/usecases/sign_in_with_google_u
 import 'package:memorysparks/features/auth/domain/usecases/sign_out_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:memorysparks/features/auth/domain/usecases/delete_account_usecase.dart';
+import 'package:memorysparks/core/usecases/usecase.dart';
+import 'package:memorysparks/features/story/domain/usecases/delete_all_stories_for_user_usecase.dart';
 
 class AuthProvider extends ChangeNotifier {
   final LoginUseCase _loginUseCase;
@@ -16,6 +19,8 @@ class AuthProvider extends ChangeNotifier {
   final SignInWithGoogleUseCase _signInWithGoogleUseCase;
   final SignOutUseCase _signOutUseCase;
   final RegisterUseCase _registerUseCase;
+  final DeleteAccountUseCase _deleteAccountUseCase;
+  final DeleteAllStoriesForUserUseCase _deleteAllStoriesForUserUseCase;
 
   bool _isLoading = false;
   String? _error;
@@ -30,6 +35,8 @@ class AuthProvider extends ChangeNotifier {
     this._signInWithGoogleUseCase,
     this._signOutUseCase,
     this._registerUseCase,
+    this._deleteAccountUseCase,
+    this._deleteAllStoriesForUserUseCase,
   );
 
   bool get isLoading => _isLoading;
@@ -257,7 +264,7 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final result = await _signOutUseCase(const NoParams());
+    final result = await _signOutUseCase(NoParams());
 
     result.fold(
       (failure) => _error = failure.message,
@@ -276,5 +283,95 @@ class AuthProvider extends ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  Future<bool> deleteAccount() async {
+    print('⚠️ AuthProvider: Iniciando proceso de eliminación de cuenta');
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    print('🔄 AuthProvider: Estado de carga activado, notificando listeners');
+
+    try {
+      // Asegúrate de tener el userId antes de borrar para poder limpiar datos locales
+      final userId = _currentUser?.id;
+      if (userId == null) {
+        print('❌ AuthProvider: No hay usuario autenticado para eliminar');
+        _error = 'No hay usuario autenticado';
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+      print('👤 AuthProvider: Usuario identificado: $userId');
+
+      // Usar el UseCase para eliminar la cuenta
+      print('🔄 AuthProvider: Llamando a DeleteAccountUseCase');
+      final result = await _deleteAccountUseCase(NoParams());
+
+      return result.fold(
+        (failure) {
+          print(
+              '❌ AuthProvider: Error en eliminación de cuenta: ${failure.message}');
+          _error = failure.message;
+          _isLoading = false;
+          notifyListeners();
+          return false;
+        },
+        (_) async {
+          print(
+              '✅ AuthProvider: Cuenta eliminada en Supabase, procediendo a limpiar datos locales');
+          // Borrar datos locales después de eliminar en Supabase
+          await deleteLocalData(userId);
+
+          // Limpiar estado
+          print('🧹 AuthProvider: Limpiando estado de sesión');
+          _userProfile = null;
+          _isAuthenticated = false;
+          _currentUser = null;
+          _isLoading = false;
+          notifyListeners();
+          print(
+              '🏁 AuthProvider: Proceso de eliminación completado exitosamente');
+          return true;
+        },
+      );
+    } catch (e) {
+      print('💥 AuthProvider: Excepción durante eliminación de cuenta: $e');
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<void> deleteLocalData(String userId) async {
+    print(
+        '🧹 AuthProvider: Iniciando limpieza de datos locales para usuario: $userId');
+
+    try {
+      // Eliminar historias locales
+      print('📚 AuthProvider: Eliminando historias locales');
+      final deleteStoriesResult = await _deleteAllStoriesForUserUseCase(
+          DeleteAllStoriesParams(userId: userId));
+
+      deleteStoriesResult.fold(
+          (failure) => print(
+              '❌ AuthProvider: Error al eliminar historias: ${failure.message}'),
+          (_) => print('✅ AuthProvider: Historias eliminadas con éxito'));
+
+      // Limpiar caché y preferencias si es necesario
+      print('🗑️ AuthProvider: Limpiando caché y preferencias de usuario');
+
+      // Aquí podrías agregar más operaciones de limpieza:
+      // - SharedPreferences
+      // - Caché de imágenes
+      // - Tokens almacenados
+      // etc.
+
+      print('✅ AuthProvider: Datos locales eliminados completamente');
+    } catch (e) {
+      print('💥 AuthProvider: Error durante la limpieza de datos locales: $e');
+      // Continuar con el proceso incluso si hay errores en la limpieza local
+    }
   }
 }

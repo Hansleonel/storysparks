@@ -1,5 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:memorysparks/features/auth/domain/entities/profile.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
 
 abstract class AuthRemoteDataSource {
   Future<AuthResponse> login(String email, String password);
@@ -18,6 +21,7 @@ abstract class AuthRemoteDataSource {
     String? bio,
   });
   Future<void> logout();
+  Future<void> deleteAccount();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -587,6 +591,78 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       await supabaseClient.auth.signOut();
     } catch (e) {
       throw Exception('Error during logout: $e');
+    }
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    try {
+      print(
+          '🔥 AuthRemoteDataSource: Iniciando proceso de eliminación de cuenta');
+
+      final session = supabaseClient.auth.currentSession;
+      if (session == null) {
+        print('❌ AuthRemoteDataSource: No hay sesión activa');
+        throw Exception('No hay sesión activa');
+      }
+
+      print('🔐 AuthRemoteDataSource: Sesión válida, obtenido token de acceso');
+      print(
+          '🔑 AuthRemoteDataSource: Token JWT presente (exp: ${DateTime.fromMillisecondsSinceEpoch(session.expiresAt! * 1000).toIso8601String()})');
+      print('🌐 AuthRemoteDataSource: Llamando a Edge Function delete-user');
+
+      // Aquí es donde se hace la llamada HTTP a la Edge Function
+      final edgeFunctionUrl =
+          'https://vsmzgwzfmnfwuusahsil.supabase.co/functions/v1/delete-user';
+      print(
+          '🔗 AuthRemoteDataSource: URL de la Edge Function: $edgeFunctionUrl');
+
+      final stopwatch = Stopwatch()..start();
+      final response = await http.delete(
+        Uri.parse(edgeFunctionUrl),
+        headers: {
+          'Authorization': 'Bearer ${session.accessToken}',
+          'Content-Type': 'application/json',
+        },
+      );
+      stopwatch.stop();
+
+      print(
+          '📡 AuthRemoteDataSource: Respuesta recibida [${response.statusCode}] en ${stopwatch.elapsedMilliseconds}ms');
+      print('📊 AuthRemoteDataSource: Headers: ${response.headers}');
+      print('📄 AuthRemoteDataSource: Body: ${response.body}');
+
+      if (response.statusCode != 200) {
+        print(
+            '❌ AuthRemoteDataSource: Error en la respuesta: ${response.body}');
+        print(
+            '🔍 AuthRemoteDataSource: Código de estado: ${response.statusCode}');
+
+        // Analizar respuesta para dar mensajes más específicos
+        if (response.statusCode == 401) {
+          print('🔒 AuthRemoteDataSource: Error de autenticación');
+          throw Exception('Error de autenticación: No autorizado');
+        } else if (response.statusCode == 400) {
+          print('⚠️ AuthRemoteDataSource: Error en la solicitud');
+          String errorDetails = 'Error al eliminar la cuenta';
+          try {
+            final responseJson = jsonDecode(response.body);
+            if (responseJson['error'] != null) {
+              errorDetails = responseJson['error'];
+            }
+          } catch (e) {
+            print('📋 AuthRemoteDataSource: No se pudo decodificar JSON: $e');
+          }
+          throw Exception(errorDetails);
+        } else {
+          throw Exception('Error al eliminar la cuenta: ${response.body}');
+        }
+      }
+
+      print('✅ AuthRemoteDataSource: Cuenta eliminada exitosamente');
+    } catch (e) {
+      print('💥 AuthRemoteDataSource: Error durante eliminación de cuenta: $e');
+      throw Exception('Error al eliminar la cuenta: $e');
     }
   }
 }

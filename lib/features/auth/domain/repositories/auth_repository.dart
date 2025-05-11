@@ -22,4 +22,5 @@ abstract class AuthRepository {
     String? bio,
   });
   Future<void> logout();
+  Future<Either<Failure, void>> deleteAccount();
 }

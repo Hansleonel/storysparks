@@ -108,4 +108,31 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> logout() async {
     await _remoteDataSource.logout();
   }
+
+  @override
+  Future<Either<Failure, void>> deleteAccount() async {
+    try {
+      print('🏛️ AuthRepositoryImpl: Iniciando eliminación de cuenta');
+      print('📤 AuthRepositoryImpl: Llamando al datasource remoto');
+      await _remoteDataSource.deleteAccount();
+      print('✅ AuthRepositoryImpl: Cuenta eliminada con éxito');
+      return const Right(null);
+    } catch (e) {
+      print('❌ AuthRepositoryImpl: Error en eliminación de cuenta: $e');
+      // Analizar el error para dar un mensaje más específico
+      String errorMessage = e.toString();
+      if (errorMessage.contains('foreign key constraint')) {
+        print(
+            '🔑 AuthRepositoryImpl: Error de restricción de clave foránea detectado');
+        return Left(ServerFailure(
+            'No se pudo eliminar la cuenta debido a datos relacionados. Por favor, contacta a soporte.'));
+      } else if (errorMessage.contains('permission denied')) {
+        print('🔒 AuthRepositoryImpl: Error de permisos detectado');
+        return Left(
+            ServerFailure('No tienes permisos para realizar esta acción.'));
+      } else {
+        return Left(ServerFailure(errorMessage));
+      }
+    }
+  }
 }

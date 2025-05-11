@@ -20,4 +20,5 @@ abstract class StoryRepository {
   Future<List<Story>> getPopularStories(String userId);
   Future<List<Story>> getRecentStories(String userId);
   Future<void> cleanupOldDraftStories();
+  Future<void> deleteAllStoriesForUser(String userId);
 }

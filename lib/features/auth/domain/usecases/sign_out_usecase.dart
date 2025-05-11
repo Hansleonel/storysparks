@@ -13,7 +13,3 @@ class SignOutUseCase implements UseCase<void, NoParams> {
     return await repository.signOut();
   }
 }
-
-class NoParams {
-  const NoParams();
-}

@@ -22,6 +22,8 @@ import 'package:memorysparks/features/story/domain/usecases/update_story_rating_
 import 'package:memorysparks/features/story/domain/usecases/continue_story_usecase.dart';
 import 'package:memorysparks/features/story/presentation/providers/story_provider.dart';
 import 'package:memorysparks/features/subscription/presentation/providers/subscription_provider.dart';
+import 'package:memorysparks/features/auth/domain/usecases/delete_account_usecase.dart';
+import 'package:memorysparks/features/story/domain/usecases/delete_all_stories_for_user_usecase.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -44,6 +46,8 @@ void main() async {
             getIt<SignInWithGoogleUseCase>(),
             getIt<SignOutUseCase>(),
             getIt<RegisterUseCase>(),
+            getIt<DeleteAccountUseCase>(),
+            getIt<DeleteAllStoriesForUserUseCase>(),
           ),
         ),
         ChangeNotifierProvider(

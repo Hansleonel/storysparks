@@ -334,6 +334,11 @@ Mantén la descripción concisa pero rica en detalles significativos.
     }
   }
 
+  @override
+  Future<void> deleteAllStoriesForUser(String userId) async {
+    await _localDatasource.deleteAllStoriesForUser(userId);
+  }
+
   String _getLanguageName(String? languageCode) {
     switch (languageCode?.toLowerCase()) {
       case 'es':

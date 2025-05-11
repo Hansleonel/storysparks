@@ -325,4 +325,13 @@ class StoryLocalDatasource {
             ))
         .toList();
   }
+
+  Future<void> deleteAllStoriesForUser(String userId) async {
+    final db = await database;
+    await db.delete(
+      tableName,
+      where: 'user_id = ?',
+      whereArgs: [userId],
+    );
+  }
 }

@@ -5,6 +5,7 @@ import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../providers/settings_provider.dart';
+import 'package:memorysparks/features/auth/presentation/providers/auth_provider.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -79,8 +80,10 @@ class _SettingsView extends StatelessWidget {
                     icon: Icons.delete_forever_outlined,
                     title: AppLocalizations.of(context)?.deleteAccount ??
                         'Delete Account',
-                    onTap: () {
-                      showDialog(
+                    onTap: () async {
+                      print(
+                          '👉 SettingsPage: Usuario ha tocado "Delete Account"');
+                      final confirm = await showDialog<bool>(
                         context: context,
                         builder: (context) => AlertDialog(
                           title: Text(
@@ -94,7 +97,11 @@ class _SettingsView extends StatelessWidget {
                           ),
                           actions: [
                             TextButton(
-                              onPressed: () => Navigator.pop(context),
+                              onPressed: () {
+                                print(
+                                    '🚫 SettingsPage: Usuario canceló la eliminación de cuenta');
+                                Navigator.pop(context, false);
+                              },
                               child: Text(
                                 AppLocalizations.of(context)?.cancel ??
                                     'Cancel',
@@ -102,8 +109,9 @@ class _SettingsView extends StatelessWidget {
                             ),
                             TextButton(
                               onPressed: () {
-                                // TODO: Implement delete account logic
-                                Navigator.pop(context);
+                                print(
+                                    '⚠️ SettingsPage: Usuario confirmó la eliminación de cuenta');
+                                Navigator.pop(context, true);
                               },
                               child: Text(
                                 AppLocalizations.of(context)?.delete ??
@@ -114,6 +122,80 @@ class _SettingsView extends StatelessWidget {
                           ],
                         ),
                       );
+
+                      if (confirm == true) {
+                        print(
+                            '🔄 SettingsPage: Iniciando proceso de eliminación de cuenta');
+                        // Mostrar cargando
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+
+                        try {
+                          final authProvider = context.read<AuthProvider>();
+                          print(
+                              '📱 SettingsPage: Llamando a deleteAccount en AuthProvider');
+                          final success = await authProvider.deleteAccount();
+
+                          // Cerrar diálogo de carga
+                          if (context.mounted) Navigator.pop(context);
+
+                          if (success) {
+                            print(
+                                '✅ SettingsPage: Cuenta eliminada con éxito, redirigiendo a login');
+                            if (context.mounted) {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                AppRoutes.login,
+                                (route) => false,
+                              );
+
+                              // Mostrar mensaje de éxito
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Your account has been deleted successfully',
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                          } else {
+                            print(
+                                '❌ SettingsPage: Error al eliminar cuenta: ${authProvider.error}');
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Error deleting account: ${authProvider.error}',
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        } catch (e) {
+                          print(
+                              '💥 SettingsPage: Excepción al eliminar cuenta: $e');
+                          // Cerrar diálogo de carga
+                          if (context.mounted) Navigator.pop(context);
+
+                          // Mostrar error
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Error deleting account: $e',
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      }
                     },
                     textColor: Colors.red,
                   ),

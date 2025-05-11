@@ -32,6 +32,8 @@ import 'package:memorysparks/features/story/domain/usecases/get_image_descriptio
 import 'package:memorysparks/features/story/data/services/image_service.dart';
 import '../data/repositories/locale_repository_impl.dart';
 import '../domain/repositories/locale_repository.dart';
+import 'package:memorysparks/features/auth/domain/usecases/delete_account_usecase.dart';
+import 'package:memorysparks/features/story/domain/usecases/delete_all_stories_for_user_usecase.dart';
 
 final getIt = GetIt.instance;
 
@@ -79,6 +81,8 @@ void setupServiceLocator() {
       () => SignInWithGoogleUseCase(getIt<AuthRepository>()));
   getIt.registerLazySingleton(() => SignOutUseCase(getIt<AuthRepository>()));
   getIt.registerLazySingleton(() => RegisterUseCase(getIt<AuthRepository>()));
+  getIt.registerLazySingleton(
+      () => DeleteAccountUseCase(getIt<AuthRepository>()));
   getIt
       .registerLazySingleton(() => GetUserNameUseCase(getIt<AuthRepository>()));
   getIt.registerLazySingleton(() => GetProfileUseCase(getIt<AuthRepository>()));
@@ -96,6 +100,8 @@ void setupServiceLocator() {
         repository: getIt<StoryRepository>(),
         localeRepository: getIt<LocaleRepository>(),
       ));
+  getIt.registerLazySingleton(
+      () => DeleteAllStoriesForUserUseCase(getIt<StoryRepository>()));
 
   getIt.registerLazySingleton(
       () => UpdateStoryStatusUseCase(getIt<StoryRepository>()));
