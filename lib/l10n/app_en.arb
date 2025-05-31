@@ -31,7 +31,14 @@
     "confirmPassword": "Confirm Password",
     "confirmPasswordRequired": "Please confirm your password",
     "continueStory": "Continue story",
-    "continuing": "Continuing...",
+    "continueStoryMode": "Continue Story Mode",
+    "automaticContinuation": "Automatic Continuation",
+    "automaticContinuationDescription": "Let AI continue the story naturally",
+    "customContinuation": "Custom Continuation",
+    "customContinuationDescription": "Write your own direction for the story",
+    "writeYourDirection": "Write how you want the story to continue...",
+    "continueWithDirection": "Add Direction",
+    "continueAutomatically": "Auto Continue",
     "createAccount": "Create Account",
     "delete": "Delete",
     "deleteAccount": "Delete Account",
@@ -159,5 +166,6 @@
     "weeksAgo": "{weeks, plural, =1{1 week ago} other{{weeks} weeks ago}}",
     "welcomeBack": "Welcome back 👋",
     "yesterday": "Yesterday",
-    "yourStory": "Your Story"
+    "yourStory": "Your Story",
+    "continuing": "Continuing..."
 }

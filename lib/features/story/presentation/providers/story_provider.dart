@@ -325,4 +325,46 @@ class StoryProvider extends ChangeNotifier {
         '⚠️ StoryProvider: Cannot continue - No story or story ID available');
     return false;
   }
+
+  Future<bool> continueStoryWithDirection(String direction) async {
+    if (_story != null && _story!.id != null) {
+      try {
+        debugPrint(
+            '🔄 StoryProvider: Starting story continuation with custom direction...');
+        debugPrint('📝 Direction: $direction');
+        _isContinuing = true;
+        _error = null;
+        notifyListeners();
+
+        final result = await _continueStoryUseCase.executeWithDirection(
+            _story!, direction);
+
+        return result.fold(
+          (failure) {
+            debugPrint(
+                '❌ StoryProvider: Error continuing story with direction - $failure');
+            _error = failure.toString();
+            notifyListeners();
+            return false;
+          },
+          (updatedStory) {
+            _story = updatedStory;
+            // Procesar el contenido actualizado
+            _processStoryContent();
+            _error = null;
+            debugPrint(
+                '✅ StoryProvider: Story continuation with direction completed successfully');
+            notifyListeners();
+            return true;
+          },
+        );
+      } finally {
+        _isContinuing = false;
+        notifyListeners();
+      }
+    }
+    debugPrint(
+        '⚠️ StoryProvider: Cannot continue - No story or story ID available');
+    return false;
+  }
 }

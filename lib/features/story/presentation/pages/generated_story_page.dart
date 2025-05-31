@@ -13,6 +13,7 @@ import '../providers/story_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
+import '../widgets/continue_story_dialog.dart';
 
 class GeneratedStoryPage extends StatefulWidget {
   final Story story;
@@ -418,40 +419,66 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                         onPressed: provider.isContinuing
                             ? null
                             : () async {
-                                debugPrint('🔘 FAB pressed - Continuing story');
-                                final success = await provider.continueStory();
-                                if (success && mounted) {
-                                  // Realizar scroll automático después de la continuación
-                                  _scrollAfterContinuation();
-                                  widget.onStoryStateChanged?.call();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        AppLocalizations.of(context)!
-                                            .storyContinuedSuccess,
-                                        style: const TextStyle(
-                                          color: AppColors.white,
-                                          fontFamily: 'Urbanist',
+                                debugPrint(
+                                    '🔘 FAB pressed - Showing continue story dialog');
+
+                                // Mostrar el diálogo de opciones de continuación
+                                final result =
+                                    await showDialog<Map<String, dynamic>>(
+                                  context: context,
+                                  builder: (context) =>
+                                      const ContinueStoryDialog(),
+                                );
+
+                                if (result != null && mounted) {
+                                  bool success = false;
+
+                                  if (result['mode'] == 'automatic') {
+                                    debugPrint(
+                                        '🤖 Continuing story automatically');
+                                    success = await provider.continueStory();
+                                  } else if (result['mode'] == 'custom') {
+                                    final direction =
+                                        result['direction'] as String;
+                                    debugPrint(
+                                        '📝 Continuing story with direction: $direction');
+                                    success = await provider
+                                        .continueStoryWithDirection(direction);
+                                  }
+
+                                  if (success && mounted) {
+                                    // Realizar scroll automático después de la continuación
+                                    _scrollAfterContinuation();
+                                    widget.onStoryStateChanged?.call();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          AppLocalizations.of(context)!
+                                              .storyContinuedSuccess,
+                                          style: const TextStyle(
+                                            color: AppColors.white,
+                                            fontFamily: 'Urbanist',
+                                          ),
                                         ),
+                                        backgroundColor: AppColors.success,
                                       ),
-                                      backgroundColor: AppColors.success,
-                                    ),
-                                  );
-                                } else if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        provider.error ??
-                                            AppLocalizations.of(context)!
-                                                .storyContinueError,
-                                        style: const TextStyle(
-                                          color: AppColors.white,
-                                          fontFamily: 'Urbanist',
+                                    );
+                                  } else if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          provider.error ??
+                                              AppLocalizations.of(context)!
+                                                  .storyContinueError,
+                                          style: const TextStyle(
+                                            color: AppColors.white,
+                                            fontFamily: 'Urbanist',
+                                          ),
                                         ),
+                                        backgroundColor: Colors.red,
                                       ),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
+                                    );
+                                  }
                                 }
                               },
                         icon: provider.isContinuing

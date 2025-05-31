@@ -11,6 +11,8 @@ abstract class StoryRepository {
 
   Future<Story> continueStory(Story story);
 
+  Future<Story> continueStoryWithDirection(Story story, String direction);
+
   Future<int> saveStory(Story story);
   Future<void> updateStoryStatus(int storyId, String status);
   Future<List<Story>> getSavedStories(String userId);

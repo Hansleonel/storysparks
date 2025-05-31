@@ -177,6 +177,64 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
     }
   }
 
+  @override
+  Future<Story> continueStoryWithDirection(
+      Story story, String direction) async {
+    debugPrint(
+        '🗄️ StoryRepository: Iniciando continuación de historia con dirección personalizada');
+
+    if (story.id == null) {
+      throw Exception('No se puede continuar una historia sin ID');
+    }
+
+    try {
+      final chatSession =
+          _sessionManager.getOrCreateSession(story.id.toString(), story);
+
+      final prompt =
+          'Continúa la narración siguiendo esta dirección específica: "$direction". Mantén el mismo tono y estilo de la historia, pero incorpora la dirección proporcionada de manera natural y coherente. Dale un desenlace abierto para que el usuario pueda continuar la historia.';
+
+      debugPrint(
+          '🤖 StoryRepository: Solicitando continuación con dirección...');
+      debugPrint('📝 Prompt personalizado: $prompt');
+      final response = await chatSession.sendMessage(Content.text(prompt));
+
+      if (response.text == null) {
+        throw Exception(
+            'No se pudo continuar la historia con la dirección especificada');
+      }
+
+      debugPrint(
+          '✅ StoryRepository: Continuación con dirección generada exitosamente');
+
+      // Crear una versión actualizada de la historia con la continuación
+      final updatedStory = story.copyWith(
+        content: '${story.content}\n\n--- Continuación ---\n\n${response.text}',
+        rating: story.rating > 0
+            ? story.rating
+            : 5.0, // Mantener el rating existente o usar 5.0 si es 0
+      );
+
+      // Actualizar la historia existente en la base de datos
+      await _localDatasource.updateStoryContent(updatedStory);
+      debugPrint(
+          '✅ StoryRepository: Historia con dirección actualizada en base de datos');
+
+      return updatedStory;
+    } catch (e) {
+      debugPrint(
+          '❌ StoryRepository: Error durante la continuación con dirección');
+      debugPrint('   Error detallado: $e');
+
+      if (story.id != null) {
+        _sessionManager.clearSession(story.id.toString());
+      }
+
+      _handleError(e);
+      rethrow;
+    }
+  }
+
   void _handleError(dynamic e) {
     final errorMessage = e.toString().toLowerCase();
 
