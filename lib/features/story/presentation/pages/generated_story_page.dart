@@ -14,6 +14,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 import '../widgets/continue_story_dialog.dart';
+import '../widgets/share_story_modal.dart';
 
 class GeneratedStoryPage extends StatefulWidget {
   final Story story;
@@ -202,12 +203,46 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                 },
               ),
               actions: [
-                IconButton(
-                  icon: const Icon(Icons.share_outlined,
-                      color: AppColors.textPrimary),
-                  onPressed: () {
-                    // TODO: Implementar compartir
-                  },
+                Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.primary.withOpacity(0.1),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.08),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () async {
+                        await ShareStoryModal.show(
+                          context,
+                          widget.story,
+                        );
+                      },
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        alignment: Alignment.center,
+                        child: Icon(
+                          Icons.share_outlined,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
                 IconButton(
                   icon: provider.isSaving
@@ -234,61 +269,199 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                           if (provider.isSaved) {
                             showDialog(
                               context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text(
-                                  AppLocalizations.of(context)!.deleteFromSaved,
-                                  style: const TextStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontWeight: FontWeight.w600,
+                              barrierDismissible: false,
+                              builder: (context) => Dialog(
+                                backgroundColor: Colors.transparent,
+                                child: Container(
+                                  margin: const EdgeInsets.all(16),
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.white,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                content: Text(
-                                  AppLocalizations.of(context)!
-                                      .deleteConfirmation,
-                                  style: const TextStyle(
-                                    fontFamily: 'Urbanist',
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text(
-                                        AppLocalizations.of(context)!.cancel),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      await provider.deleteStory();
-                                      if (mounted) {
-                                        Navigator.pop(
-                                            context); // Cerrar diálogo
-                                        Navigator.pop(context); // Volver atrás
-                                        widget.onStoryStateChanged
-                                            ?.call(); // Actualizar biblioteca
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              AppLocalizations.of(context)!
-                                                  .storyDeletedSuccess,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontFamily: 'Urbanist',
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Ícono de advertencia
+                                      Container(
+                                        width: 64,
+                                        height: 64,
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withOpacity(0.1),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.delete_outline,
+                                          color: Colors.red,
+                                          size: 32,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 24),
+
+                                      // Título
+                                      Text(
+                                        AppLocalizations.of(context)!
+                                            .deleteFromSaved,
+                                        style: const TextStyle(
+                                          fontFamily: 'Playfair',
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 12),
+
+                                      // Contenido
+                                      Text(
+                                        AppLocalizations.of(context)!
+                                            .deleteConfirmation,
+                                        style: const TextStyle(
+                                          fontFamily: 'Urbanist',
+                                          fontSize: 16,
+                                          color: AppColors.textSecondary,
+                                          height: 1.4,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 32),
+
+                                      // Botones
+                                      Row(
+                                        children: [
+                                          // Botón Cancelar
+                                          Expanded(
+                                            child: Container(
+                                              height: 48,
+                                              decoration: BoxDecoration(
+                                                color: AppColors.background,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                border: Border.all(
+                                                  color: AppColors.border,
+                                                ),
+                                              ),
+                                              child: Material(
+                                                color: Colors.transparent,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                child: InkWell(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  onTap: () =>
+                                                      Navigator.pop(context),
+                                                  child: Center(
+                                                    child: Text(
+                                                      AppLocalizations.of(
+                                                              context)!
+                                                          .cancel,
+                                                      style: const TextStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: AppColors
+                                                            .textPrimary,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                            backgroundColor: Colors.red,
                                           ),
-                                        );
-                                      }
-                                    },
-                                    child: Text(
-                                      AppLocalizations.of(context)!.delete,
-                                      style: const TextStyle(
-                                        color: Colors.red,
-                                        fontWeight: FontWeight.w600,
+                                          const SizedBox(width: 12),
+
+                                          // Botón Eliminar
+                                          Expanded(
+                                            child: Container(
+                                              height: 48,
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Colors.red,
+                                                    Colors.red.withOpacity(0.8),
+                                                  ],
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.red
+                                                        .withOpacity(0.3),
+                                                    blurRadius: 8,
+                                                    offset: const Offset(0, 4),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Material(
+                                                color: Colors.transparent,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                child: InkWell(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  onTap: () async {
+                                                    await provider
+                                                        .deleteStory();
+                                                    if (mounted) {
+                                                      Navigator.pop(
+                                                          context); // Cerrar diálogo
+                                                      Navigator.pop(
+                                                          context); // Volver atrás
+                                                      widget.onStoryStateChanged
+                                                          ?.call(); // Actualizar biblioteca
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                            AppLocalizations.of(
+                                                                    context)!
+                                                                .storyDeletedSuccess,
+                                                            style:
+                                                                const TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontFamily:
+                                                                  'Urbanist',
+                                                            ),
+                                                          ),
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                  child: Center(
+                                                    child: Text(
+                                                      AppLocalizations.of(
+                                                              context)!
+                                                          .delete,
+                                                      style: const TextStyle(
+                                                        fontFamily: 'Urbanist',
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             );
                           } else {

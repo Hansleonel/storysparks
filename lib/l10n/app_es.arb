@@ -167,5 +167,27 @@
     "welcomeBack": "¡Bienvenido de nuevo! 👋",
     "writeYourDirection": "Escribe cómo quieres que continúe la historia...",
     "yesterday": "Ayer",
-    "yourStory": "Tu Historia"
+    "yourStory": "Tu Historia",
+    "@shareStoryMessage": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            }
+        }
+    },
+    "shareStoryMessage": "Elige cómo quieres compartir \"{title}\"",
+    "shareStory": "Compartir Historia",
+    "shareStoryStyled": "Compartir Estilizado",
+    "shareStoryStyledSubtitle": "Texto decorado con emojis y formato elegante",
+    "shareStorySimple": "Compartir Simple",
+    "shareStorySimpleSubtitle": "Texto limpio y directo",
+    "shareStorySuccess": "Historia compartida exitosamente",
+    "shareStoryError": "Error al compartir la historia",
+    "shareContinues": "[...continúa]",
+    "shareGenre": "Género",
+    "shareGeneratedWith": "Historia generada con MemorySparks",
+    "shareGeneratedWithAI": "Historia generada con inteligencia artificial",
+    "shareDownloadApp": "Descarga MemorySparks para crear tus propias historias",
+    "shareDetails": "Detalles",
+    "shareRating": "Rating"
 }

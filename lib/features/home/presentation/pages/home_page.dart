@@ -570,14 +570,25 @@ class _GenerateButton extends StatelessWidget {
               ),
               disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
             ),
-            child: Text(
-              AppLocalizations.of(context)!.generateStory,
-              style: const TextStyle(
-                fontFamily: 'Urbanist',
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: AppColors.white,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.auto_stories,
+                  color: AppColors.white,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  AppLocalizations.of(context)!.generateStory,
+                  style: const TextStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.white,
+                  ),
+                ),
+              ],
             ),
           );
         },
