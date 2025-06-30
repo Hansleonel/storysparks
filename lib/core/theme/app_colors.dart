@@ -24,4 +24,15 @@ class AppColors {
 
   // Green variant
   static const Color greenVariant = Color(0xFF4CAF93);
+
+  // Context quality indicators
+  static const Color contextInsufficient =
+      Color(0xFFEF4444); // Red shade for insufficient context
+  static const Color contextBasic =
+      Color(0xFFF59E0B); // Amber/orange for basic context
+  static const Color contextGood =
+      Color(0xFF10B981); // Emerald green for good context
+  static const Color contextRich = Color(0xFF3B82F6); // Blue for rich context
+  static const Color contextExceptional =
+      Color(0xFF8B5CF6); // Purple for exceptional context
 }

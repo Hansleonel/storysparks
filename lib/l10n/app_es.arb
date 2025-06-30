@@ -13,6 +13,13 @@
             }
         }
     },
+    "@shareStoryMessage": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            }
+        }
+    },
     "@weeksAgo": {
         "placeholders": {
             "weeks": {
@@ -24,6 +31,20 @@
     "accountSettings": "Cuenta",
     "alreadyHaveAccount": "¿Ya tienes una cuenta?",
     "authError": "Error de autenticación",
+    "authorStyleAdvancedConfig": "✨ Configuración avanzada",
+    "authorStyleApply": "Aplicar estilo",
+    "authorStyleAuthor": "Estilo de autor",
+    "authorStyleAuthorDescription": "Ej: Gabriel García Márquez, J.K. Rowling",
+    "authorStyleAuthorHint": "Escribe el nombre del autor...",
+    "authorStyleBook": "Estilo de libro",
+    "authorStyleBookDescription": "Ej: Cien años de soledad, Harry Potter",
+    "authorStyleBookHint": "Escribe el nombre del libro...",
+    "authorStyleCustom": "Estilo personalizado",
+    "authorStyleCustomDescription": "Describe el estilo narrativo que quieres",
+    "authorStyleCustomHint": "Ej: Narrativa poética con mucha descripción...",
+    "authorStyleDescription": "Agrega el estilo de un autor o libro para inspirar tu historia",
+    "authorStyleRemove": "Quitar estilo",
+    "authorStyleTitle": "Estilo narrativo",
     "automaticContinuation": "Continuación Automática",
     "automaticContinuationDescription": "Deja que la IA continúe la historia naturalmente",
     "bio": "Biografía",
@@ -131,7 +152,22 @@
     "seeMore": "Ver más",
     "selectFromGallery": "Seleccionar de la galería",
     "settings": "Configuración",
+    "shareContinues": "[...continúa]",
+    "shareDetails": "Detalles",
+    "shareDownloadApp": "Descarga MemorySparks para crear tus propias historias",
+    "shareGeneratedWith": "Historia generada con MemorySparks",
+    "shareGeneratedWithAI": "Historia generada con inteligencia artificial",
+    "shareGenre": "Género",
     "shareMemoryHint": "Comparte un recuerdo o pensamiento especial que dejó una marca en tu vida. Descríbelo en detalle, sin temer a la tristeza, y verás la magia de darle vida a ese recuerdo.",
+    "shareRating": "Rating",
+    "shareStory": "Compartir Historia",
+    "shareStoryError": "Error al compartir la historia",
+    "shareStoryMessage": "Elige cómo quieres compartir \"{title}\"",
+    "shareStorySimple": "Compartir Simple",
+    "shareStorySimpleSubtitle": "Texto limpio y directo",
+    "shareStoryStyled": "Compartir Estilizado",
+    "shareStoryStyledSubtitle": "Texto decorado con emojis y formato elegante",
+    "shareStorySuccess": "Historia compartida exitosamente",
     "signIn": "Iniciar sesión",
     "signInWithApple": "Iniciar sesión con Apple",
     "signInWithGoogle": "Iniciar sesión con Google",
@@ -167,27 +203,5 @@
     "welcomeBack": "¡Bienvenido de nuevo! 👋",
     "writeYourDirection": "Escribe cómo quieres que continúe la historia...",
     "yesterday": "Ayer",
-    "yourStory": "Tu Historia",
-    "@shareStoryMessage": {
-        "placeholders": {
-            "title": {
-                "type": "String"
-            }
-        }
-    },
-    "shareStoryMessage": "Elige cómo quieres compartir \"{title}\"",
-    "shareStory": "Compartir Historia",
-    "shareStoryStyled": "Compartir Estilizado",
-    "shareStoryStyledSubtitle": "Texto decorado con emojis y formato elegante",
-    "shareStorySimple": "Compartir Simple",
-    "shareStorySimpleSubtitle": "Texto limpio y directo",
-    "shareStorySuccess": "Historia compartida exitosamente",
-    "shareStoryError": "Error al compartir la historia",
-    "shareContinues": "[...continúa]",
-    "shareGenre": "Género",
-    "shareGeneratedWith": "Historia generada con MemorySparks",
-    "shareGeneratedWithAI": "Historia generada con inteligencia artificial",
-    "shareDownloadApp": "Descarga MemorySparks para crear tus propias historias",
-    "shareDetails": "Detalles",
-    "shareRating": "Rating"
+    "yourStory": "Tu Historia"
 }

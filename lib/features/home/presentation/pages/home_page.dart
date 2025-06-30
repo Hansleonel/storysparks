@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
@@ -10,6 +11,7 @@ import '../providers/home_provider.dart';
 import 'package:memorysparks/core/constants/genre_constants.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:memorysparks/core/widgets/loading_lottie.dart';
+import 'package:memorysparks/features/story/presentation/widgets/author_style_dialog.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -18,15 +20,15 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => context.read<HomeProvider>().unfocusMemoryInput(),
-      child: Scaffold(
+      child: const Scaffold(
         backgroundColor: AppColors.background,
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: EdgeInsets.all(24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   _Header(),
                   SizedBox(height: 32),
                   _MemoryInput(),
@@ -89,6 +91,10 @@ class _MemoryInput extends StatelessWidget {
             ),
             contentPadding: const EdgeInsets.all(16),
           ),
+        ),
+        _WordCounter(
+          controller: provider.memoryController,
+          focusNode: provider.memoryFocusNode,
         ),
         const SizedBox(height: 16),
         Consumer<HomeProvider>(
@@ -357,6 +363,8 @@ class _GenreSection extends StatelessWidget {
         ),
         SizedBox(height: 16),
         _GenreChips(),
+        SizedBox(height: 12),
+        _AuthorStyleOption(),
       ],
     );
   }
@@ -396,48 +404,63 @@ class _GenreChip extends StatelessWidget {
         builder: (context, provider, _) {
           final isSelected =
               provider.selectedGenre == GenreConstants.toStringValue(genre);
-          return FilterChip(
-            selected: isSelected,
-            showCheckmark: false,
-            label: Row(
-              children: [
-                Icon(
-                  genre.icon,
-                  size: 18,
-                  color: isSelected ? AppColors.white : AppColors.textSecondary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  genre.key == 'genreHappy'
-                      ? l10n.genreHappy
-                      : genre.key == 'genreSad'
-                          ? l10n.genreSad
-                          : genre.key == 'genreRomantic'
-                              ? l10n.genreRomantic
-                              : genre.key == 'genreNostalgic'
-                                  ? l10n.genreNostalgic
-                                  : genre.key == 'genreAdventure'
-                                      ? l10n.genreAdventure
-                                      : l10n.genreFamily,
-                  style: TextStyle(
-                    fontFamily: 'Urbanist',
-                    color:
-                        isSelected ? AppColors.white : AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: AppColors.white,
-            selectedColor: AppColors.primary,
-            onSelected: (bool selected) {
+          return GestureDetector(
+            onTap: () {
+              // Feedback haptic sutil para selección
+              HapticFeedback.selectionClick();
               provider.setSelectedGenre(
-                  selected ? GenreConstants.toStringValue(genre) : '');
+                  isSelected ? '' : GenreConstants.toStringValue(genre));
             },
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24),
-              side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.border,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary : AppColors.white,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: isSelected ? AppColors.primary : AppColors.border,
+                  width: isSelected ? 2 : 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(
+                      genre.icon,
+                      key: ValueKey('${genre.key}_${isSelected}'),
+                      size: 18,
+                      color: isSelected
+                          ? AppColors.white
+                          : AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 200),
+                    style: TextStyle(
+                      fontFamily: 'Urbanist',
+                      color: isSelected
+                          ? AppColors.white
+                          : AppColors.textSecondary,
+                    ),
+                    child: Text(
+                      genre.key == 'genreHappy'
+                          ? l10n.genreHappy
+                          : genre.key == 'genreSad'
+                              ? l10n.genreSad
+                              : genre.key == 'genreRomantic'
+                                  ? l10n.genreRomantic
+                                  : genre.key == 'genreNostalgic'
+                                      ? l10n.genreNostalgic
+                                      : genre.key == 'genreAdventure'
+                                          ? l10n.genreAdventure
+                                          : l10n.genreFamily,
+                    ),
+                  ),
+                ],
               ),
             ),
           );
@@ -537,6 +560,8 @@ class _GenerateButton extends StatelessWidget {
           return ElevatedButton(
             onPressed: provider.isGenerateEnabled
                 ? () async {
+                    // Feedback haptic para acción importante
+                    HapticFeedback.mediumImpact();
                     try {
                       final story = await provider.generateStory();
                       if (context.mounted) {
@@ -594,6 +619,196 @@ class _GenerateButton extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class _WordCounter extends StatelessWidget {
+  final TextEditingController controller;
+  final FocusNode focusNode;
+
+  const _WordCounter({
+    required this.controller,
+    required this.focusNode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, right: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          AnimatedBuilder(
+            animation: Listenable.merge([controller, focusNode]),
+            builder: (context, child) {
+              final text = controller.text.trim();
+              final wordCount = text.isEmpty
+                  ? 0
+                  : text
+                      .split(RegExp(r'\s+'))
+                      .where((word) => word.isNotEmpty)
+                      .length;
+              final isActive = focusNode.hasFocus;
+
+              return _buildContextQualityIndicator(wordCount, isActive);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContextQualityIndicator(int wordCount, bool isActive) {
+    String message;
+    Color color;
+    IconData? icon;
+
+    // Siempre mostrar advertencia si no hay suficientes palabras
+    if (!isActive) {
+      // Si tiene suficientes palabras pero no está enfocado, mostrar discreto
+      message = '$wordCount palabras';
+      color = AppColors.textSecondary.withOpacity(0.6);
+      icon = Icons.edit_outlined;
+    } else {
+      if (wordCount == 0) {
+        message = 'Comparte tu memoria...';
+        color = AppColors.textSecondary.withOpacity(0.6);
+        icon = Icons.edit_outlined;
+      } else if (wordCount <= 5) {
+        message = '$wordCount palabras';
+        color = AppColors.textSecondary.withOpacity(0.8);
+        icon = Icons.edit_outlined;
+      } else if (wordCount < 20) {
+        message = '$wordCount palabras - Añade más detalles';
+        color = AppColors.contextInsufficient;
+        icon = Icons.edit_outlined;
+      } else if (wordCount < 30) {
+        message = '$wordCount palabras ✓ Buen inicio';
+        color = AppColors.contextBasic;
+        icon = Icons.check_circle_outline;
+      } else if (wordCount < 50) {
+        message = '$wordCount palabras ✓ Historia rica';
+        color = AppColors.contextGood;
+        icon = Icons.thumb_up_outlined;
+      } else if (wordCount < 75) {
+        message = '$wordCount palabras ✓ Muy detallada';
+        color = AppColors.contextRich;
+        icon = Icons.auto_awesome_outlined;
+      } else {
+        message = '$wordCount palabras ✓ ¡Excepcional!';
+        color = AppColors.contextExceptional;
+        icon = Icons.stars_outlined;
+      }
+    }
+
+    return Flexible(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: color,
+          ),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              message,
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 12,
+                color: color,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AuthorStyleOption extends StatelessWidget {
+  const _AuthorStyleOption();
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<HomeProvider>(
+      builder: (context, provider, child) {
+        final hasStyle = provider.authorStyle?.isNotEmpty ?? false;
+
+        return GestureDetector(
+          onTap: () async {
+            final result = await showDialog<Map<String, dynamic>>(
+              context: context,
+              builder: (context) => AuthorStyleDialog(
+                currentAuthor: provider.authorStyleType == 'author'
+                    ? provider.authorStyle
+                    : null,
+                currentBook: provider.authorStyleType == 'book'
+                    ? provider.authorStyle
+                    : null,
+              ),
+            );
+
+            if (result != null) {
+              if (result['clear'] == true) {
+                provider.clearAuthorStyle();
+              } else if (result['text'] != null && result['type'] != null) {
+                provider.setAuthorStyle(result['text'], result['type']);
+              }
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  hasStyle ? Icons.auto_stories : Icons.tune,
+                  size: 16,
+                  color: hasStyle
+                      ? AppColors.primary
+                      : AppColors.textSecondary.withOpacity(0.7),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  hasStyle
+                      ? _getStyleDisplayText(provider)
+                      : AppLocalizations.of(context)!.authorStyleAdvancedConfig,
+                  style: TextStyle(
+                    fontFamily: 'Urbanist',
+                    fontWeight: FontWeight.w500,
+                    color: hasStyle
+                        ? AppColors.primary
+                        : AppColors.textSecondary.withOpacity(0.8),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _getStyleDisplayText(HomeProvider provider) {
+    if (provider.authorStyleType == 'author') {
+      final author = provider.authorStyle!;
+      return author.length > 20
+          ? '✨ Estilo de ${author.substring(0, 15)}...'
+          : '✨ Estilo de $author';
+    } else if (provider.authorStyleType == 'book') {
+      final book = provider.authorStyle!;
+      return book.length > 20
+          ? '📖 Estilo de ${book.substring(0, 15)}...'
+          : '📖 Estilo de $book';
+    } else {
+      return '✨ Estilo personalizado';
+    }
   }
 }
 

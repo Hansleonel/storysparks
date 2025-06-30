@@ -13,6 +13,13 @@
             }
         }
     },
+    "@shareStoryMessage": {
+        "placeholders": {
+            "title": {
+                "type": "String"
+            }
+        }
+    },
     "@weeksAgo": {
         "placeholders": {
             "weeks": {
@@ -24,6 +31,20 @@
     "accountSettings": "Account",
     "alreadyHaveAccount": "Already have an account?",
     "authError": "Authentication error",
+    "authorStyleAdvancedConfig": "✨ Advanced Configuration",
+    "authorStyleApply": "Apply Style",
+    "authorStyleAuthor": "Author Style",
+    "authorStyleAuthorDescription": "E.g: Gabriel García Márquez, J.K. Rowling",
+    "authorStyleAuthorHint": "Write the author's name...",
+    "authorStyleBook": "Book Style",
+    "authorStyleBookDescription": "E.g: One Hundred Years of Solitude, Harry Potter",
+    "authorStyleBookHint": "Write the book's name...",
+    "authorStyleCustom": "Custom Style",
+    "authorStyleCustomDescription": "Describe the narrative style you want",
+    "authorStyleCustomHint": "E.g: Poetic narrative with lots of description...",
+    "authorStyleDescription": "Add the style of an author or book to inspire your story",
+    "authorStyleRemove": "Remove Style",
+    "authorStyleTitle": "Narrative Style",
     "automaticContinuation": "Automatic Continuation",
     "automaticContinuationDescription": "Let AI continue the story naturally",
     "bio": "Bio",
@@ -131,7 +152,22 @@
     "seeMore": "See more",
     "selectFromGallery": "Select from gallery",
     "settings": "Settings",
+    "shareContinues": "[...continues]",
+    "shareDetails": "Details",
+    "shareDownloadApp": "Download MemorySparks to create your own stories",
+    "shareGeneratedWith": "Story generated with MemorySparks",
+    "shareGeneratedWithAI": "Story generated with artificial intelligence",
+    "shareGenre": "Genre",
     "shareMemoryHint": "Share a special memory or thought that left a mark on your life. Describe it in detail, without fearing the sadness, and you'll see the magic of bringing it back to life.",
+    "shareRating": "Rating",
+    "shareStory": "Share Story",
+    "shareStoryError": "Error sharing story",
+    "shareStoryMessage": "Choose how you want to share \"{title}\"",
+    "shareStorySimple": "Share Simple",
+    "shareStorySimpleSubtitle": "Clean and direct text",
+    "shareStoryStyled": "Share Styled",
+    "shareStoryStyledSubtitle": "Decorated text with emojis and elegant formatting",
+    "shareStorySuccess": "Story shared successfully",
     "signIn": "Sign in",
     "signInWithApple": "Sign in with Apple",
     "signInWithGoogle": "Sign in with Google",
@@ -167,27 +203,5 @@
     "welcomeBack": "Welcome back 👋",
     "writeYourDirection": "Write how you want the story to continue...",
     "yesterday": "Yesterday",
-    "yourStory": "Your Story",
-    "@shareStoryMessage": {
-        "placeholders": {
-            "title": {
-                "type": "String"
-            }
-        }
-    },
-    "shareStoryMessage": "Choose how you want to share \"{title}\"",
-    "shareStory": "Share Story",
-    "shareStoryStyled": "Share Styled",
-    "shareStoryStyledSubtitle": "Decorated text with emojis and elegant formatting",
-    "shareStorySimple": "Share Simple",
-    "shareStorySimpleSubtitle": "Clean and direct text",
-    "shareStorySuccess": "Story shared successfully",
-    "shareStoryError": "Error sharing story",
-    "shareContinues": "[...continues]",
-    "shareGenre": "Genre",
-    "shareGeneratedWith": "Story generated with MemorySparks",
-    "shareGeneratedWithAI": "Story generated with artificial intelligence",
-    "shareDownloadApp": "Download MemorySparks to create your own stories",
-    "shareDetails": "Details",
-    "shareRating": "Rating"
+    "yourStory": "Your Story"
 }

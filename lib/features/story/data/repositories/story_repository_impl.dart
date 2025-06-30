@@ -1,3 +1,5 @@
+import 'dart:developer' as Dev;
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -68,7 +70,7 @@ class StoryRepositoryImpl implements StoryRepository {
 
       final prompt = '''
 Genera una historia cautivadora inspirada en el siguiente recuerdo personal: "${params.memoryText}".${params.imageDescription != null ? '\nTeniendo en cuenta esta descripción de la imagen relacionada: "${params.imageDescription}".' : ''}
-El género de la historia será ${params.genre}. Por favor, genera la historia en $languageName
+El género de la historia será ${params.genre}.${_getAuthorStyleInstruction(params)} Por favor, genera la historia en $languageName
 Instrucciones específicas:
 
 Comienza con una frase breve y poderosa que despierte el interés, ya sea presentando un detalle sensorial, una pregunta intrigante o situando la acción.
@@ -77,6 +79,8 @@ Evita comenzar siempre de la misma forma; varía entre descripciones sensoriales
 Asegura que la historia se mantenga coherente con el género (${params.genre}), sin perder el matiz personal del recuerdo.
 Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la historia, recuerda generar la historia en el idioma $languageName, recuerda empezar directamente con la historia, no con una respuesta como aqui esta la historia, o cosas que no sean parte de la historia.
 ''';
+
+      Dev.log('🤖 StoryRepository: Prompt: $prompt');
 
       debugPrint('🤖 StoryRepository: Enviando prompt a Gemini...');
       debugPrint('   Longitud del prompt: ${prompt.length} caracteres');
@@ -407,6 +411,28 @@ Mantén la descripción concisa pero rica en detalles significativos.
         debugPrint(
             "⚠️ StoryRepository: Código de idioma no reconocido o nulo ('$languageCode'), usando español por defecto.");
         return 'español';
+    }
+  }
+
+  String _getAuthorStyleInstruction(StoryParams params) {
+    if (params.authorStyle == null || params.authorStyle!.isEmpty) {
+      return '';
+    }
+
+    final style = params.authorStyle!;
+    final type = params.authorStyleType ?? 'custom';
+
+    debugPrint('📝 StoryRepository: Aplicando estilo: "$style" (tipo: $type)');
+
+    switch (type) {
+      case 'author':
+        return ' Escribe la historia imitando el estilo narrativo característico de $style.';
+      case 'book':
+        return ' Escribe la historia imitando el estilo narrativo de la obra "$style".';
+      case 'custom':
+        return ' Aplica el siguiente estilo narrativo: $style.';
+      default:
+        return ' Aplica el siguiente estilo narrativo: $style.';
     }
   }
 }

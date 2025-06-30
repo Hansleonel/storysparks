@@ -15,6 +15,8 @@ class HomeProvider extends ChangeNotifier {
   String selectedGenre = '';
   bool isGenerateEnabled = false;
   String? selectedImagePath;
+  String? authorStyle;
+  String? authorStyleType; // 'author', 'book', or 'custom'
   bool isLoading = false;
   String? _userName;
   final GetUserNameUseCase _getUserNameUseCase;
@@ -59,10 +61,15 @@ class HomeProvider extends ChangeNotifier {
   }
 
   void _updateGenerateButton() {
-    final bool newState = memoryController.text.isNotEmpty;
+    final text = memoryController.text.trim();
+    final wordCount = text.isEmpty
+        ? 0
+        : text.split(RegExp(r'\s+')).where((word) => word.isNotEmpty).length;
+
+    final bool newState = wordCount >= 20;
     if (isGenerateEnabled != newState) {
       debugPrint(
-          '🏠 HomeProvider: Botón de generar ${newState ? 'habilitado' : 'deshabilitado'}');
+          '🏠 HomeProvider: Botón de generar ${newState ? 'habilitado' : 'deshabilitado'} (Palabras: $wordCount)');
       isGenerateEnabled = newState;
       notifyListeners();
     }
@@ -71,6 +78,21 @@ class HomeProvider extends ChangeNotifier {
   void setSelectedGenre(String genre) {
     debugPrint('🏠 HomeProvider: Género seleccionado: $genre');
     selectedGenre = genre;
+    notifyListeners();
+  }
+
+  void setAuthorStyle(String? style, String? type) {
+    debugPrint(
+        '🏠 HomeProvider: Estilo de autor establecido: $style (tipo: $type)');
+    authorStyle = style;
+    authorStyleType = type;
+    notifyListeners();
+  }
+
+  void clearAuthorStyle() {
+    debugPrint('🏠 HomeProvider: Estilo de autor removido');
+    authorStyle = null;
+    authorStyleType = null;
     notifyListeners();
   }
 
@@ -99,6 +121,8 @@ class HomeProvider extends ChangeNotifier {
     selectedGenre = '';
     selectedImagePath = null;
     _imageDescription = null;
+    authorStyle = null;
+    authorStyleType = null;
     isGenerateEnabled = false;
     notifyListeners();
   }
@@ -166,6 +190,8 @@ class HomeProvider extends ChangeNotifier {
           genre: selectedGenre,
           imageDescription: _imageDescription,
           imagePath: selectedImagePath,
+          authorStyle: authorStyle,
+          authorStyleType: authorStyleType,
         ),
         userId: currentUser.id,
       );
