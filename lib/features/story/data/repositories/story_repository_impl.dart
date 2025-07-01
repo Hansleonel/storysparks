@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:memorysparks/core/utils/cover_image_helper.dart';
+import 'package:memorysparks/core/domain/repositories/locale_repository.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:mime/mime.dart';
@@ -19,12 +20,14 @@ class StoryRepositoryImpl implements StoryRepository {
   final StoryLocalDatasource _localDatasource;
   final GenerativeModel _model;
   final ImageService _imageService;
+  final LocaleRepository _localeRepository;
   // TODO this line is used to create the session manager, need to check if it's working
   late final ChatSessionManager _sessionManager;
 
   StoryRepositoryImpl(
     this._localDatasource,
     this._imageService,
+    this._localeRepository,
   ) : _model = GenerativeModel(
           model: 'gemini-2.0-flash',
           apiKey: dotenv.env['GEMINI_API_KEY'] ?? '',
@@ -140,11 +143,18 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
     }
 
     try {
+      // Obtener el idioma actual del dispositivo
+      final locale = await _localeRepository.getCurrentLocale();
+      final languageCode = locale.languageCode;
+      final languageName = _getLanguageName(languageCode);
+
+      debugPrint(
+          '🌍 StoryRepository: Idioma detectado para continuación: $languageName ($languageCode)');
+
       final chatSession =
           _sessionManager.getOrCreateSession(story.id.toString(), story);
 
-      const prompt =
-          'Continúa la narración de forma natural y coherente. La continuación debe mantener el mismo tono y estilo y dale un desenlace abierto para que el usuario pueda continuar la historia.';
+      final prompt = _getContinueStoryPrompt(languageCode);
 
       debugPrint('🤖 StoryRepository: Solicitando continuación...');
       final response = await chatSession.sendMessage(Content.text(prompt));
@@ -156,8 +166,9 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
       debugPrint('✅ StoryRepository: Continuación generada exitosamente');
 
       // Crear una versión actualizada de la historia con la continuación
+      final continuationMarker = _getContinuationMarker(languageCode);
       final updatedStory = story.copyWith(
-        content: '${story.content}\n\n--- Continuación ---\n\n${response.text}',
+        content: '${story.content}$continuationMarker${response.text}',
         rating: story.rating > 0
             ? story.rating
             : 5.0, // Mantener el rating existente o usar 5.0 si es 0
@@ -192,11 +203,19 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
     }
 
     try {
+      // Obtener el idioma actual del dispositivo
+      final locale = await _localeRepository.getCurrentLocale();
+      final languageCode = locale.languageCode;
+      final languageName = _getLanguageName(languageCode);
+
+      debugPrint(
+          '🌍 StoryRepository: Idioma detectado para continuación con dirección: $languageName ($languageCode)');
+
       final chatSession =
           _sessionManager.getOrCreateSession(story.id.toString(), story);
 
       final prompt =
-          'Continúa la narración siguiendo esta dirección específica: "$direction". Mantén el mismo tono y estilo de la historia, pero incorpora la dirección proporcionada de manera natural y coherente. Dale un desenlace abierto para que el usuario pueda continuar la historia.';
+          _getContinueStoryWithDirectionPrompt(languageCode, direction);
 
       debugPrint(
           '🤖 StoryRepository: Solicitando continuación con dirección...');
@@ -212,8 +231,9 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
           '✅ StoryRepository: Continuación con dirección generada exitosamente');
 
       // Crear una versión actualizada de la historia con la continuación
+      final continuationMarker = _getContinuationMarker(languageCode);
       final updatedStory = story.copyWith(
-        content: '${story.content}\n\n--- Continuación ---\n\n${response.text}',
+        content: '${story.content}$continuationMarker${response.text}',
         rating: story.rating > 0
             ? story.rating
             : 5.0, // Mantener el rating existente o usar 5.0 si es 0
@@ -433,6 +453,40 @@ Mantén la descripción concisa pero rica en detalles significativos.
         return ' Aplica el siguiente estilo narrativo: $style.';
       default:
         return ' Aplica el siguiente estilo narrativo: $style.';
+    }
+  }
+
+  String _getContinueStoryPrompt(String languageCode) {
+    switch (languageCode.toLowerCase()) {
+      case 'es':
+        return 'Continúa la narración de forma natural y coherente. La continuación debe mantener el mismo tono y estilo y dale un desenlace abierto para que el usuario pueda continuar la historia.';
+      case 'en':
+        return 'Continue the narrative naturally and coherently. The continuation should maintain the same tone and style and give it an open ending so the user can continue the story.';
+      default:
+        return 'Continúa la narración de forma natural y coherente. La continuación debe mantener el mismo tono y estilo y dale un desenlace abierto para que el usuario pueda continuar la historia.';
+    }
+  }
+
+  String _getContinueStoryWithDirectionPrompt(
+      String languageCode, String direction) {
+    switch (languageCode.toLowerCase()) {
+      case 'es':
+        return 'Continúa la narración siguiendo esta dirección específica: "$direction". Mantén el mismo tono y estilo de la historia, pero incorpora la dirección proporcionada de manera natural y coherente. Dale un desenlace abierto para que el usuario pueda continuar la historia.';
+      case 'en':
+        return 'Continue the narrative following this specific direction: "$direction". Maintain the same tone and style of the story, but incorporate the provided direction naturally and coherently. Give it an open ending so the user can continue the story.';
+      default:
+        return 'Continúa la narración siguiendo esta dirección específica: "$direction". Mantén el mismo tono y estilo de la historia, pero incorpora la dirección proporcionada de manera natural y coherente. Dale un desenlace abierto para que el usuario pueda continuar la historia.';
+    }
+  }
+
+  String _getContinuationMarker(String languageCode) {
+    switch (languageCode.toLowerCase()) {
+      case 'es':
+        return '\n\n--- Continuación ---\n\n';
+      case 'en':
+        return '\n\n--- Continuation ---\n\n';
+      default:
+        return '\n\n--- Continuación ---\n\n';
     }
   }
 }

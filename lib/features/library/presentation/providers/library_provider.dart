@@ -14,7 +14,7 @@ class LibraryProvider extends ChangeNotifier {
   List<Story> _popularStories = [];
   List<Story> _recentStories = [];
   bool _isLoading = false;
-  LibraryViewType _viewType = LibraryViewType.grid;
+  LibraryViewType _viewType = LibraryViewType.timeline;
 
   LibraryProvider(this._authRepository);
 

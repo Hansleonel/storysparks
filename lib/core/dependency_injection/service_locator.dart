@@ -77,6 +77,7 @@ void setupServiceLocator() {
   getIt.registerLazySingleton<StoryRepository>(() => StoryRepositoryImpl(
         getIt<StoryLocalDatasource>(),
         getIt<ImageService>(),
+        getIt<LocaleRepository>(),
       ));
 
   // Core
