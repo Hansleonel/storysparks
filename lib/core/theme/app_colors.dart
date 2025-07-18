@@ -22,6 +22,10 @@ class AppColors {
   // Status colors
   static const Color success = Color(0xFF34D399);
 
+  // Notification colors
+  static const Color newIndicator =
+      Color(0xFFEF4444); // Red for "new" badges and indicators
+
   // Green variant
   static const Color greenVariant = Color(0xFF4CAF93);
 

@@ -7,6 +7,7 @@ import 'package:memorysparks/features/story/domain/entities/story.dart';
 import 'package:memorysparks/core/widgets/empty_state.dart';
 import '../providers/library_provider.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
+import 'package:memorysparks/core/providers/new_story_indicator_provider.dart';
 import 'dart:io';
 
 class LibraryPage extends StatefulWidget {
@@ -212,23 +213,30 @@ class _PopularStoriesSection extends StatelessWidget {
                     final story = provider.popularStories[index];
                     return Padding(
                       padding: const EdgeInsets.only(right: 16),
-                      child: _StoryCard(
-                        story: story,
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.generatedStory,
-                            arguments: {
-                              'story': story,
-                              'isFromLibrary': true,
-                              'onIncrementReadCount': () async {
-                                if (story.id != null) {
-                                  await provider.incrementReadCount(story.id!);
-                                }
-                              },
-                              'onStoryStateChanged': () {
-                                provider.loadStories();
-                              },
+                      child: Consumer<NewStoryIndicatorProvider>(
+                        builder: (context, notificationProvider, _) {
+                          return _StoryCard(
+                            story: story,
+                            isNew: notificationProvider
+                                .isLatestNewStory(story.id?.toString() ?? ''),
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                AppRoutes.generatedStory,
+                                arguments: {
+                                  'story': story,
+                                  'isFromLibrary': true,
+                                  'onIncrementReadCount': () async {
+                                    if (story.id != null) {
+                                      await provider
+                                          .incrementReadCount(story.id!);
+                                    }
+                                  },
+                                  'onStoryStateChanged': () {
+                                    provider.loadStories();
+                                  },
+                                },
+                              );
                             },
                           );
                         },
@@ -297,23 +305,30 @@ class _NewStoriesSection extends StatelessWidget {
                     final story = provider.recentStories[index];
                     return Padding(
                       padding: const EdgeInsets.only(right: 16),
-                      child: _StoryCard(
-                        story: story,
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.generatedStory,
-                            arguments: {
-                              'story': story,
-                              'isFromLibrary': true,
-                              'onIncrementReadCount': () async {
-                                if (story.id != null) {
-                                  await provider.incrementReadCount(story.id!);
-                                }
-                              },
-                              'onStoryStateChanged': () {
-                                provider.loadStories();
-                              },
+                      child: Consumer<NewStoryIndicatorProvider>(
+                        builder: (context, notificationProvider, _) {
+                          return _StoryCard(
+                            story: story,
+                            isNew: notificationProvider
+                                .isLatestNewStory(story.id?.toString() ?? ''),
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                AppRoutes.generatedStory,
+                                arguments: {
+                                  'story': story,
+                                  'isFromLibrary': true,
+                                  'onIncrementReadCount': () async {
+                                    if (story.id != null) {
+                                      await provider
+                                          .incrementReadCount(story.id!);
+                                    }
+                                  },
+                                  'onStoryStateChanged': () {
+                                    provider.loadStories();
+                                  },
+                                },
+                              );
                             },
                           );
                         },
@@ -333,10 +348,12 @@ class _NewStoriesSection extends StatelessWidget {
 class _StoryCard extends StatelessWidget {
   final Story story;
   final VoidCallback onTap;
+  final bool isNew;
 
   const _StoryCard({
     required this.story,
     required this.onTap,
+    this.isNew = false,
   });
 
   @override
@@ -366,18 +383,53 @@ class _StoryCard extends StatelessWidget {
           children: [
             Expanded(
               flex: 3,
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16),
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                      image: DecorationImage(
+                        image: story.customImagePath != null
+                            ? FileImage(File(story.customImagePath!))
+                            : AssetImage(story.imageUrl) as ImageProvider,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                  image: DecorationImage(
-                    image: story.customImagePath != null
-                        ? FileImage(File(story.customImagePath!))
-                        : AssetImage(story.imageUrl) as ImageProvider,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                  if (isNew)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.newIndicator,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context)!.newLabel,
+                          style: const TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
             Expanded(
@@ -494,7 +546,15 @@ class _TimelineView extends StatelessWidget {
               itemCount: storiesForDate.length,
               separatorBuilder: (context, index) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
-                return _TimelineCard(story: storiesForDate[index]);
+                return Consumer<NewStoryIndicatorProvider>(
+                  builder: (context, notificationProvider, _) {
+                    return _TimelineCard(
+                      story: storiesForDate[index],
+                      isNew: notificationProvider.isLatestNewStory(
+                          storiesForDate[index].id?.toString() ?? ''),
+                    );
+                  },
+                );
               },
             ),
           ],
@@ -506,8 +566,12 @@ class _TimelineView extends StatelessWidget {
 
 class _TimelineCard extends StatelessWidget {
   final Story story;
+  final bool isNew;
 
-  const _TimelineCard({required this.story});
+  const _TimelineCard({
+    required this.story,
+    this.isNew = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -552,160 +616,163 @@ class _TimelineCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Stack(
           children: [
-            ClipRRect(
-              borderRadius:
-                  const BorderRadius.horizontal(left: Radius.circular(16)),
-              child: SizedBox(
-                width: imageWidth,
-                child: story.customImagePath != null
-                    ? Image.file(
-                        File(story.customImagePath!),
-                        fit: BoxFit.cover,
-                      )
-                    : Image.asset(
-                        story.imageUrl,
-                        fit: BoxFit.cover,
-                      ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding:
-                    EdgeInsets.all(size.width * 0.04), // Padding responsive
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      story.memory,
-                      style: TextStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: size.width * 0.04, // Texto responsive
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: size.height * 0.008),
-                    Row(
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ClipRRect(
+                  borderRadius:
+                      const BorderRadius.horizontal(left: Radius.circular(16)),
+                  child: SizedBox(
+                    width: imageWidth,
+                    child: story.customImagePath != null
+                        ? Image.file(
+                            File(story.customImagePath!),
+                            fit: BoxFit.cover,
+                          )
+                        : Image.asset(
+                            story.imageUrl,
+                            fit: BoxFit.cover,
+                          ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding:
+                        EdgeInsets.all(size.width * 0.04), // Padding responsive
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: size.width * 0.03,
-                            vertical: size.height * 0.005,
+                        Text(
+                          story.memory,
+                          style: TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: size.width * 0.04, // Texto responsive
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
                           ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            story.genre,
-                            style: TextStyle(
-                              fontFamily: 'Urbanist',
-                              fontSize: size.width * 0.03,
-                              color: AppColors.primary,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: size.height * 0.008),
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: size.width * 0.03,
+                                vertical: size.height * 0.005,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                story.genre,
+                                style: TextStyle(
+                                  fontFamily: 'Urbanist',
+                                  fontSize: size.width * 0.03,
+                                  color: AppColors.primary,
+                                ),
+                              ),
                             ),
+                          ],
+                        ),
+                        SizedBox(height: size.height * 0.032),
+                        // Barra de progreso
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: story.readCount > 0 ? 1 : 0,
+                            backgroundColor: AppColors.border,
+                            color: AppColors.primary,
+                            minHeight: 4,
+                          ),
+                        ),
+                        SizedBox(height: size.height * 0.008),
+                        // Información de progreso
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Contador de vistas
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.remove_red_eye_outlined,
+                                    size: size.width * 0.04,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  SizedBox(width: size.width * 0.01),
+                                  Text(
+                                    '${story.readCount}',
+                                    style: TextStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: size.width * 0.03,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (story.rating > 0) ...[
+                                SizedBox(width: size.width * 0.04),
+                                // Rating
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.star_rounded,
+                                      size: size.width * 0.04,
+                                      color: AppColors.accent,
+                                    ),
+                                    SizedBox(width: size.width * 0.01),
+                                    Text(
+                                      story.rating.toStringAsFixed(1),
+                                      style: TextStyle(
+                                        fontFamily: 'Urbanist',
+                                        fontSize: size.width * 0.03,
+                                        color: AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                              SizedBox(width: size.width * 0.04),
+                              // Estado de lectura
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.description_outlined,
+                                    size: size.width * 0.04,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  SizedBox(width: size.width * 0.01),
+                                  Text(
+                                    story.readCount > 0
+                                        ? AppLocalizations.of(context)!
+                                            .completed
+                                        : AppLocalizations.of(context)!.unread,
+                                    style: TextStyle(
+                                      fontFamily: 'Urbanist',
+                                      fontSize: size.width * 0.03,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: size.height * 0.032),
-                    // Barra de progreso
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: story.readCount > 0 ? 1 : 0,
-                        backgroundColor: AppColors.border,
-                        color: AppColors.primary,
-                        minHeight: 4,
-                      ),
-                    ),
-                    SizedBox(height: size.height * 0.008),
-                    // Información de progreso
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Contador de vistas
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.remove_red_eye_outlined,
-                                size: size.width * 0.04,
-                                color: AppColors.textSecondary,
-                              ),
-                              SizedBox(width: size.width * 0.01),
-                              Text(
-                                '${story.readCount}',
-                                style: TextStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: size.width * 0.03,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (story.rating > 0) ...[
-                            SizedBox(width: size.width * 0.04),
-                            // Rating
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.star_rounded,
-                                  size: size.width * 0.04,
-                                  color: AppColors.accent,
-                                ),
-                                SizedBox(width: size.width * 0.01),
-                                Text(
-                                  story.rating.toStringAsFixed(1),
-                                  style: TextStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: size.width * 0.03,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                          SizedBox(width: size.width * 0.04),
-                          // Estado de lectura
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.description_outlined,
-                                size: size.width * 0.04,
-                                color: AppColors.textSecondary,
-                              ),
-                              SizedBox(width: size.width * 0.01),
-                              Text(
-                                story.readCount > 0
-                                    ? AppLocalizations.of(context)!.completed
-                                    : AppLocalizations.of(context)!.unread,
-                                style: TextStyle(
-                                  fontFamily: 'Urbanist',
-                                  fontSize: size.width * 0.03,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            // Menú de opciones
-            /*SizedBox(
+                // Menú de opciones
+                /*SizedBox(
               width: size.width * 0.12,
               child: IconButton(
                 icon: Icon(
@@ -718,6 +785,39 @@ class _TimelineCard extends StatelessWidget {
                 },
               ),
             ),*/
+              ],
+            ),
+            if (isNew)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.newIndicator,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context)!.newLabel,
+                    style: const TextStyle(
+                      fontFamily: 'Urbanist',
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

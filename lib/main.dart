@@ -24,6 +24,7 @@ import 'package:memorysparks/features/story/presentation/providers/story_provide
 import 'package:memorysparks/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:memorysparks/features/auth/domain/usecases/delete_account_usecase.dart';
 import 'package:memorysparks/features/story/domain/usecases/delete_all_stories_for_user_usecase.dart';
+import 'package:memorysparks/core/providers/new_story_indicator_provider.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -64,6 +65,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => getIt<SubscriptionProvider>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => NewStoryIndicatorProvider(),
         ),
       ],
       child: const MyApp(),

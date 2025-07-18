@@ -9,6 +9,7 @@ import 'package:memorysparks/features/library/presentation/pages/library_page.da
 import 'package:memorysparks/features/library/presentation/providers/library_provider.dart';
 import 'package:memorysparks/features/profile/presentation/pages/profile_page.dart';
 import 'package:memorysparks/features/profile/presentation/providers/profile_provider.dart';
+import 'package:memorysparks/core/providers/new_story_indicator_provider.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -18,7 +19,13 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _selectedIndex = 0;
+  // Navigation constants
+  static const int _homeIndex = 0;
+  static const int _libraryIndex = 1;
+  static const int _profileIndex = 2;
+  static const Duration _notificationClearDelay = Duration(seconds: 3);
+
+  int _selectedIndex = _homeIndex;
   late final List<Widget> _screens;
 
   @override
@@ -37,10 +44,15 @@ class _MainNavigationState extends State<MainNavigation> {
     ];
   }
 
-  void _onItemTapped(LibraryProvider provider, int index) {
+  void _onItemTapped(LibraryProvider libraryProvider,
+      NewStoryIndicatorProvider newStoryIndicatorProvider, int index) {
     setState(() {
-      if (index == 1 && _selectedIndex != index) {
-        provider.loadStories();
+      if (index == _libraryIndex && _selectedIndex != index) {
+        libraryProvider.loadStories();
+        // Limpiar el indicador de historias nuevas después de un delay para que se vea la etiqueta
+        Future.delayed(_notificationClearDelay, () {
+          newStoryIndicatorProvider.clearNewStories();
+        });
       }
       _selectedIndex = index;
     });
@@ -50,6 +62,8 @@ class _MainNavigationState extends State<MainNavigation> {
   Widget build(BuildContext context) {
     final libraryProvider =
         Provider.of<LibraryProvider>(context, listen: false);
+    final notificationProvider =
+        Provider.of<NewStoryIndicatorProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: AppColors.background,
       body: IndexedStack(
@@ -58,13 +72,30 @@ class _MainNavigationState extends State<MainNavigation> {
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: (index) => _onItemTapped(libraryProvider, index),
+        onTap: (index) =>
+            _onItemTapped(libraryProvider, notificationProvider, index),
       ),
     );
   }
 }
 
 class CustomBottomNavigationBar extends StatelessWidget {
+  // Styling constants
+  static const double _shadowBlurRadius = 10.0;
+  static const Offset _shadowOffset = Offset(0, -5);
+  static const double _shadowOpacity = 0.1;
+  static const double _navigationBarElevation = 0.0;
+  static const double _selectedLabelFontSize = 12.0;
+  static const double _unselectedLabelFontSize = 12.0;
+  static const FontWeight _selectedLabelWeight = FontWeight.w600;
+  static const FontWeight _unselectedLabelWeight = FontWeight.w500;
+  static const String _fontFamily = 'Urbanist';
+
+  // Notification indicator constants
+  static const double _notificationIndicatorSize = 8.0;
+  static const double _notificationIndicatorTopPosition = 0.0;
+  static const double _notificationIndicatorRightPosition = 0.0;
+
   final int currentIndex;
   final ValueChanged<int> onTap;
 
@@ -81,29 +112,29 @@ class CustomBottomNavigationBar extends StatelessWidget {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+            color: Colors.black.withOpacity(_shadowOpacity),
+            blurRadius: _shadowBlurRadius,
+            offset: _shadowOffset,
           ),
         ],
       ),
       child: BottomNavigationBar(
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textSecondary,
-        elevation: 0,
+        elevation: _navigationBarElevation,
         backgroundColor: AppColors.white,
         currentIndex: currentIndex,
         onTap: onTap,
         type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: const TextStyle(
-          fontFamily: 'Urbanist',
-          fontWeight: FontWeight.w600,
-          fontSize: 12,
+        selectedLabelStyle: TextStyle(
+          fontFamily: _fontFamily,
+          fontWeight: _selectedLabelWeight,
+          fontSize: _selectedLabelFontSize,
         ),
-        unselectedLabelStyle: const TextStyle(
-          fontFamily: 'Urbanist',
-          fontWeight: FontWeight.w500,
-          fontSize: 12,
+        unselectedLabelStyle: TextStyle(
+          fontFamily: _fontFamily,
+          fontWeight: _unselectedLabelWeight,
+          fontSize: _unselectedLabelFontSize,
         ),
         items: [
           BottomNavigationBarItem(
@@ -112,8 +143,50 @@ class CustomBottomNavigationBar extends StatelessWidget {
             label: l10n.home,
           ),
           BottomNavigationBarItem(
-            icon: const Icon(Icons.bookmark_outline),
-            activeIcon: const Icon(Icons.bookmark),
+            icon: Consumer<NewStoryIndicatorProvider>(
+              builder: (context, notificationProvider, _) {
+                return Stack(
+                  children: [
+                    const Icon(Icons.bookmark_outline),
+                    if (notificationProvider.hasNewStories)
+                      Positioned(
+                        top: _notificationIndicatorTopPosition,
+                        right: _notificationIndicatorRightPosition,
+                        child: Container(
+                          width: _notificationIndicatorSize,
+                          height: _notificationIndicatorSize,
+                          decoration: const BoxDecoration(
+                            color: AppColors.newIndicator,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
+            activeIcon: Consumer<NewStoryIndicatorProvider>(
+              builder: (context, notificationProvider, _) {
+                return Stack(
+                  children: [
+                    const Icon(Icons.bookmark),
+                    if (notificationProvider.hasNewStories)
+                      Positioned(
+                        top: _notificationIndicatorTopPosition,
+                        right: _notificationIndicatorRightPosition,
+                        child: Container(
+                          width: _notificationIndicatorSize,
+                          height: _notificationIndicatorSize,
+                          decoration: const BoxDecoration(
+                            color: AppColors.newIndicator,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
             label: l10n.library,
           ),
           BottomNavigationBarItem(

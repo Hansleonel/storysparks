@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:memorysparks/core/dependency_injection/service_locator.dart';
+import 'package:memorysparks/core/providers/new_story_indicator_provider.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:memorysparks/core/constants/genre_constants.dart';
 import 'package:memorysparks/features/story/domain/usecases/update_story_rating_usecase.dart';
@@ -468,6 +469,15 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                             final success = await provider.saveStory();
                             if (success && mounted) {
                               widget.onStoryStateChanged?.call();
+
+                              // Marcar que hay una nueva historia guardada
+                              final notificationProvider =
+                                  context.read<NewStoryIndicatorProvider>();
+                              if (provider.story?.id != null) {
+                                await notificationProvider.markNewStoryAdded(
+                                    provider.story!.id.toString());
+                              }
+
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
