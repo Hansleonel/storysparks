@@ -13,6 +13,13 @@
             }
         }
     },
+    "@pdfPageNumber": {
+        "placeholders": {
+            "pageNumber": {
+                "type": "int"
+            }
+        }
+    },
     "@shareStoryMessage": {
         "placeholders": {
             "title": {
@@ -137,6 +144,9 @@
     "paywallTrialText": "Prueba gratis por 3 días, cancela cuando quieras",
     "paywallWeeklyDescription": "Para quienes quieran probar de forma intensiva a corto plazo",
     "paywallWeeklyPlan": "Semanal",
+    "pdfPersonalStory": "Una historia personal",
+    "pdfGeneratedWith": "Generado con amor por Memory Sparks",
+    "pdfPageNumber": "Página {pageNumber}",
     "personalInformation": "Información Personal",
     "popularStories": "Historias Populares 🔥",
     "preferences": "Preferencias",
@@ -166,8 +176,8 @@
     "shareStoryMessage": "Elige cómo quieres compartir \"{title}\"",
     "shareStorySimple": "Compartir Simple",
     "shareStorySimpleSubtitle": "Texto limpio y directo",
-    "shareStoryStyled": "Compartir Estilizado",
-    "shareStoryStyledSubtitle": "Texto decorado con emojis y formato elegante",
+    "shareStoryStyled": "Compartir como Carta",
+    "shareStoryStyledSubtitle": "Genera un PDF hermoso con diseño elegante",
     "shareStorySuccess": "Historia compartida exitosamente",
     "signIn": "Iniciar sesión",
     "signInWithApple": "Iniciar sesión con Apple",

@@ -100,13 +100,13 @@ class _ShareStoryModalState extends State<ShareStoryModal> {
             // Opciones
             _buildShareOption(
               context: context,
-              icon: Icons.auto_awesome_outlined,
+              icon: Icons.picture_as_pdf_outlined,
               title: l10n.shareStoryStyled,
               subtitle: l10n.shareStoryStyledSubtitle,
               color: AppColors.primary,
               onTap: () async {
                 final provider = context.read<ShareProvider>();
-                final success = await provider.shareStyled(
+                final success = await provider.sharePDF(
                     widget.story, 'Memory Sparks', l10n);
                 if (mounted && success) {
                   Navigator.pop(context);

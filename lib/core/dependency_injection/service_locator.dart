@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // Core
 import 'package:memorysparks/core/constants/api_constants.dart';
 import 'package:memorysparks/core/services/share_service.dart';
+import 'package:memorysparks/core/services/pdf_letter_service.dart';
 import '../data/repositories/locale_repository_impl.dart';
 import '../domain/repositories/locale_repository.dart';
 
@@ -88,6 +89,7 @@ void setupServiceLocator() {
     () => StoryCleanupService(getIt<StoryRepository>()),
   );
   getIt.registerLazySingleton<ShareService>(() => ShareService());
+  getIt.registerLazySingleton<PDFLetterService>(() => PDFLetterService());
 
   // Domain Layer - Use Cases (Singleton ✅)
   // Auth
@@ -143,6 +145,7 @@ void setupServiceLocator() {
   getIt.registerFactory(() => ShareProvider(
         shareStoryUseCase: getIt<ShareStoryUseCase>(),
         shareService: getIt<ShareService>(),
+        pdfLetterService: getIt<PDFLetterService>(),
       ));
 
   // Nota: Los providers globales están en main.dart ℹ️

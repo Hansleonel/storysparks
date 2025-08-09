@@ -2,17 +2,21 @@ import 'package:flutter/foundation.dart';
 import 'package:memorysparks/features/story/domain/entities/story.dart';
 import 'package:memorysparks/features/story/domain/usecases/share_story_usecase.dart';
 import 'package:memorysparks/core/services/share_service.dart';
+import 'package:memorysparks/core/services/pdf_letter_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ShareProvider extends ChangeNotifier {
   final ShareStoryUseCase _shareStoryUseCase;
   final ShareService _shareService;
+  final PDFLetterService _pdfLetterService;
 
   ShareProvider({
     required ShareStoryUseCase shareStoryUseCase,
     required ShareService shareService,
+    required PDFLetterService pdfLetterService,
   })  : _shareStoryUseCase = shareStoryUseCase,
-        _shareService = shareService;
+        _shareService = shareService,
+        _pdfLetterService = pdfLetterService;
 
   bool _isSharing = false;
   String? _error;
@@ -31,7 +35,7 @@ class ShareProvider extends ChangeNotifier {
     });
   }
 
-  /// Comparte una historia con formato elegante
+  /// Comparte una historia con formato elegante (DEPRECATED - usar sharePDF)
   Future<bool> shareStyled(
       Story story, String appName, AppLocalizations l10n) async {
     return _executeShare(() {
@@ -39,6 +43,38 @@ class ShareProvider extends ChangeNotifier {
       final text =
           _shareStoryUseCase.executeStyled(story, appName, translations);
       return _shareService.shareText(text, subject: story.title);
+    });
+  }
+
+  /// Comparte una historia como carta PDF hermosa
+  Future<bool> sharePDF(
+      Story story, String appName, AppLocalizations l10n) async {
+    return _executeShare(() async {
+      debugPrint('📄 ShareProvider: Generando carta PDF hermosa...');
+
+      // Crear traducciones para el PDF
+      final pdfTranslations = PDFTranslations(
+        personalStory: l10n.pdfPersonalStory,
+        generatedWith: l10n.pdfGeneratedWith,
+        pageNumber: (pageNum) => l10n.pdfPageNumber(pageNum),
+      );
+
+      // Generar el PDF
+      final pdfPath = await _pdfLetterService.generateStoryLetter(
+        story: story,
+        translations: pdfTranslations,
+      );
+
+      debugPrint('✅ ShareProvider: PDF generado en: $pdfPath');
+
+      // Compartir el PDF
+      await _shareService.sharePDF(
+        pdfPath,
+        description: '📚 ${story.title}\n\n✨ Generado con $appName',
+        subject: story.title,
+      );
+
+      debugPrint('✅ ShareProvider: PDF compartido exitosamente');
     });
   }
 
