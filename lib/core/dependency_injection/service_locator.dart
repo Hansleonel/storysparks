@@ -49,6 +49,15 @@ import 'package:memorysparks/features/story/domain/usecases/update_story_status_
 import 'package:memorysparks/features/story/presentation/providers/share_provider.dart';
 
 // Subscription
+import 'package:memorysparks/features/subscription/data/datasources/revenuecat_datasource.dart';
+import 'package:memorysparks/features/subscription/data/repositories/subscription_repository_impl.dart';
+import 'package:memorysparks/features/subscription/domain/repositories/subscription_repository.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/check_premium_status_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/get_offerings_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/initialize_revenuecat_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/logout_revenuecat_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/purchase_package_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/restore_purchases_usecase.dart';
 import 'package:memorysparks/features/subscription/presentation/providers/subscription_provider.dart';
 
 final getIt = GetIt.instance;
@@ -83,6 +92,16 @@ void setupServiceLocator() {
 
   // Core
   getIt.registerLazySingleton<LocaleRepository>(() => LocaleRepositoryImpl());
+
+  // Subscription
+  getIt.registerLazySingleton<RevenueCatDataSource>(
+      () => RevenueCatDataSourceImpl());
+  getIt.registerLazySingleton<SubscriptionRepository>(
+    () => SubscriptionRepositoryImpl(
+      revenueCatDataSource: getIt<RevenueCatDataSource>(),
+      authRepository: getIt<AuthRepository>(),
+    ),
+  );
 
   // Services
   getIt.registerLazySingleton<StoryCleanupService>(
@@ -129,6 +148,20 @@ void setupServiceLocator() {
   getIt.registerLazySingleton(
       () => UpdateStoryStatusUseCase(getIt<StoryRepository>()));
 
+  // Subscription Use Cases
+  getIt.registerLazySingleton(
+      () => InitializeRevenueCatUseCase(getIt<SubscriptionRepository>()));
+  getIt.registerLazySingleton(
+      () => LogoutRevenueCatUseCase(getIt<SubscriptionRepository>()));
+  getIt.registerLazySingleton(
+      () => CheckPremiumStatusUseCase(getIt<SubscriptionRepository>()));
+  getIt.registerLazySingleton(
+      () => GetOfferingsUseCase(getIt<SubscriptionRepository>()));
+  getIt.registerLazySingleton(
+      () => PurchasePackageUseCase(getIt<SubscriptionRepository>()));
+  getIt.registerLazySingleton(
+      () => RestorePurchasesUseCase(getIt<SubscriptionRepository>()));
+
   // Presentation Layer - Page Providers (Factory ✅)
   getIt.registerFactory(() => ProfileProvider(
         getProfileUseCase: getIt<GetProfileUseCase>(),
@@ -141,7 +174,14 @@ void setupServiceLocator() {
         getIt<GetImageDescriptionUseCase>(),
       ));
   getIt.registerFactory(() => SettingsProvider(getIt()));
-  getIt.registerFactory(() => SubscriptionProvider());
+  getIt.registerFactory(() => SubscriptionProvider(
+        initializeRevenueCatUseCase: getIt<InitializeRevenueCatUseCase>(),
+        logoutRevenueCatUseCase: getIt<LogoutRevenueCatUseCase>(),
+        checkPremiumStatusUseCase: getIt<CheckPremiumStatusUseCase>(),
+        getOfferingsUseCase: getIt<GetOfferingsUseCase>(),
+        purchasePackageUseCase: getIt<PurchasePackageUseCase>(),
+        restorePurchasesUseCase: getIt<RestorePurchasesUseCase>(),
+      ));
   getIt.registerFactory(() => ShareProvider(
         shareStoryUseCase: getIt<ShareStoryUseCase>(),
         shareService: getIt<ShareService>(),

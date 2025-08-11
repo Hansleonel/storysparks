@@ -49,6 +49,7 @@ void main() async {
             getIt<RegisterUseCase>(),
             getIt<DeleteAccountUseCase>(),
             getIt<DeleteAllStoriesForUserUseCase>(),
+            getIt<SubscriptionProvider>(),
           ),
         ),
         ChangeNotifierProvider(

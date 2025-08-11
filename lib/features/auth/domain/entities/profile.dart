@@ -17,6 +17,7 @@ class Profile extends Equatable {
   final int followingCount;
   final bool isPrivate;
   final bool isVerified;
+  final bool isPremium;
 
   const Profile({
     required this.id,
@@ -35,6 +36,7 @@ class Profile extends Equatable {
     this.followingCount = 0,
     this.isPrivate = false,
     this.isVerified = false,
+    this.isPremium = false,
   });
 
   @override
@@ -55,5 +57,30 @@ class Profile extends Equatable {
         followingCount,
         isPrivate,
         isVerified,
+        isPremium,
       ];
+
+  factory Profile.fromMap(Map<String, dynamic> map) {
+    return Profile(
+      id: map['id'] ?? '',
+      username: map['username'] ?? '',
+      fullName: map['full_name'],
+      avatarUrl: map['avatar_url'],
+      email: map['email'],
+      bio: map['bio'],
+      provider: map['provider'] ?? 'email',
+      createdAt: DateTime.tryParse(map['created_at'] ?? '') ?? DateTime.now(),
+      updatedAt: DateTime.tryParse(map['updated_at'] ?? '') ?? DateTime.now(),
+      lastSignIn: map['last_sign_in'] != null
+          ? DateTime.tryParse(map['last_sign_in'])
+          : null,
+      storiesGenerated: map['stories_generated'] ?? 0,
+      storiesShared: map['stories_shared'] ?? 0,
+      followersCount: map['followers_count'] ?? 0,
+      followingCount: map['following_count'] ?? 0,
+      isPrivate: map['is_private'] ?? false,
+      isVerified: map['is_verified'] ?? false,
+      isPremium: map['is_premium'] ?? false,
+    );
+  }
 }

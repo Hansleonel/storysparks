@@ -1,12 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+// import 'package:memorysparks/features/subscription/presentation/pages/paywall_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
-// import 'package:memorysparks/core/utils/modal_utils.dart';
-// import 'package:memorysparks/features/subscription/presentation/pages/paywall_page.dart';
 import '../providers/home_provider.dart';
 import 'package:memorysparks/core/constants/genre_constants.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -38,6 +37,8 @@ class HomePage extends StatelessWidget {
                   // _ProtagonistSection(),
                   //SizedBox(height: 40),
                   _GenerateButton(),
+                  // SizedBox(height: 16),
+                  //_TemporaryPaywallButton(),
                 ],
               ),
             ),
@@ -926,3 +927,50 @@ class _Header extends StatelessWidget {
     );
   }
 }
+
+/* class _TemporaryPaywallButton extends StatelessWidget {
+  const _TemporaryPaywallButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const PaywallScreen(
+                sourceScreen: 'home_test',
+              ),
+            ),
+          );
+        },
+        icon: const Icon(
+          Icons.star_border,
+          color: Colors.orange,
+          size: 20,
+        ),
+        label: const Text(
+          '🚀 TEST: Abrir Paywall Apple',
+          style: TextStyle(
+            fontFamily: 'Urbanist',
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.orange,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.orange.withOpacity(0.1),
+          foregroundColor: Colors.orange,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.orange.withOpacity(0.3)),
+          ),
+          elevation: 0,
+        ),
+      ),
+    );
+  }
+} */

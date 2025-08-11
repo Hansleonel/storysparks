@@ -1,94 +1,339 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
-import '../../domain/entities/subscription_plan.dart';
+import 'package:memorysparks/core/usecases/usecase.dart';
+import 'package:memorysparks/features/subscription/domain/entities/customer_info_entity.dart';
+import 'package:memorysparks/features/subscription/domain/entities/offering_entity.dart';
+import 'package:memorysparks/features/subscription/domain/entities/package_entity.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/check_premium_status_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/get_offerings_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/initialize_revenuecat_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/logout_revenuecat_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/purchase_package_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/restore_purchases_usecase.dart';
+
+enum SubscriptionState { initial, loading, loaded, purchasing, error }
 
 class SubscriptionProvider extends ChangeNotifier {
-  List<SubscriptionPlan> get subscriptionPlans {
-    const weeklyPrice = 3.99;
-    const monthlyPrice = 9.99;
-    const annualPrice = 59.99;
+  final InitializeRevenueCatUseCase initializeRevenueCatUseCase;
+  final LogoutRevenueCatUseCase logoutRevenueCatUseCase;
+  final CheckPremiumStatusUseCase checkPremiumStatusUseCase;
+  final GetOfferingsUseCase getOfferingsUseCase;
+  final PurchasePackageUseCase purchasePackageUseCase;
+  final RestorePurchasesUseCase restorePurchasesUseCase;
 
-    // Calculamos el ahorro del plan mensual comparado con el semanal
-    final monthlySavings =
-        ((weeklyPrice * 4 - monthlyPrice) / (weeklyPrice * 4) * 100).round();
+  SubscriptionProvider({
+    required this.initializeRevenueCatUseCase,
+    required this.logoutRevenueCatUseCase,
+    required this.checkPremiumStatusUseCase,
+    required this.getOfferingsUseCase,
+    required this.purchasePackageUseCase,
+    required this.restorePurchasesUseCase,
+  });
 
-    // Calculamos el ahorro del plan anual comparado con el mensual
-    final annualSavings =
-        ((monthlyPrice * 12 - annualPrice) / (monthlyPrice * 12) * 100).round();
+  SubscriptionState _state = SubscriptionState.initial;
+  SubscriptionState get state => _state;
 
-    return [
-      const SubscriptionPlan(
-        id: 'weekly',
-        name: 'weekly',
-        type: PlanType.weekly,
-        price: weeklyPrice,
-        description: 'weekly_description',
-        features: [
-          'unlimited_stories',
-          'no_ads',
-          'character_editing',
-          'story_continuation',
-        ],
-      ),
-      SubscriptionPlan(
-        id: 'monthly',
-        name: 'monthly',
-        type: PlanType.monthly,
-        price: monthlyPrice,
-        description: 'monthly_description',
-        isPopular: true,
-        savings: monthlySavings.toDouble(),
-        features: const [
-          'unlimited_stories',
-          'no_ads',
-          'character_editing',
-          'story_continuation',
-          'early_access',
-        ],
-      ),
-      SubscriptionPlan(
-        id: 'annual',
-        name: 'annual',
-        type: PlanType.annual,
-        price: annualPrice,
-        description: 'annual_description',
-        savings: annualSavings.toDouble(),
-        features: const [
-          'unlimited_stories',
-          'no_ads',
-          'character_editing',
-          'story_continuation',
-          'early_access',
-          'priority_support',
-          'ai_narration',
-        ],
-        highlightedFeatures: const [
-          'ai_narration',
-        ],
-      ),
-    ];
+  bool _isPremium = false;
+  bool get isPremium => _isPremium;
+
+  List<OfferingEntity> _offerings = [];
+  List<OfferingEntity> get offerings => _offerings;
+
+  PackageEntity? _selectedPackage;
+  PackageEntity? get selectedPackage => _selectedPackage;
+
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
+  CustomerInfoEntity? _customerInfo;
+  CustomerInfoEntity? get customerInfo => _customerInfo;
+
+  int _selectedPlanIndex = 1; // Monthly selected by default
+  int get selectedPlanIndex => _selectedPlanIndex;
+
+  /// Get sorted packages in the correct order: Weekly, Monthly, Yearly
+  List<PackageEntity> get sortedPackages {
+    final packages =
+        _offerings.expand((offering) => offering.availablePackages).toList();
+
+    // Sort packages in the desired order
+    packages.sort((a, b) {
+      int getOrder(String identifier) {
+        if (identifier.toLowerCase().contains('weekly')) return 0;
+        if (identifier.toLowerCase().contains('monthly')) return 1;
+        if (identifier.toLowerCase().contains('yearly') ||
+            identifier.toLowerCase().contains('annual')) return 2;
+        return 3; // Unknown packages go last
+      }
+
+      return getOrder(a.identifier).compareTo(getOrder(b.identifier));
+    });
+
+    return packages;
   }
 
-  SubscriptionPlan? _selectedPlan;
-  SubscriptionPlan? get selectedPlan => _selectedPlan;
+  /// Get enriched package data with UI properties
+  List<Map<String, dynamic>> get enrichedPackages {
+    return sortedPackages.map((package) {
+      final identifier = package.identifier.toLowerCase();
+      String title = 'Plan';
+      int savings = 0;
+      bool isPopular = false;
 
-  void selectPlan(SubscriptionPlan plan) {
-    debugPrint('\n🎯 ===== Plan Selection Debug Info ===== 🎯');
-    debugPrint('📝 Selected Plan: ${plan.name}');
-    debugPrint('💵 Price: \$${plan.price}');
-    debugPrint('✨ Features: ${plan.features.join(", ")}');
-    if (plan.highlightedFeatures.isNotEmpty) {
-      debugPrint(
-          '🌟 Highlighted Features: ${plan.highlightedFeatures.join(", ")}');
+      if (identifier.contains('weekly')) {
+        title = 'Weekly';
+      } else if (identifier.contains('monthly')) {
+        title = 'Monthly';
+        savings = 25;
+        isPopular = true;
+      } else if (identifier.contains('yearly') ||
+          identifier.contains('annual')) {
+        title = 'Yearly';
+        savings = 67;
+      }
+
+      return {
+        'package': package,
+        'title': title,
+        'savings': savings,
+        'isPopular': isPopular,
+        'identifier': package.identifier,
+        'priceString': package.priceString,
+      };
+    }).toList();
+  }
+
+  /// Get currently selected package
+  PackageEntity? get currentSelectedPackage {
+    final packages = sortedPackages;
+    if (_selectedPlanIndex < packages.length) {
+      return packages[_selectedPlanIndex];
     }
-    debugPrint('🏁 ================================== 🏁\n');
+    return null;
+  }
 
-    _selectedPlan = plan;
+  /// Initialize RevenueCat with user ID
+  Future<void> initializeWithUser(String userId) async {
+    try {
+      log('🔧 Initializing RevenueCat for user: $userId');
+      _setState(SubscriptionState.loading);
+
+      final result = await initializeRevenueCatUseCase(userId);
+
+      result.fold(
+        (failure) {
+          log('❌ Failed to initialize RevenueCat: ${failure.toString()}');
+          _setError(failure.toString());
+        },
+        (_) async {
+          log('✅ RevenueCat initialized successfully');
+          // Load initial data
+          await _loadInitialData();
+        },
+      );
+    } catch (e) {
+      log('💥 Exception during RevenueCat initialization: $e');
+      _setError(e.toString());
+    }
+  }
+
+  /// Logout from RevenueCat
+  Future<void> logoutRevenueCat() async {
+    try {
+      log('🔐 Logging out from RevenueCat');
+      final result = await logoutRevenueCatUseCase(NoParams());
+
+      result.fold(
+        (failure) =>
+            log('⚠️ Error logging out from RevenueCat: ${failure.toString()}'),
+        (_) {
+          log('✅ RevenueCat logout successful');
+          _resetState();
+        },
+      );
+    } catch (e) {
+      log('💥 Exception during RevenueCat logout: $e');
+    }
+  }
+
+  /// Check current premium status
+  Future<void> checkPremiumStatus() async {
+    try {
+      final result = await checkPremiumStatusUseCase(NoParams());
+
+      result.fold(
+        (failure) {
+          log('❌ Failed to check premium status: ${failure.toString()}');
+          _isPremium = false;
+        },
+        (isPremium) {
+          log('💎 Premium status: $isPremium');
+          _isPremium = isPremium;
+        },
+      );
+
+      notifyListeners();
+    } catch (e) {
+      log('💥 Exception checking premium status: $e');
+      _isPremium = false;
+      notifyListeners();
+    }
+  }
+
+  /// Load available offerings
+  Future<void> loadOfferings() async {
+    try {
+      _setState(SubscriptionState.loading);
+
+      final result = await getOfferingsUseCase(NoParams());
+
+      result.fold(
+        (failure) {
+          log('❌ Failed to load offerings: ${failure.toString()}');
+          _setError(failure.toString());
+        },
+        (offerings) {
+          log('📦 Loaded ${offerings.length} offerings');
+          _offerings = offerings;
+          _setState(SubscriptionState.loaded);
+
+          // Auto-select first package if available
+          if (offerings.isNotEmpty &&
+              offerings.first.availablePackages.isNotEmpty) {
+            _selectedPackage = offerings.first.availablePackages.first;
+            log('🎯 Auto-selected package: ${_selectedPackage!.identifier}');
+          }
+        },
+      );
+    } catch (e) {
+      log('💥 Exception loading offerings: $e');
+      _setError(e.toString());
+    }
+  }
+
+  /// Purchase selected package
+  Future<bool> purchasePackage(PackageEntity package) async {
+    try {
+      log('💳 Starting purchase for: ${package.identifier}');
+      _setState(SubscriptionState.purchasing);
+
+      final result = await purchasePackageUseCase(package);
+
+      return result.fold(
+        (failure) {
+          log('❌ Purchase failed: ${failure.toString()}');
+          _setError(failure.toString());
+          return false;
+        },
+        (customerInfo) {
+          log('🎉 Purchase successful!');
+          _customerInfo = customerInfo;
+          _isPremium = customerInfo.isPremium;
+          _setState(SubscriptionState.loaded);
+          return true;
+        },
+      );
+    } catch (e) {
+      log('💥 Exception during purchase: $e');
+      _setError(e.toString());
+      return false;
+    }
+  }
+
+  /// Restore purchases
+  Future<bool> restorePurchases() async {
+    try {
+      log('🔄 Restoring purchases...');
+      _setState(SubscriptionState.loading);
+
+      final result = await restorePurchasesUseCase(NoParams());
+
+      return result.fold(
+        (failure) {
+          log('❌ Restore failed: ${failure.toString()}');
+          _setError(failure.toString());
+          return false;
+        },
+        (customerInfo) {
+          log('✅ Purchases restored successfully');
+          _customerInfo = customerInfo;
+          _isPremium = customerInfo.isPremium;
+          _setState(SubscriptionState.loaded);
+          return true;
+        },
+      );
+    } catch (e) {
+      log('💥 Exception during restore: $e');
+      _setError(e.toString());
+      return false;
+    }
+  }
+
+  /// Select a package for purchase (legacy method)
+  void selectPackage(PackageEntity package) {
+    log('🎯 Selected package: ${package.identifier} - ${package.priceString}');
+    _selectedPackage = package;
     notifyListeners();
   }
 
-  void clearSelection() {
-    debugPrint('\n🔄 Clearing plan selection');
-    _selectedPlan = null;
+  /// Select a plan by index
+  void selectPlanByIndex(int index) {
+    final packages = sortedPackages;
+    if (index >= 0 && index < packages.length) {
+      _selectedPlanIndex = index;
+      _selectedPackage = packages[index];
+      log('🎯 Selected plan [$index]: ${_selectedPackage!.identifier} - ${_selectedPackage!.priceString}');
+      notifyListeners();
+    }
+  }
+
+  /// Purchase currently selected package
+  Future<bool> purchaseCurrentPackage() async {
+    final package = currentSelectedPackage;
+    if (package == null) {
+      log('❌ No package selected for purchase');
+      return false;
+    }
+    return await purchasePackage(package);
+  }
+
+  /// Clear error message
+  void clearError() {
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  /// Load initial data after initialization
+  Future<void> _loadInitialData() async {
+    await Future.wait([
+      checkPremiumStatus(),
+      loadOfferings(),
+    ]);
+  }
+
+  /// Set state and notify listeners
+  void _setState(SubscriptionState newState) {
+    _state = newState;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  /// Set error state
+  void _setError(String error) {
+    _state = SubscriptionState.error;
+    _errorMessage = error;
+    notifyListeners();
+  }
+
+  /// Reset state to initial
+  void _resetState() {
+    _state = SubscriptionState.initial;
+    _isPremium = false;
+    _offerings = [];
+    _selectedPackage = null;
+    _errorMessage = null;
+    _customerInfo = null;
     notifyListeners();
   }
 }

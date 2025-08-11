@@ -53,6 +53,9 @@ dependencies:
   # Image Picker
   image_picker: ^1.0.4
 
+  # URL Launcher
+  url_launcher: ^6.2.2
+
   # Utils
   equatable: ^2.0.5
   dartz: ^0.10.1
@@ -81,6 +84,9 @@ dependencies:
   uuid: ^4.3.3
   lottie: ^3.2.0
   google_sign_in: ^6.2.2
+
+  # RevenueCat for in-app purchases
+  purchases_flutter: ^8.8.0
 
 dev_dependencies:
   flutter_test:

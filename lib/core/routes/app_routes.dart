@@ -5,7 +5,7 @@ import 'package:memorysparks/features/navigation/presentation/pages/main_navigat
 import 'package:memorysparks/features/profile/presentation/pages/settings_page.dart';
 import 'package:memorysparks/features/story/domain/entities/story.dart';
 import 'package:memorysparks/features/story/presentation/pages/generated_story_page.dart';
-import 'package:memorysparks/features/subscription/presentation/pages/paywall_page.dart';
+import 'package:memorysparks/features/subscription/presentation/pages/paywall_screen.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -35,7 +35,7 @@ class AppRoutes {
         );
       case paywall:
         return MaterialPageRoute(
-          builder: (_) => const PaywallPage(),
+          builder: (_) => const PaywallScreen(),
         );
       case generatedStory:
         if (routeSettings.arguments is! Map<String, dynamic>) {

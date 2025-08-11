@@ -239,6 +239,8 @@ class _LoginPageState extends State<LoginPage> {
                     }
 
                     if (user != null && mounted) {
+                      // ✅ Reset loading state immediately before navigation
+                      authProvider.resetLoadingState();
                       Navigator.pushReplacementNamed(context, AppRoutes.main);
                     }
                   },
@@ -311,7 +313,7 @@ class _LoginPageState extends State<LoginPage> {
           height: 48,
           style: SignInWithAppleButtonStyle.black,
           onPressed: () async {
-            await provider.signInWithApple();
+            final success = await provider.signInWithApple();
 
             if (provider.error != null) {
               if (mounted) {
@@ -325,8 +327,18 @@ class _LoginPageState extends State<LoginPage> {
               return;
             }
 
-            if (provider.isAuthenticated && mounted) {
+            if (success && mounted) {
+              // ✅ Reset loading state immediately before navigation
+              provider.resetLoadingState();
               Navigator.pushReplacementNamed(context, AppRoutes.main);
+            } else if (mounted) {
+              // 🚨 Debug: Authentication failed but no error
+              debugPrint(
+                  '🚨 Apple Sign In: Authentication failed but no error reported');
+              debugPrint('🚨 success: $success');
+              debugPrint('🚨 isAuthenticated: ${provider.isAuthenticated}');
+              debugPrint('🚨 currentUser: ${provider.currentUser}');
+              debugPrint('🚨 error: ${provider.error}');
             }
           },
         );
@@ -375,6 +387,8 @@ class _LoginPageState extends State<LoginPage> {
               }
 
               if (success && mounted) {
+                // ✅ Reset loading state immediately before navigation
+                provider.resetLoadingState();
                 Navigator.pushReplacementNamed(context, AppRoutes.main);
               }
             },

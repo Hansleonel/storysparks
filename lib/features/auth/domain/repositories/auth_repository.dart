@@ -23,4 +23,6 @@ abstract class AuthRepository {
   });
   Future<void> logout();
   Future<Either<Failure, void>> deleteAccount();
+  Future<Either<Failure, Profile>> updatePremiumStatus(
+      {required bool isPremium});
 }

@@ -22,6 +22,7 @@ abstract class AuthRemoteDataSource {
   });
   Future<void> logout();
   Future<void> deleteAccount();
+  Future<Profile> updatePremiumStatus({required bool isPremium});
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -663,6 +664,56 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e) {
       print('💥 AuthRemoteDataSource: Error durante eliminación de cuenta: $e');
       throw Exception('Error al eliminar la cuenta: $e');
+    }
+  }
+
+  @override
+  Future<Profile> updatePremiumStatus({required bool isPremium}) async {
+    try {
+      final currentUser = supabaseClient.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('No authenticated user');
+      }
+
+      print(
+          '💎 Updating premium status to: $isPremium for user: ${currentUser.id}');
+
+      // Update premium status in profiles table
+      final response = await supabaseClient
+          .from('profiles')
+          .update({'is_premium': isPremium})
+          .eq('id', currentUser.id)
+          .select()
+          .single();
+
+      return Profile.fromMap(response);
+    } catch (e) {
+      print('❌ Error updating premium status: $e');
+
+      // If profile doesn't exist, create it
+      if (e.toString().contains('PGRST116')) {
+        final currentUser = supabaseClient.auth.currentUser;
+        if (currentUser != null) {
+          print(
+              'ℹ️ Profile not found, creating new one with premium: $isPremium');
+
+          final newProfile = {
+            'id': currentUser.id,
+            'is_premium': isPremium,
+            'created_at': DateTime.now().toIso8601String(),
+          };
+
+          final response = await supabaseClient
+              .from('profiles')
+              .insert(newProfile)
+              .select()
+              .single();
+
+          return Profile.fromMap(response);
+        }
+      }
+
+      rethrow;
     }
   }
 }

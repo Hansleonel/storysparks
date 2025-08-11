@@ -12,6 +12,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:memorysparks/features/auth/domain/usecases/delete_account_usecase.dart';
 import 'package:memorysparks/core/usecases/usecase.dart';
 import 'package:memorysparks/features/story/domain/usecases/delete_all_stories_for_user_usecase.dart';
+import 'package:memorysparks/features/subscription/presentation/providers/subscription_provider.dart';
 
 class AuthProvider extends ChangeNotifier {
   final LoginUseCase _loginUseCase;
@@ -21,6 +22,7 @@ class AuthProvider extends ChangeNotifier {
   final RegisterUseCase _registerUseCase;
   final DeleteAccountUseCase _deleteAccountUseCase;
   final DeleteAllStoriesForUserUseCase _deleteAllStoriesForUserUseCase;
+  final SubscriptionProvider _subscriptionProvider;
 
   bool _isLoading = false;
   String? _error;
@@ -37,6 +39,7 @@ class AuthProvider extends ChangeNotifier {
     this._registerUseCase,
     this._deleteAccountUseCase,
     this._deleteAllStoriesForUserUseCase,
+    this._subscriptionProvider,
   );
 
   bool get isLoading => _isLoading;
@@ -48,6 +51,12 @@ class AuthProvider extends ChangeNotifier {
 
   void togglePasswordVisibility() {
     _isPasswordVisible = !_isPasswordVisible;
+    notifyListeners();
+  }
+
+  /// Reset loading state after successful navigation
+  void resetLoadingState() {
+    _isLoading = false;
     notifyListeners();
   }
 
@@ -119,12 +128,32 @@ class AuthProvider extends ChangeNotifier {
           _error = failure.message;
           _isAuthenticated = false;
           _currentUser = null;
+          _isLoading = false; // ✅ Only set loading false on failure
+          notifyListeners();
           return null;
         },
-        (response) {
+        (response) async {
           _currentUser = response.user;
+
+          // 🔑 Initialize RevenueCat with user ID BEFORE setting authenticated
+          if (_currentUser?.id != null) {
+            try {
+              await _subscriptionProvider.initializeWithUser(_currentUser!.id);
+              debugPrint(
+                  '🟢 RevenueCat initialized for user: ${_currentUser!.id}');
+            } catch (e) {
+              debugPrint('🔴 Error initializing RevenueCat: $e');
+              // Don't fail login if RevenueCat fails
+            }
+          }
+
+          // ✅ Set authenticated AFTER RevenueCat initialization
           _isAuthenticated = true;
           _error = null;
+
+          // ✅ Keep loading true on success - UI will navigate immediately
+          // _isLoading stays true to prevent double login until navigation
+          notifyListeners();
           return _currentUser;
         },
       );
@@ -132,14 +161,14 @@ class AuthProvider extends ChangeNotifier {
       _error = e.toString();
       _isAuthenticated = false;
       _currentUser = null;
-      return null;
-    } finally {
-      _isLoading = false;
+      _isLoading = false; // ✅ Only set loading false on exception
       notifyListeners();
+      return null;
     }
+    // ✅ Removed finally block - loading state managed explicitly
   }
 
-  Future<void> signInWithApple() async {
+  Future<bool> signInWithApple() async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -161,26 +190,49 @@ class AuthProvider extends ChangeNotifier {
         ),
       );
 
-      result.fold(
+      return result.fold(
         (failure) {
           _error = failure.message;
           _isAuthenticated = false;
           _currentUser = null;
+          _isLoading = false; // ✅ Only set loading false on failure
+          notifyListeners();
+          return false;
         },
-        (response) {
+        (response) async {
           _currentUser = response.user;
+
+          // 🔑 Initialize RevenueCat with user ID BEFORE setting authenticated
+          if (_currentUser?.id != null) {
+            try {
+              await _subscriptionProvider.initializeWithUser(_currentUser!.id);
+              debugPrint(
+                  '🟢 RevenueCat initialized for Apple user: ${_currentUser!.id}');
+            } catch (e) {
+              debugPrint('🔴 Error initializing RevenueCat (Apple): $e');
+              // Don't fail login if RevenueCat fails
+            }
+          }
+
+          // ✅ Set authenticated AFTER RevenueCat initialization
           _isAuthenticated = true;
           _error = null;
+
+          // ✅ Keep loading true on success - UI will navigate immediately
+          // _isLoading stays true to prevent double login until navigation
+          notifyListeners();
+          return true;
         },
       );
     } catch (e) {
       _error = e.toString();
       _isAuthenticated = false;
       _currentUser = null;
-    } finally {
-      _isLoading = false;
+      _isLoading = false; // ✅ Only set loading false on exception
       notifyListeners();
+      return false;
     }
+    // ✅ Removed finally block - loading state managed explicitly
   }
 
   Future<bool> signInWithGoogle() async {
@@ -241,11 +293,28 @@ class AuthProvider extends ChangeNotifier {
           notifyListeners();
           return false;
         },
-        (response) {
+        (response) async {
           _currentUser = response.user;
+
+          // 🔑 Initialize RevenueCat with user ID BEFORE setting authenticated
+          if (_currentUser?.id != null) {
+            try {
+              await _subscriptionProvider.initializeWithUser(_currentUser!.id);
+              debugPrint(
+                  '🟢 RevenueCat initialized for Google user: ${_currentUser!.id}');
+            } catch (e) {
+              debugPrint('🔴 Error initializing RevenueCat (Google): $e');
+              // Don't fail login
+              // if RevenueCat fails
+            }
+          }
+
+          // ✅ Set authenticated AFTER RevenueCat initialization
           _isAuthenticated = true;
           _error = null;
-          _isLoading = false;
+
+          // ✅ Keep loading true on success - UI will navigate immediately
+          // _isLoading stays true to prevent double login until navigation
           notifyListeners();
           return true;
         },
@@ -268,7 +337,16 @@ class AuthProvider extends ChangeNotifier {
 
     result.fold(
       (failure) => _error = failure.message,
-      (_) {
+      (_) async {
+        // 🔐 Logout from RevenueCat before clearing auth state
+        try {
+          await _subscriptionProvider.logoutRevenueCat();
+          debugPrint('🟢 RevenueCat logout successful');
+        } catch (e) {
+          debugPrint('🔴 Error during RevenueCat logout: $e');
+          // Continue with logout even if RevenueCat fails
+        }
+
         _isAuthenticated = false;
         _error = null;
         _currentUser = null;
