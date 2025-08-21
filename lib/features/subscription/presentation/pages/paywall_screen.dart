@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:memorysparks/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:memorysparks/features/subscription/domain/entities/package_entity.dart';
@@ -98,9 +99,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Unlock Memory Sparks',
-                              style: TextStyle(
+                            Text(
+                              AppLocalizations.of(context)!.unlockMemorySparks,
+                              style: const TextStyle(
                                 fontFamily: 'Playfair',
                                 fontSize: 32,
                                 height: 1.2,
@@ -110,19 +111,22 @@ class _PaywallScreenState extends State<PaywallScreen> {
                             ),
                             SizedBox(height: screenHeight * 0.02),
                             _buildBenefitItem(
-                              'Unlimited personalized stories',
+                              AppLocalizations.of(context)!
+                                  .unlimitedPersonalizedStories,
                               Icons.auto_awesome,
                             ),
                             _buildBenefitItem(
-                              'No ads or interruptions',
+                              AppLocalizations.of(context)!
+                                  .noAdsOrInterruptions,
                               Icons.block,
                             ),
                             _buildBenefitItem(
-                              'Early access to new features',
+                              AppLocalizations.of(context)!
+                                  .earlyAccessToNewFeatures,
                               Icons.star_outline,
                             ),
                             _buildBenefitItem(
-                              'All genres available',
+                              AppLocalizations.of(context)!.allGenresAvailable,
                               Icons.palette_rounded,
                               isHighlighted: true,
                             ),
@@ -211,9 +215,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                         ),
                       ],
                     ),
-                    child: const Text(
-                      'NEW',
-                      style: TextStyle(
+                    child: Text(
+                      AppLocalizations.of(context)!.newTag,
+                      style: const TextStyle(
                         fontFamily: 'Urbanist',
                         color: Colors.white,
                         fontSize: 10,
@@ -233,16 +237,16 @@ class _PaywallScreenState extends State<PaywallScreen> {
   Widget _buildPricingPlans(SubscriptionProvider subscriptionProvider) {
     // Use REAL data from RevenueCat offerings, no mock data
     if (subscriptionProvider.offerings.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(32.0),
+          padding: const EdgeInsets.all(32.0),
           child: Column(
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
               Text(
-                'Loading subscription plans...',
-                style: TextStyle(
+                AppLocalizations.of(context)!.loadingSubscriptionPlans,
+                style: const TextStyle(
                   color: Color(0xFF6B7280),
                   fontFamily: 'Urbanist',
                 ),
@@ -315,9 +319,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                                 color: const Color(0xFFEC4899),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Text(
-                                'POPULAR',
-                                style: TextStyle(
+                              child: Text(
+                                AppLocalizations.of(context)!.popularTag,
+                                style: const TextStyle(
                                   fontFamily: 'Urbanist',
                                   color: Colors.white,
                                   fontSize: 11,
@@ -333,9 +337,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                                     color: const Color(0xFF10B981),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: const Text(
-                                    'BEST VALUE',
-                                    style: TextStyle(
+                                  child: Text(
+                                    AppLocalizations.of(context)!.bestValueTag,
+                                    style: const TextStyle(
                                       fontFamily: 'Urbanist',
                                       color: Colors.white,
                                       fontSize: 11,
@@ -441,9 +445,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : const Text(
-                'Get Pro',
-                style: TextStyle(
+            : Text(
+                AppLocalizations.of(context)!.getPro,
+                style: const TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -459,9 +463,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
               subscriptionProvider.state == SubscriptionState.purchasing)
           ? null
           : () => _handleRestore(subscriptionProvider),
-      child: const Text(
-        'Restore Purchases',
-        style: TextStyle(
+      child: Text(
+        AppLocalizations.of(context)!.restorePurchases,
+        style: const TextStyle(
           color: Color(0xFF6B7280),
           fontSize: 14,
           fontFamily: 'Urbanist',
@@ -475,7 +479,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildLinkButton(
-          'Terms of Service',
+          AppLocalizations.of(context)!.termsOfService,
           'https://memorysparks.app/terms',
         ),
         Container(
@@ -484,7 +488,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
           color: const Color(0xFF6B7280),
         ),
         _buildLinkButton(
-          'Privacy Policy',
+          AppLocalizations.of(context)!.privacyPolicy,
           'https://memorysparks.app/privacy',
         ),
       ],
@@ -507,9 +511,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
   }
 
   Widget _buildCompactTerms() {
-    return const Text(
-      'By continuing, you accept our terms and conditions. Subscription renews automatically.',
-      style: TextStyle(
+    return Text(
+      AppLocalizations.of(context)!.subscriptionTermsText,
+      style: const TextStyle(
         fontSize: 11,
         color: Color(0xFF6B7280),
         fontFamily: 'Urbanist',
@@ -538,18 +542,18 @@ class _PaywallScreenState extends State<PaywallScreen> {
               color: Colors.amber,
             ),
             const SizedBox(height: 24),
-            const Text(
-              '¡Ya eres Premium!',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.alreadyPremiumTitle,
+              style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Disfruta de todas las funciones premium de Memory Sparks',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)!.alreadyPremiumMessage,
+              style: const TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
               ),
@@ -568,9 +572,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Continuar',
-                  style: TextStyle(
+                child: Text(
+                  AppLocalizations.of(context)!.continueButton,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -652,21 +656,21 @@ class _PaywallScreenState extends State<PaywallScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A2E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Welcome to Premium!',
-          style: TextStyle(color: Colors.white, fontFamily: 'Urbanist'),
+        title: Text(
+          AppLocalizations.of(context)!.welcomeToPremium,
+          style: const TextStyle(color: Colors.white, fontFamily: 'Urbanist'),
         ),
-        content: const Text(
-          'You now have access to all premium features of Memory Sparks.',
-          style: TextStyle(color: Colors.white70, fontFamily: 'Urbanist'),
+        content: Text(
+          AppLocalizations.of(context)!.premiumAccessMessage,
+          style: const TextStyle(color: Colors.white70, fontFamily: 'Urbanist'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'Continue',
-              style:
-                  TextStyle(color: Color(0xFF6366F1), fontFamily: 'Urbanist'),
+            child: Text(
+              AppLocalizations.of(context)!.continueButton,
+              style: const TextStyle(
+                  color: Color(0xFF6366F1), fontFamily: 'Urbanist'),
             ),
           ),
         ],
@@ -680,9 +684,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A2E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Error',
-          style: TextStyle(color: Colors.white, fontFamily: 'Urbanist'),
+        title: Text(
+          AppLocalizations.of(context)!.error,
+          style: const TextStyle(color: Colors.white, fontFamily: 'Urbanist'),
         ),
         content: Text(
           message,
@@ -691,8 +695,8 @@ class _PaywallScreenState extends State<PaywallScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'OK',
+            child: Text(
+              AppLocalizations.of(context)!.ok,
               style:
                   TextStyle(color: Color(0xFF6366F1), fontFamily: 'Urbanist'),
             ),
@@ -708,9 +712,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A2E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Information',
-          style: TextStyle(color: Colors.white, fontFamily: 'Urbanist'),
+        title: Text(
+          AppLocalizations.of(context)!.information,
+          style: const TextStyle(color: Colors.white, fontFamily: 'Urbanist'),
         ),
         content: Text(
           message,
@@ -719,8 +723,8 @@ class _PaywallScreenState extends State<PaywallScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
-              'OK',
+            child: Text(
+              AppLocalizations.of(context)!.ok,
               style:
                   TextStyle(color: Color(0xFF6366F1), fontFamily: 'Urbanist'),
             ),

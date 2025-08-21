@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:memorysparks/features/library/presentation/providers/library_provider.dart';
@@ -30,7 +31,7 @@ class ProfilePage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Error al cargar el perfil',
+                        AppLocalizations.of(context)!.errorLoadingProfile,
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 16,
@@ -40,7 +41,7 @@ class ProfilePage extends StatelessWidget {
                       const SizedBox(height: 8),
                       ElevatedButton(
                         onPressed: () => provider.refreshProfile(),
-                        child: const Text('Reintentar'),
+                        child: Text(AppLocalizations.of(context)!.retry),
                       ),
                     ],
                   ),
@@ -49,10 +50,10 @@ class ProfilePage extends StatelessWidget {
 
               final profile = provider.profile;
               if (profile == null) {
-                return const Center(
+                return Center(
                   child: Text(
-                    'No se encontró el perfil',
-                    style: TextStyle(
+                    AppLocalizations.of(context)!.noProfileFound,
+                    style: const TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 16,
                       color: AppColors.textSecondary,
@@ -147,6 +148,9 @@ class ProfilePage extends StatelessWidget {
                                 color: AppColors.accent,
                               ),
                             ),
+                            const SizedBox(height: 12),
+                            // Premium Status Badge
+                            _PremiumStatusBadge(isPremium: profile.isPremium),
                             if (profile.bio != null) ...[
                               const SizedBox(height: 8),
                               // Biography
@@ -166,15 +170,17 @@ class ProfilePage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 _StatItem(
-                                  label: 'Historias',
+                                  label: AppLocalizations.of(context)!.stories,
                                   value: '${profile.storiesGenerated}',
                                 ),
                                 _StatItem(
-                                  label: 'Seguidores',
+                                  label:
+                                      AppLocalizations.of(context)!.followers,
                                   value: '${profile.followersCount}',
                                 ),
                                 _StatItem(
-                                  label: 'Siguiendo',
+                                  label:
+                                      AppLocalizations.of(context)!.following,
                                   value: '${profile.followingCount}',
                                 ),
                               ],
@@ -200,9 +206,9 @@ class ProfilePage extends StatelessWidget {
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
                           ),
-                          tabs: const [
-                            Tab(text: 'Historias'),
-                            Tab(text: 'Reviews'),
+                          tabs: [
+                            Tab(text: AppLocalizations.of(context)!.stories),
+                            Tab(text: AppLocalizations.of(context)!.reviews),
                           ],
                         ),
                       ),
@@ -311,10 +317,10 @@ class _StoriesTabState extends State<_StoriesTab> {
         }
 
         if (provider.recentStories.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
-              'No hay historias aún',
-              style: TextStyle(
+              AppLocalizations.of(context)!.noStoriesYet,
+              style: const TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 16,
                 color: AppColors.textSecondary,
@@ -450,5 +456,101 @@ class _ReviewsTab extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _PremiumStatusBadge extends StatelessWidget {
+  final bool isPremium;
+
+  const _PremiumStatusBadge({required this.isPremium});
+
+  @override
+  Widget build(BuildContext context) {
+    if (isPremium) {
+      // Premium user badge - elegant golden design
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFFFD700).withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.star,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              AppLocalizations.of(context)!.premium,
+              style: const TextStyle(
+                fontFamily: 'Urbanist',
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Non-premium user button - using paywall colors
+      return GestureDetector(
+        onTap: () {
+          Navigator.pushNamed(context, AppRoutes.paywall);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF6B4BFF), Color(0xFF8B5CF6)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF6B4BFF).withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.diamond_outlined,
+                color: Colors.white,
+                size: 18,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                AppLocalizations.of(context)!.upgradeToPremium,
+                style: const TextStyle(
+                  fontFamily: 'Urbanist',
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 }
