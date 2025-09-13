@@ -32,12 +32,17 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
   - Limpieza automática de borradores antiguos
   - Análisis semántico de imágenes con IA
 
-- ✅ **Sistema de Suscripción**:
+- ✅ **Sistema de Suscripción Premium (RevenueCat)**:
 
-  - Planes flexibles: Semanal, Mensual, Anual
+  - Integración completa con RevenueCat para manejo de suscripciones in-app
+  - Planes flexibles: Semanal, Mensual, Anual con descuentos automáticos
   - Beneficios por nivel: historias ilimitadas, sin publicidad, edición de personajes, continuación de historias, acceso anticipado, soporte prioritario
-  - Interfaz de pago moderna y atractiva, cálculo automático de ahorros y período de prueba gratuito
+  - Interfaz de pago moderna y atractiva (PaywallScreen) con Apple App Store compliance
+  - PremiumGate widget para controlar acceso a funciones premium
+  - Sincronización automática con backend (Supabase) del estado premium
   - Gestión de beneficios y control de acceso según suscripción
+  - Restauración automática de compras y manejo de errores robusto
+  - Integración automática con sistema de autenticación existente
 
 - ✅ **Creación y Personalización de Historias**:
 
@@ -60,12 +65,30 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
   - Localización de textos y mensajes
   - Adaptación de contenido según región
 
+- ✅ **Exportación y Compartir**:
+
+  - Generación de cartas PDF hermosas y elegantes con diseño temático por género
+  - Servicio de compartir integrado (ShareService) para redes sociales y mensajería
+  - PDFs con branding de la app, fuentes personalizadas y diseño profesional
+  - Exportación de historias en formato carta con metadata y ratings
+  - Temas visuales específicos por género (Romance, Aventura, Misterio, Fantasía)
+
+- ✅ **Gestión de Perfil y Configuraciones**:
+
+  - Página de perfil completa con información del usuario
+  - Sistema de configuraciones avanzado (SettingsProvider)
+  - Gestión de preferencias de idioma y tema
+  - Eliminación segura de cuenta con Edge Function en Supabase
+  - Visualización de estadísticas de historias del usuario
+
 - ✅ **Otras funcionalidades destacadas**:
   - Vista de biblioteca en grid y timeline
   - Limpieza automática de borradores antiguos
   - Gestión de historias populares y recientes
   - Calificación de historias
   - Gestión de imágenes personalizadas para portadas
+  - Indicador de nuevas historias (NewStoryIndicatorProvider)
+  - Animaciones Lottie para estados de carga
 
 ## 🛠️ Tecnologías Implementadas
 
@@ -73,10 +96,12 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
 - **Lenguaje**: Dart
 - **Gestión de Estado**: Provider
 - **Backend y Autenticación**:
-  - Supabase para autenticación y almacenamiento
+  - Supabase para autenticación, almacenamiento y backend
   - Sign in with Apple integration
   - Google Sign-In integration
   - Gestión segura de tokens
+  - Edge Functions para operaciones backend (eliminación de cuentas)
+  - Sincronización automática de estado premium con backend
 - **Arquitectura**: Clean Architecture implementada con:
   - Presentation Layer (providers, pages)
   - Domain Layer (usecases, repositories)
@@ -108,53 +133,80 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
   - SVG Support (flutter_svg)
   - Audio (just_audio)
   - Image Picker con soporte multiformat
-  - Animaciones personalizadas
+  - Animaciones Lottie para estados de carga
+  - Fuentes personalizadas (Playfair Display, Urbanist)
   - Optimización de carga de recursos
+- **Exportación y Documentos**:
+  - Generación de PDFs elegantes con pdf package
+  - Servicio de compartir multiplataforma (share_plus)
+  - Temas visuales personalizados por género
+  - Cartas hermosas con branding y metadata
 - **Monetización**:
-  - Sistema de suscripciones in-app
-  - Gestión de planes y beneficios
-  - Cálculo de descuentos
+  - RevenueCat SDK para suscripciones in-app multiplataforma
+  - Sistema de suscripciones con Clean Architecture
+  - Gestión de planes y beneficios con entitlements
+  - Cálculo automático de descuentos y savings
+  - Apple App Store compliance para paywalls
+  - Restauración automática de compras
+  - Sincronización bidireccional con backend
 
 ## 📂 Estructura del Proyecto Actual
 
 ```
 lib/
 ├── core/
-│   ├── theme/
-│   │   └── app_colors.dart
+│   ├── constants/
+│   │   ├── api_constants.dart
+│   │   ├── genre_constants.dart
+│   │   └── revenuecat_constants.dart
 │   ├── dependency_injection/
 │   │   └── service_locator.dart
-│   └── routes/
-│       └── app_routes.dart
+│   ├── providers/
+│   │   └── new_story_indicator_provider.dart
+│   ├── routes/
+│   │   └── app_routes.dart
+│   ├── services/
+│   │   ├── auth_service.dart
+│   │   ├── pdf_letter_service.dart
+│   │   └── share_service.dart
+│   ├── theme/
+│   │   └── app_colors.dart
+│   ├── utils/
+│   │   ├── cover_image_helper.dart
+│   │   ├── date_formatter.dart
+│   │   └── modal_utils.dart
+│   └── widgets/
+│       ├── empty_state.dart
+│       ├── loading_lottie.dart
+│       └── lottie_animation.dart
+├── examples/
+│   ├── pdf_example.dart
+│   └── revenuecat_example.dart
 ├── features/
 │   ├── auth/
-│   │   ├── data/
-│   │   │   ├── datasources/
-│   │   │   └── repositories/
-│   │   └── presentation/
-│   │       ├── providers/
-│   │       └── pages/
-│   ├── story/
-│   │   ├── data/
-│   │   │   ├── datasources/
-│   │   │   ├── managers/
-│   │   │   └── repositories/
-│   │   ├── domain/
-│   │   │   ├── repositories/
-│   │   │   └── usecases/
-│   │   └── presentation/
-│   │       ├── providers/
-│   │       └── pages/
+│   │   ├── data/, domain/, presentation/
+│   │   └── usecases/ (login, register, apple/google signin, delete account)
 │   ├── home/
+│   │   ├── domain/usecases/
 │   │   └── presentation/
-│   │       ├── providers/
-│   │       └── pages/
 │   ├── library/
 │   │   └── presentation/
-│   │       └── pages/
-│   └── navigation/
-│       └── presentation/
-│           └── pages/
+│   ├── navigation/
+│   │   └── presentation/
+│   ├── profile/
+│   │   ├── data/, domain/, presentation/
+│   │   └── pages/ (profile, settings)
+│   ├── story/
+│   │   ├── data/ (datasources, managers, services)
+│   │   ├── domain/ (entities, repositories, usecases)
+│   │   └── presentation/ (providers, pages, widgets)
+│   └── subscription/
+│       ├── data/ (revenuecat datasource, models)
+│       ├── domain/ (entities, repositories, usecases)
+│       └── presentation/ (paywall, premium gate, providers)
+├── l10n/
+│   ├── app_en.arb
+│   └── app_es.arb
 └── main.dart
 ```
 
@@ -166,6 +218,8 @@ lib/
    - Dart SDK
    - Android Studio / Xcode
    - API Key de Google Generative AI
+   - Cuenta de RevenueCat (para suscripciones)
+   - Proyecto de Supabase configurado
 
 2. **Instalación**:
 
@@ -182,8 +236,10 @@ lib/
    GEMINI_API_KEY=tu_api_key_aqui
    SUPABASE_URL=tu_url_de_supabase
    SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
+   SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key_de_supabase
    GOOGLE_WEB_CLIENT_ID=tu_web_client_id.apps.googleusercontent.com
    GOOGLE_IOS_CLIENT_ID=tu_ios_client_id.apps.googleusercontent.com
+   REVENUECAT_API_KEY=tu_revenuecat_api_key
    ```
 
    Para obtener los IDs de cliente de Google:
@@ -211,8 +267,26 @@ lib/
    </array>
    ```
 
-4. **Ejecutar el Proyecto**:
+   Para RevenueCat, configura también el archivo `ios/Runner/Products.storekit` para testing local de suscripciones.
+
+4. **Configuración de Supabase (Backend)**:
+
+   El proyecto incluye configuración completa de Supabase con:
+
+   - Edge Functions para operaciones backend
+   - Configuración local en `supabase/config.toml`
+   - Function de eliminación de cuenta en `supabase/functions/delete-user/`
+
+5. **Ejecutar el Proyecto**:
+
    ```bash
+   flutter run
+   ```
+
+   Para desarrollo local con Supabase:
+
+   ```bash
+   supabase start
    flutter run
    ```
 
@@ -222,23 +296,56 @@ lib/
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0
+  cupertino_icons: ^1.0.2
+
+  # State Management
   provider: ^6.1.1
+
+  # Network
   dio: ^5.4.0
+
+  # Local Storage
   sqflite: ^2.3.0
+  path: ^1.8.3
+
+  # UI Components
   flutter_svg: ^2.0.9
+  flutter_rating_bar: ^4.0.1
+  lottie: ^3.2.0
+
+  # Media
   just_audio: ^0.9.36
   image_picker: ^1.0.4
+  image: ^4.1.7
+
+  # Utils
   equatable: ^2.0.5
   dartz: ^0.10.1
   get_it: ^7.6.4
   injectable: ^2.3.2
-  google_generative_ai: ^0.3.3
+  google_generative_ai: ^0.3.0
   flutter_dotenv: ^5.1.0
-  flutter_rating_bar: ^4.0.1
+  mime: ^1.0.4
+  uuid: ^4.3.3
+  path_provider: ^2.1.2
+  url_launcher: ^6.2.2
+
+  # Auth
   sign_in_with_apple: ^6.1.4
   google_sign_in: ^6.2.2
-  supabase_flutter: ^2.8.3
-  mime: ^1.0.6
+  supabase_flutter: ^2.9.0
+  shared_preferences: ^2.3.5
+
+  # Sharing & Export
+  share_plus: ^7.2.2
+  pdf: ^3.10.7
+  printing: ^5.12.0
+
+  # Monetization
+  purchases_flutter: ^8.8.0
 ```
 
 ## 🔄 Flujo de la Aplicación Implementado
@@ -268,6 +375,27 @@ dependencies:
    - ✅ Limpieza automática de borradores antiguos
    - ✅ Gestión de historias populares y recientes
 
+4. **Sistema de Suscripciones**:
+
+   - ✅ Integración completa con RevenueCat
+   - ✅ Paywall conforme a Apple App Store guidelines
+   - ✅ PremiumGate para control de acceso a funciones
+   - ✅ Sincronización automática con backend
+   - ✅ Restauración de compras y manejo de errores
+
+5. **Exportación y Compartir**:
+
+   - ✅ Generación de cartas PDF elegantes
+   - ✅ Compartir historias en múltiples formatos
+   - ✅ Temas visuales personalizados por género
+   - ✅ Integración con ShareService nativo
+
+6. **Gestión de Perfil**:
+
+   - ✅ Página de perfil con estadísticas de usuario
+   - ✅ Configuraciones avanzadas y preferencias
+   - ✅ Eliminación segura de cuenta con Edge Function
+
 ## 🛡️ Seguridad
 
 - ✅ Implementación de autenticación segura
@@ -281,14 +409,60 @@ dependencies:
 - ✅ Prevención de inyección SQL
 - ✅ Manejo seguro de tokens de autenticación
 - ✅ Verificación de integridad de datos
+- ✅ Edge Functions seguras con verificación JWT
+- ✅ Eliminación segura de datos con stored procedures
+- ✅ Gestión segura de suscripciones con RevenueCat
+- ✅ Protección de API keys y configuración sensible
+
+## 🏗️ Arquitectura Backend (Supabase)
+
+El proyecto incluye una arquitectura backend completa:
+
+### Edge Functions
+
+- **delete-user**: Función para eliminación segura de cuentas de usuario
+  - Limpieza completa de datos relacionados
+  - Verificación JWT automática
+  - Stored procedures para integridad referencial
+
+### Configuración Local
+
+- Desarrollo local con `supabase/config.toml`
+- Configuración de servicios: Auth, Storage, Realtime, Analytics
+- Variables de entorno seguras
+
+## 🔧 Configuración de RevenueCat
+
+Para configurar las suscripciones in-app:
+
+1. **RevenueCat Dashboard**:
+
+   - API Key: `appl_iUnkmztHtYheiyGRCengKTwiPja`
+   - Entitlement ID: `Memory Sparks Subscriptions`
+
+2. **App Store Connect**:
+
+   - Configura productos de suscripción (Semanal, Mensual, Anual)
+   - Asocia los productos con RevenueCat
+
+3. **Configuración en código**:
+   - Actualiza `lib/core/constants/revenuecat_constants.dart`
+   - Agrega la API key a las variables de entorno
+
+## 📄 Documentación Adicional
+
+- **RevenueCat Implementation**: Ver `REVENUECAT_IMPLEMENTATION.md` para detalles completos
+- **PDF Examples**: Ver `lib/examples/pdf_example.dart` para uso de generación de PDFs
+- **RevenueCat Examples**: Ver `lib/examples/revenuecat_example.dart` para implementación de suscripciones
 
 ## 🔜 Próximas Características y Mejoras
 
-- [ ] **Compartir historias en redes sociales** _(estructura en UI, pendiente implementación)_
 - [ ] **Temas personalizables (oscuro/claro)** _(estructura en settings, pendiente implementación)_
-- [ ] **Exportación de historias en diferentes formatos** _(planeado)_
 - [ ] **Generación de audiolibros** _(botón en UI, pendiente implementación)_
 - [ ] **Personalización avanzada de portadas** _(actualmente solo selección de imagen, edición avanzada pendiente)_
+- [ ] **Análisis de uso y métricas** _(estructura preparada)_
+- [ ] **Notificaciones push** _(estructura en settings)_
+- [ ] **Sincronización en la nube** _(backend preparado)_
 
 ## 👥 Contribución
 
