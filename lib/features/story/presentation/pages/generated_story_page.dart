@@ -12,10 +12,11 @@ import 'package:memorysparks/features/story/domain/usecases/continue_story_useca
 import '../../domain/entities/story.dart';
 import '../providers/story_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:memorysparks/l10n/app_localizations.dart';
 import 'dart:io';
 import '../widgets/continue_story_dialog.dart';
 import '../widgets/share_story_modal.dart';
+import 'package:memorysparks/core/widgets/confirmation_dialog.dart';
 
 class GeneratedStoryPage extends StatefulWidget {
   final Story story;
@@ -166,36 +167,19 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                   if (!provider.isSaved && !widget.isFromLibrary) {
                     showDialog(
                       context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text(
-                          '¿Salir sin guardar?',
-                          style: TextStyle(
-                            fontFamily: 'Urbanist',
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        content: const Text(
-                          'Esta historia es única y se perderá si sales sin guardarla. ¿Estás seguro de que quieres salir?',
-                          style: TextStyle(
-                            fontFamily: 'Urbanist',
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancelar'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context); // Cerrar diálogo
-                              Navigator.pop(context); // Volver atrás
-                            },
-                            child: const Text(
-                              'Salir',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ),
-                        ],
+                      barrierDismissible: false,
+                      builder: (context) => ConfirmationDialog(
+                        icon: Icons.warning_rounded,
+                        iconColor: const Color(0xFFEF4444),
+                        title: AppLocalizations.of(context)!.exitWithoutSaving,
+                        message: AppLocalizations.of(context)!
+                            .exitWithoutSavingMessage,
+                        cancelText: AppLocalizations.of(context)!.cancel,
+                        confirmText: AppLocalizations.of(context)!.exit,
+                        onConfirm: () {
+                          Navigator.pop(context); // Cerrar diálogo
+                          Navigator.pop(context); // Volver atrás
+                        },
                       ),
                     );
                   } else {
@@ -271,198 +255,39 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                             showDialog(
                               context: context,
                               barrierDismissible: false,
-                              builder: (context) => Dialog(
-                                backgroundColor: Colors.transparent,
-                                child: Container(
-                                  margin: const EdgeInsets.all(16),
-                                  padding: const EdgeInsets.all(24),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 20,
-                                        offset: const Offset(0, 8),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      // Ícono de advertencia
-                                      Container(
-                                        width: 64,
-                                        height: 64,
-                                        decoration: BoxDecoration(
-                                          color: Colors.red.withOpacity(0.1),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.delete_outline,
-                                          color: Colors.red,
-                                          size: 32,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 24),
-
-                                      // Título
-                                      Text(
-                                        AppLocalizations.of(context)!
-                                            .deleteFromSaved,
-                                        style: const TextStyle(
-                                          fontFamily: 'Playfair',
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.textPrimary,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      const SizedBox(height: 12),
-
-                                      // Contenido
-                                      Text(
-                                        AppLocalizations.of(context)!
-                                            .deleteConfirmation,
-                                        style: const TextStyle(
-                                          fontFamily: 'Urbanist',
-                                          fontSize: 16,
-                                          color: AppColors.textSecondary,
-                                          height: 1.4,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      const SizedBox(height: 32),
-
-                                      // Botones
-                                      Row(
-                                        children: [
-                                          // Botón Cancelar
-                                          Expanded(
-                                            child: Container(
-                                              height: 48,
-                                              decoration: BoxDecoration(
-                                                color: AppColors.background,
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                border: Border.all(
-                                                  color: AppColors.border,
-                                                ),
-                                              ),
-                                              child: Material(
-                                                color: Colors.transparent,
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                child: InkWell(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  onTap: () =>
-                                                      Navigator.pop(context),
-                                                  child: Center(
-                                                    child: Text(
-                                                      AppLocalizations.of(
-                                                              context)!
-                                                          .cancel,
-                                                      style: const TextStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        color: AppColors
-                                                            .textPrimary,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
+                              builder: (context) => ConfirmationDialog(
+                                icon: Icons.delete_outline,
+                                iconColor: Colors.red,
+                                title: AppLocalizations.of(context)!
+                                    .deleteFromSaved,
+                                message: AppLocalizations.of(context)!
+                                    .deleteConfirmation,
+                                cancelText:
+                                    AppLocalizations.of(context)!.cancel,
+                                confirmText:
+                                    AppLocalizations.of(context)!.delete,
+                                onConfirm: () async {
+                                  Navigator.pop(context); // Cerrar diálogo
+                                  await provider.deleteStory();
+                                  if (mounted) {
+                                    Navigator.pop(context); // Volver atrás
+                                    widget.onStoryStateChanged
+                                        ?.call(); // Actualizar biblioteca
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          AppLocalizations.of(context)!
+                                              .storyDeletedSuccess,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: 'Urbanist',
                                           ),
-                                          const SizedBox(width: 12),
-
-                                          // Botón Eliminar
-                                          Expanded(
-                                            child: Container(
-                                              height: 48,
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    Colors.red,
-                                                    Colors.red.withOpacity(0.8),
-                                                  ],
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.red
-                                                        .withOpacity(0.3),
-                                                    blurRadius: 8,
-                                                    offset: const Offset(0, 4),
-                                                  ),
-                                                ],
-                                              ),
-                                              child: Material(
-                                                color: Colors.transparent,
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                child: InkWell(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  onTap: () async {
-                                                    await provider
-                                                        .deleteStory();
-                                                    if (mounted) {
-                                                      Navigator.pop(
-                                                          context); // Cerrar diálogo
-                                                      Navigator.pop(
-                                                          context); // Volver atrás
-                                                      widget.onStoryStateChanged
-                                                          ?.call(); // Actualizar biblioteca
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                        SnackBar(
-                                                          content: Text(
-                                                            AppLocalizations.of(
-                                                                    context)!
-                                                                .storyDeletedSuccess,
-                                                            style:
-                                                                const TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontFamily:
-                                                                  'Urbanist',
-                                                            ),
-                                                          ),
-                                                          backgroundColor:
-                                                              Colors.red,
-                                                        ),
-                                                      );
-                                                    }
-                                                  },
-                                                  child: Center(
-                                                    child: Text(
-                                                      AppLocalizations.of(
-                                                              context)!
-                                                          .delete,
-                                                      style: const TextStyle(
-                                                        fontFamily: 'Urbanist',
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                        ),
+                                        backgroundColor: Colors.red,
                                       ),
-                                    ],
-                                  ),
-                                ),
+                                    );
+                                  }
+                                },
                               ),
                             );
                           } else {

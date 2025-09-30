@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:memorysparks/features/story/domain/usecases/update_story_status_usecase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

@@ -29,12 +29,12 @@ class StoryRepositoryImpl implements StoryRepository {
     this._imageService,
     this._localeRepository,
   ) : _model = GenerativeModel(
-          model: 'gemini-2.0-flash',
+          model: 'gemini-2.5-flash',
           apiKey: dotenv.env['GEMINI_API_KEY'] ?? '',
         ) {
     // TODO this line is used to create the session manager, need to check if it's working
     _sessionManager = ChatSessionManager(_model);
-    debugPrint('🗄️ StoryRepository: Inicializado con modelo gemini-2.0-flash');
+    debugPrint('🗄️ StoryRepository: Inicializado con modelo gemini-2.5-flash');
   }
 
   @override
@@ -80,6 +80,7 @@ Comienza con una frase breve y poderosa que despierte el interés, ya sea presen
 A lo largo del relato, mantén un tono emotivo y describe escenas con detalles vívidos, conservando la esencia del recuerdo original.
 Evita comenzar siempre de la misma forma; varía entre descripciones sensoriales, preguntas directas, diálogos o metáforas.
 Asegura que la historia se mantenga coherente con el género (${params.genre}), sin perder el matiz personal del recuerdo.
+La historia debe de tener por lo menos 7 parrafos.
 Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la historia, recuerda generar la historia en el idioma $languageName, recuerda empezar directamente con la historia, no con una respuesta como aqui esta la historia, o cosas que no sean parte de la historia.
 ''';
 

@@ -8,7 +8,7 @@ import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
 import '../providers/home_provider.dart';
 import 'package:memorysparks/core/constants/genre_constants.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:memorysparks/core/widgets/loading_lottie.dart';
 import 'package:memorysparks/features/story/presentation/widgets/author_style_dialog.dart';
 

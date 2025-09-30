@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:memorysparks/core/utils/date_formatter.dart';
 import 'package:memorysparks/features/story/domain/entities/story.dart';

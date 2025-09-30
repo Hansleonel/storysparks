@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:memorysparks/core/dependency_injection/service_locator.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:memorysparks/l10n/app_localizations.dart';
+import 'package:memorysparks/core/widgets/confirmation_dialog.dart';
 import '../providers/settings_provider.dart';
 import 'package:memorysparks/features/auth/presentation/providers/auth_provider.dart';
 
@@ -85,41 +86,30 @@ class _SettingsView extends StatelessWidget {
                           '👉 SettingsPage: Usuario ha tocado "Delete Account"');
                       final confirm = await showDialog<bool>(
                         context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text(
-                            AppLocalizations.of(context)?.deleteAccountTitle ??
-                                'Delete Account',
-                          ),
-                          content: Text(
-                            AppLocalizations.of(context)
-                                    ?.deleteAccountConfirmation ??
-                                'Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently deleted.',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                print(
-                                    '🚫 SettingsPage: Usuario canceló la eliminación de cuenta');
-                                Navigator.pop(context, false);
-                              },
-                              child: Text(
-                                AppLocalizations.of(context)?.cancel ??
-                                    'Cancel',
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                print(
-                                    '⚠️ SettingsPage: Usuario confirmó la eliminación de cuenta');
-                                Navigator.pop(context, true);
-                              },
-                              child: Text(
-                                AppLocalizations.of(context)?.delete ??
-                                    'Delete',
-                                style: const TextStyle(color: Colors.red),
-                              ),
-                            ),
-                          ],
+                        barrierDismissible: false,
+                        builder: (context) => ConfirmationDialog(
+                          icon: Icons.delete_forever_outlined,
+                          iconColor: Colors.red,
+                          title: AppLocalizations.of(context)
+                                  ?.deleteAccountTitle ??
+                              'Delete Account',
+                          message: AppLocalizations.of(context)
+                                  ?.deleteAccountConfirmation ??
+                              'Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently deleted.',
+                          cancelText:
+                              AppLocalizations.of(context)?.cancel ?? 'Cancel',
+                          confirmText:
+                              AppLocalizations.of(context)?.delete ?? 'Delete',
+                          onCancel: () {
+                            print(
+                                '🚫 SettingsPage: Usuario canceló la eliminación de cuenta');
+                            Navigator.pop(context, false);
+                          },
+                          onConfirm: () {
+                            print(
+                                '⚠️ SettingsPage: Usuario confirmó la eliminación de cuenta');
+                            Navigator.pop(context, true);
+                          },
                         ),
                       );
 

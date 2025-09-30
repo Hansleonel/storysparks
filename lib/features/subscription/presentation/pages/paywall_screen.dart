@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:memorysparks/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:memorysparks/features/subscription/domain/entities/package_entity.dart';

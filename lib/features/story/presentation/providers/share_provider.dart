@@ -3,7 +3,7 @@ import 'package:memorysparks/features/story/domain/entities/story.dart';
 import 'package:memorysparks/features/story/domain/usecases/share_story_usecase.dart';
 import 'package:memorysparks/core/services/share_service.dart';
 import 'package:memorysparks/core/services/pdf_letter_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:memorysparks/l10n/app_localizations.dart';
 
 class ShareProvider extends ChangeNotifier {
   final ShareStoryUseCase _shareStoryUseCase;

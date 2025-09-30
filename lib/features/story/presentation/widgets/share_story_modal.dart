@@ -4,7 +4,7 @@ import 'package:memorysparks/core/dependency_injection/service_locator.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:memorysparks/features/story/domain/entities/story.dart';
 import 'package:memorysparks/features/story/presentation/providers/share_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:memorysparks/l10n/app_localizations.dart';
 
 class ShareStoryModal extends StatefulWidget {
   final Story story;
