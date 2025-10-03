@@ -480,7 +480,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
       children: [
         _buildLinkButton(
           AppLocalizations.of(context)!.termsOfService,
-          'https://memorysparks.app/terms',
+          'https://memorysparks.app/#terms',
         ),
         Container(
           width: 1,
@@ -489,7 +489,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
         ),
         _buildLinkButton(
           AppLocalizations.of(context)!.privacyPolicy,
-          'https://memorysparks.app/privacy',
+          'https://memorysparks.app/#privacy',
         ),
       ],
     );
@@ -737,7 +737,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
   void _launchUrl(String url) async {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      await launchUrl(uri, mode: LaunchMode.inAppWebView);
     }
   }
 }
