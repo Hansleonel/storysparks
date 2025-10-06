@@ -213,6 +213,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get generatingStory => 'Generating story, please wait...';
 
   @override
+  String get generatingStoryMessage1 => 'Weaving the threads of your memory';
+
+  @override
+  String get generatingStoryMessage2 => 'Bringing your words to life';
+
+  @override
+  String get generatingStoryMessage3 => 'Creating narrative magic';
+
+  @override
+  String get generatingStoryMessage4 => 'Polishing every detail';
+
+  @override
+  String get generatingStoryMessage5 => 'Adding the final touch';
+
+  @override
   String get genreAdventure => 'Adventure';
 
   @override

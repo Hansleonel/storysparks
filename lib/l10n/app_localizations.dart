@@ -482,6 +482,36 @@ abstract class AppLocalizations {
   /// **'Generating story, please wait...'**
   String get generatingStory;
 
+  /// No description provided for @generatingStoryMessage1.
+  ///
+  /// In en, this message translates to:
+  /// **'Weaving the threads of your memory'**
+  String get generatingStoryMessage1;
+
+  /// No description provided for @generatingStoryMessage2.
+  ///
+  /// In en, this message translates to:
+  /// **'Bringing your words to life'**
+  String get generatingStoryMessage2;
+
+  /// No description provided for @generatingStoryMessage3.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating narrative magic'**
+  String get generatingStoryMessage3;
+
+  /// No description provided for @generatingStoryMessage4.
+  ///
+  /// In en, this message translates to:
+  /// **'Polishing every detail'**
+  String get generatingStoryMessage4;
+
+  /// No description provided for @generatingStoryMessage5.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding the final touch'**
+  String get generatingStoryMessage5;
+
   /// No description provided for @genreAdventure.
   ///
   /// In en, this message translates to:

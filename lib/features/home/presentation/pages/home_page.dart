@@ -553,8 +553,8 @@ class _GenerateButton extends StatelessWidget {
       child: Consumer<HomeProvider>(
         builder: (context, provider, _) {
           if (provider.isLoading) {
-            return LoadingLottie(
-              message: AppLocalizations.of(context)!.generatingStory,
+            return const LoadingLottie(
+              showTypewriterEffect: true,
             );
           }
 
