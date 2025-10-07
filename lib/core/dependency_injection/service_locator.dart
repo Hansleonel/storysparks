@@ -168,7 +168,7 @@ void setupServiceLocator() {
         getUserStoriesUseCase: getIt<GetUserStoriesUseCase>(),
       ));
   getIt.registerFactory(() => HomeProvider(
-        getIt<GetUserNameUseCase>(),
+        getIt<GetProfileUseCase>(),
         getIt<AuthRepository>(),
         getIt<GenerateStoryUseCase>(),
         getIt<GetImageDescriptionUseCase>(),

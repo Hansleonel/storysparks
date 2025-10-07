@@ -2,12 +2,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:memorysparks/core/usecases/usecase.dart';
-import 'package:memorysparks/features/home/domain/usecases/get_user_name_usecase.dart';
 import 'package:memorysparks/features/auth/domain/repositories/auth_repository.dart';
 import 'package:memorysparks/features/story/domain/entities/story.dart';
 import 'package:memorysparks/features/story/domain/entities/story_params.dart';
 import 'package:memorysparks/features/story/domain/usecases/generate_story_usecase.dart';
 import 'package:memorysparks/features/story/domain/usecases/get_image_description_usecase.dart';
+import 'package:memorysparks/features/profile/domain/usecases/get_profile_usecase.dart';
 
 class HomeProvider extends ChangeNotifier {
   final TextEditingController memoryController = TextEditingController();
@@ -19,7 +19,8 @@ class HomeProvider extends ChangeNotifier {
   String? authorStyleType; // 'author', 'book', or 'custom'
   bool isLoading = false;
   String? _userName;
-  final GetUserNameUseCase _getUserNameUseCase;
+  String? _avatarUrl;
+  final GetProfileUseCase _getProfileUseCase;
   final AuthRepository _authRepository;
   final GenerateStoryUseCase _generateStoryUseCase;
   final GetImageDescriptionUseCase _getImageDescriptionUseCase;
@@ -30,7 +31,7 @@ class HomeProvider extends ChangeNotifier {
   bool get isProcessingImage => _isProcessingImage;
 
   HomeProvider(
-    this._getUserNameUseCase,
+    this._getProfileUseCase,
     this._authRepository,
     this._generateStoryUseCase,
     this._getImageDescriptionUseCase,
@@ -41,20 +42,32 @@ class HomeProvider extends ChangeNotifier {
   }
 
   String? get userName => _userName;
+  String? get avatarUrl => _avatarUrl;
 
   Future<void> _loadUserName() async {
-    debugPrint('🏠 HomeProvider: Cargando nombre de usuario...');
-    final result = await _getUserNameUseCase(NoParams());
-    result.fold(
+    debugPrint('🏠 HomeProvider: Cargando nombre de usuario y avatar...');
+
+    // Cargar el perfil completo para obtener el avatar
+    final profileResult = await _getProfileUseCase(NoParams());
+    profileResult.fold(
       (failure) {
-        debugPrint(
-            '🏠 HomeProvider: Error al cargar nombre de usuario: $failure');
+        debugPrint('🏠 HomeProvider: Error al cargar perfil: $failure');
         _userName = 'Usuario';
+        _avatarUrl = null;
       },
-      (name) {
-        debugPrint(
-            '🏠 HomeProvider: Nombre de usuario cargado: ${name ?? 'Usuario'}');
-        _userName = name ?? 'Usuario';
+      (profile) {
+        if (profile != null) {
+          debugPrint(
+              '🏠 HomeProvider: Perfil cargado - Nombre: ${profile.fullName ?? profile.username}, Avatar: ${profile.avatarUrl}');
+          // Obtener solo el primer nombre
+          final fullName = profile.fullName ?? profile.username;
+          _userName = fullName.split(' ').first;
+          _avatarUrl = profile.avatarUrl;
+        } else {
+          debugPrint('🏠 HomeProvider: No se encontró perfil');
+          _userName = 'Usuario';
+          _avatarUrl = null;
+        }
       },
     );
     notifyListeners();

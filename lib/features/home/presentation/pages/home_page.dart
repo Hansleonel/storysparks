@@ -821,6 +821,9 @@ class _Header extends StatelessWidget {
     final userName = context.select<HomeProvider, String?>(
       (provider) => provider.userName,
     );
+    final avatarUrl = context.select<HomeProvider, String?>(
+      (provider) => provider.avatarUrl,
+    );
     final l10n = AppLocalizations.of(context)!;
 
     return Row(
@@ -834,12 +837,33 @@ class _Header extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: AppColors.border,
+                  color: AppColors.primary.withOpacity(0.1),
                   width: 2,
                 ),
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/profile.png'),
+              ),
+              child: ClipOval(
+                child: avatarUrl != null
+                    ? Image.network(
+                        avatarUrl,
                   fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: AppColors.primary.withOpacity(0.1),
+                            child: Icon(
+                              Icons.person,
+                              size: 24,
+                              color: AppColors.primary,
+                            ),
+                          );
+                        },
+                      )
+                    : Container(
+                        color: AppColors.primary.withOpacity(0.1),
+                        child: Icon(
+                          Icons.person,
+                          size: 24,
+                          color: AppColors.primary,
+                        ),
                 ),
               ),
             ),
@@ -906,7 +930,7 @@ class _Header extends StatelessWidget {
                       size: 24,
                     ),
                   ),
-                  Positioned(
+                  /* Positioned(
                     top: 14,
                     right: 14,
                     child: Container(
@@ -917,7 +941,7 @@ class _Header extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     ),
-                  ),
+                  ), */
                 ],
               ),
             ),
