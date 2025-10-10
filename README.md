@@ -89,6 +89,7 @@ StorySparks es una aplicación móvil desarrollada en Flutter que transforma rec
   - Gestión de imágenes personalizadas para portadas
   - Indicador de nuevas historias (NewStoryIndicatorProvider)
   - Animaciones Lottie para estados de carga
+  - Splash screen personalizado para iOS
 
 ## 🛠️ Tecnologías Implementadas
 
