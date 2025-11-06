@@ -104,6 +104,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get confirmPassword => 'Confirmar Contraseña';
 
   @override
+  String get copiedToClipboard => 'Copiado al portapapeles';
+
+  @override
   String get confirmPasswordRequired => 'Por favor, confirma tu contraseña';
 
   @override

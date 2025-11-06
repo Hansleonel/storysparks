@@ -63,6 +63,7 @@
     "checkingUsername": "Checking username availability...",
     "completed": "Completed",
     "confirmPassword": "Confirm Password",
+    "copiedToClipboard": "Copied to clipboard",
     "confirmPasswordRequired": "Please confirm your password",
     "continueAutomatically": "Auto Continue",
     "continueButton": "Continue",

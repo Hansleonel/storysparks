@@ -63,6 +63,7 @@
     "checkingUsername": "Verificando disponibilidad del nombre de usuario...",
     "completed": "Completado",
     "confirmPassword": "Confirmar Contraseña",
+    "copiedToClipboard": "Copiado al portapapeles",
     "confirmPasswordRequired": "Por favor, confirma tu contraseña",
     "continueAutomatically": "Auto Continuar",
     "continueButton": "Continuar",
