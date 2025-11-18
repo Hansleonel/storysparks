@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:memorysparks/features/subscription/presentation/pages/paywall_screen.dart';
+import 'package:memorysparks/features/subscription/presentation/pages/paywall_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
@@ -11,6 +11,7 @@ import 'package:memorysparks/core/constants/genre_constants.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:memorysparks/core/widgets/loading_lottie.dart';
 import 'package:memorysparks/features/story/presentation/widgets/author_style_dialog.dart';
+import 'package:memorysparks/core/utils/snackbar_utils.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -37,8 +38,8 @@ class HomePage extends StatelessWidget {
                   // _ProtagonistSection(),
                   //SizedBox(height: 40),
                   _GenerateButton(),
-                  // SizedBox(height: 16),
-                  //_TemporaryPaywallButton(),
+                  SizedBox(height: 16),
+                  _TemporaryPaywallButton(),
                 ],
               ),
             ),
@@ -578,11 +579,10 @@ class _GenerateButton extends StatelessWidget {
                       }
                     } catch (e) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(e.toString()),
-                            backgroundColor: Colors.red,
-                          ),
+                        SnackBarUtils.show(
+                          context,
+                          message: e.toString(),
+                          type: SnackBarType.error,
                         );
                       }
                     }
@@ -845,7 +845,7 @@ class _Header extends StatelessWidget {
                 child: avatarUrl != null
                     ? Image.network(
                         avatarUrl,
-                  fit: BoxFit.cover,
+                        fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: AppColors.primary.withOpacity(0.1),
@@ -864,7 +864,7 @@ class _Header extends StatelessWidget {
                           size: 24,
                           color: AppColors.primary,
                         ),
-                ),
+                      ),
               ),
             ),
             const SizedBox(width: 12),
@@ -952,7 +952,7 @@ class _Header extends StatelessWidget {
   }
 }
 
-/* class _TemporaryPaywallButton extends StatelessWidget {
+class _TemporaryPaywallButton extends StatelessWidget {
   const _TemporaryPaywallButton();
 
   @override
@@ -997,4 +997,4 @@ class _Header extends StatelessWidget {
       ),
     );
   }
-} */
+}

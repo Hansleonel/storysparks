@@ -5,6 +5,7 @@ import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:memorysparks/features/story/domain/entities/story.dart';
 import 'package:memorysparks/features/story/presentation/providers/share_provider.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
+import 'package:memorysparks/core/utils/snackbar_utils.dart';
 
 class ShareStoryModal extends StatefulWidget {
   final Story story;
@@ -110,30 +111,16 @@ class _ShareStoryModalState extends State<ShareStoryModal> {
                     widget.story, 'Memory Sparks', l10n);
                 if (mounted && success) {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        l10n.shareStorySuccess,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Urbanist',
-                        ),
-                      ),
-                      backgroundColor: AppColors.success,
-                    ),
+                  SnackBarUtils.show(
+                    context,
+                    message: l10n.shareStorySuccess,
+                    type: SnackBarType.success,
                   );
                 } else if (mounted && provider.error != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        l10n.shareStoryError,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Urbanist',
-                        ),
-                      ),
-                      backgroundColor: Colors.red,
-                    ),
+                  SnackBarUtils.show(
+                    context,
+                    message: l10n.shareStoryError,
+                    type: SnackBarType.error,
                   );
                 }
               },
@@ -151,30 +138,16 @@ class _ShareStoryModalState extends State<ShareStoryModal> {
                     widget.story, 'Memory Sparks', l10n);
                 if (mounted && success) {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        l10n.shareStorySuccess,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Urbanist',
-                        ),
-                      ),
-                      backgroundColor: AppColors.success,
-                    ),
+                  SnackBarUtils.show(
+                    context,
+                    message: l10n.shareStorySuccess,
+                    type: SnackBarType.success,
                   );
                 } else if (mounted && provider.error != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        l10n.shareStoryError,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Urbanist',
-                        ),
-                      ),
-                      backgroundColor: Colors.red,
-                    ),
+                  SnackBarUtils.show(
+                    context,
+                    message: l10n.shareStoryError,
+                    type: SnackBarType.error,
                   );
                 }
               },

@@ -7,6 +7,7 @@ import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:memorysparks/core/widgets/confirmation_dialog.dart';
 import '../providers/settings_provider.dart';
 import 'package:memorysparks/features/auth/presentation/providers/auth_provider.dart';
+import 'package:memorysparks/core/utils/snackbar_utils.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -144,26 +145,22 @@ class _SettingsView extends StatelessWidget {
                               );
 
                               // Mostrar mensaje de éxito
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
+                              SnackBarUtils.show(
+                                context,
+                                message:
                                     'Your account has been deleted successfully',
-                                  ),
-                                  backgroundColor: Colors.green,
-                                ),
+                                type: SnackBarType.success,
                               );
                             }
                           } else {
                             print(
                                 '❌ SettingsPage: Error al eliminar cuenta: ${authProvider.error}');
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
+                              SnackBarUtils.show(
+                                context,
+                                message:
                                     'Error deleting account: ${authProvider.error}',
-                                  ),
-                                  backgroundColor: Colors.red,
-                                ),
+                                type: SnackBarType.error,
                               );
                             }
                           }
@@ -175,13 +172,10 @@ class _SettingsView extends StatelessWidget {
 
                           // Mostrar error
                           if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Error deleting account: $e',
-                                ),
-                                backgroundColor: Colors.red,
-                              ),
+                            SnackBarUtils.show(
+                              context,
+                              message: 'Error deleting account: $e',
+                              type: SnackBarType.error,
                             );
                           }
                         }

@@ -18,6 +18,7 @@ import 'dart:io';
 import '../widgets/continue_story_dialog.dart';
 import '../widgets/share_story_modal.dart';
 import 'package:memorysparks/core/widgets/confirmation_dialog.dart';
+import 'package:memorysparks/core/utils/snackbar_utils.dart';
 
 class GeneratedStoryPage extends StatefulWidget {
   final Story story;
@@ -274,18 +275,11 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                                     Navigator.pop(context); // Volver atrás
                                     widget.onStoryStateChanged
                                         ?.call(); // Actualizar biblioteca
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          AppLocalizations.of(context)!
-                                              .storyDeletedSuccess,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontFamily: 'Urbanist',
-                                          ),
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
+                                    SnackBarUtils.show(
+                                      context,
+                                      message: AppLocalizations.of(context)!
+                                          .storyDeletedSuccess,
+                                      type: SnackBarType.success,
                                     );
                                   }
                                 },
@@ -304,32 +298,18 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                                     provider.story!.id.toString());
                               }
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    AppLocalizations.of(context)!
-                                        .storySavedSuccess,
-                                    style: const TextStyle(
-                                      color: AppColors.white,
-                                      fontFamily: 'Urbanist',
-                                    ),
-                                  ),
-                                  backgroundColor: AppColors.success,
-                                ),
+                              SnackBarUtils.show(
+                                context,
+                                message: AppLocalizations.of(context)!
+                                    .storySavedSuccess,
+                                type: SnackBarType.success,
                               );
                             } else if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    AppLocalizations.of(context)!
-                                        .storyDeleteError,
-                                    style: const TextStyle(
-                                      color: AppColors.white,
-                                      fontFamily: 'Urbanist',
-                                    ),
-                                  ),
-                                  backgroundColor: Colors.red,
-                                ),
+                              SnackBarUtils.show(
+                                context,
+                                message: AppLocalizations.of(context)!
+                                    .storyDeleteError,
+                                type: SnackBarType.error,
                               );
                             }
                           }
@@ -459,33 +439,19 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                                     // Realizar scroll automático después de la continuación
                                     _scrollAfterContinuation();
                                     widget.onStoryStateChanged?.call();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          AppLocalizations.of(context)!
-                                              .storyContinuedSuccess,
-                                          style: const TextStyle(
-                                            color: AppColors.white,
-                                            fontFamily: 'Urbanist',
-                                          ),
-                                        ),
-                                        backgroundColor: AppColors.success,
-                                      ),
+                                    SnackBarUtils.show(
+                                      context,
+                                      message: AppLocalizations.of(context)!
+                                          .storyContinuedSuccess,
+                                      type: SnackBarType.success,
                                     );
                                   } else if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          provider.error ??
-                                              AppLocalizations.of(context)!
-                                                  .storyContinueError,
-                                          style: const TextStyle(
-                                            color: AppColors.white,
-                                            fontFamily: 'Urbanist',
-                                          ),
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
+                                    SnackBarUtils.show(
+                                      context,
+                                      message: provider.error ??
+                                          AppLocalizations.of(context)!
+                                              .storyContinueError,
+                                      type: SnackBarType.error,
                                     );
                                   }
                                 }
@@ -700,18 +666,12 @@ class _StoryContentState extends State<_StoryContent> {
                         await Clipboard.setData(
                             ClipboardData(text: story.memory));
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
+                          SnackBarUtils.show(
+                            context,
+                            message:
                                 AppLocalizations.of(context)!.copiedToClipboard,
-                                style: const TextStyle(
-                                  color: AppColors.white,
-                                  fontFamily: 'Urbanist',
-                                ),
-                              ),
-                              backgroundColor: AppColors.success,
-                              duration: const Duration(seconds: 2),
-                            ),
+                            type: SnackBarType.success,
+                            duration: const Duration(seconds: 2),
                           );
                         }
                       },

@@ -7,6 +7,7 @@ import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:memorysparks/features/auth/presentation/providers/auth_provider.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
+import 'package:memorysparks/core/utils/snackbar_utils.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -229,11 +230,10 @@ class _LoginPageState extends State<LoginPage> {
                     );
 
                     if (authProvider.error != null && mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(authProvider.error!),
-                          backgroundColor: Colors.red,
-                        ),
+                      SnackBarUtils.show(
+                        context,
+                        message: authProvider.error!,
+                        type: SnackBarType.error,
                       );
                       return;
                     }
@@ -317,11 +317,10 @@ class _LoginPageState extends State<LoginPage> {
 
             if (provider.error != null) {
               if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(provider.error!),
-                    backgroundColor: Colors.red,
-                  ),
+                SnackBarUtils.show(
+                  context,
+                  message: provider.error!,
+                  type: SnackBarType.error,
                 );
               }
               return;
@@ -376,11 +375,10 @@ class _LoginPageState extends State<LoginPage> {
 
               if (provider.error != null) {
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(provider.error!),
-                      backgroundColor: Colors.red,
-                    ),
+                  SnackBarUtils.show(
+                    context,
+                    message: provider.error!,
+                    type: SnackBarType.error,
                   );
                 }
                 return;
