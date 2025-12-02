@@ -408,7 +408,6 @@ class _GenreChip extends StatelessWidget {
               provider.selectedGenre == GenreConstants.toStringValue(genre);
           return GestureDetector(
             onTap: () {
-              // Feedback haptic sutil para selección
               HapticFeedback.selectionClick();
               provider.setSelectedGenre(
                   isSelected ? '' : GenreConstants.toStringValue(genre));
@@ -547,26 +546,53 @@ class _GenreChip extends StatelessWidget {
 class _GenerateButton extends StatelessWidget {
   const _GenerateButton();
 
+  Future<void> _showLoadingDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return PopScope(
+          canPop: false,
+          child: Dialog(
+            backgroundColor: AppColors.white,
+            surfaceTintColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(32.0),
+              child: LoadingLottie(
+                showTypewriterEffect: true,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: Consumer<HomeProvider>(
         builder: (context, provider, _) {
-          if (provider.isLoading) {
-            return const LoadingLottie(
-              showTypewriterEffect: true,
-            );
-          }
-
           return ElevatedButton(
             onPressed: provider.isGenerateEnabled
                 ? () async {
-                    // Feedback haptic para acción importante
                     HapticFeedback.mediumImpact();
+                    FocusScope.of(context).unfocus();
+
+                    // Show modal
+                    _showLoadingDialog(context);
+
                     try {
                       final story = await provider.generateStory();
+
                       if (context.mounted) {
+                        // Close modal
+                        Navigator.of(context, rootNavigator: true).pop();
+
                         provider.resetState();
                         Navigator.pushNamed(
                           context,
@@ -579,6 +605,9 @@ class _GenerateButton extends StatelessWidget {
                       }
                     } catch (e) {
                       if (context.mounted) {
+                        // Close modal
+                        Navigator.of(context, rootNavigator: true).pop();
+
                         SnackBarUtils.show(
                           context,
                           message: e.toString(),

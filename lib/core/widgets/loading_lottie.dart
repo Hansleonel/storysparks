@@ -107,43 +107,43 @@ class _LoadingLottieState extends State<LoadingLottie> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 96,
-            height: 96,
-            child: Lottie.asset(
-              'assets/animations/lottie/loading_ai.json',
-              fit: BoxFit.contain,
-            ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 96,
+          height: 96,
+          child: Lottie.asset(
+            'assets/animations/lottie/loading_ai.json',
+            fit: BoxFit.contain,
           ),
-          if (widget.message != null || widget.showTypewriterEffect) ...[
-            const SizedBox(height: 20),
-            SizedBox(
-              height: 50, // Fixed height to prevent layout shifts
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                child: Center(
-                  child: widget.showTypewriterEffect
-                      ? _buildTypewriterText()
-                      : Text(
-                          widget.message!,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontFamily: 'Urbanist',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textPrimary,
-                          ),
+        ),
+        if (widget.message != null || widget.showTypewriterEffect) ...[
+          const SizedBox(height: 20),
+          SizedBox(
+            height: 50, // Fixed height to prevent layout shifts
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: Center(
+                child: widget.showTypewriterEffect
+                    ? _buildTypewriterText()
+                    : Text(
+                        widget.message!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textPrimary,
                         ),
-                ),
+                      ),
               ),
             ),
-          ],
+          ),
         ],
-      ),
+      ],
     );
   }
 
@@ -180,7 +180,7 @@ class _LoadingLottieState extends State<LoadingLottie> {
               fontFamily: 'Urbanist',
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: Colors.white,
+              color: AppColors.primary,
               letterSpacing: 0.3,
               height: 1.5,
             ),
