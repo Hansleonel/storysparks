@@ -60,6 +60,33 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Initialize AuthProvider state from an existing Supabase session
+  /// Called from main.dart when app starts with a valid session
+  Future<void> initializeFromExistingSession() async {
+    final user = Supabase.instance.client.auth.currentUser;
+
+    if (user != null) {
+      debugPrint(
+          '✅ AuthProvider: Initializing from existing session: ${user.id}');
+      _currentUser = user;
+      _isAuthenticated = true;
+      _error = null;
+
+      // Initialize RevenueCat with user ID
+      try {
+        await _subscriptionProvider.initializeWithUser(user.id);
+        debugPrint(
+            '🟢 RevenueCat initialized for restored session: ${user.id}');
+      } catch (e) {
+        debugPrint(
+            '🔴 Error initializing RevenueCat during session restore: $e');
+        // Don't fail session restore if RevenueCat fails
+      }
+
+      notifyListeners();
+    }
+  }
+
   Future<bool> register({
     required String email,
     required String password,

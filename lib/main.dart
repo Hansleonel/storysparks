@@ -16,6 +16,7 @@ import 'package:memorysparks/features/auth/domain/usecases/sign_in_with_google_u
 import 'package:memorysparks/features/auth/presentation/pages/login_page.dart';
 import 'package:memorysparks/features/auth/presentation/providers/auth_provider.dart';
 import 'package:memorysparks/features/library/presentation/providers/library_provider.dart';
+import 'package:memorysparks/features/navigation/presentation/pages/main_navigation.dart';
 import 'package:memorysparks/features/story/domain/usecases/delete_story_usecase.dart';
 import 'package:memorysparks/features/story/domain/usecases/save_story_usecase.dart';
 import 'package:memorysparks/features/story/domain/usecases/update_story_rating_usecase.dart';
@@ -36,6 +37,11 @@ void main() async {
   );
 
   setupServiceLocator();
+
+  // Check for existing session BEFORE building the app
+  // This is instant since Supabase already loaded tokens from local storage
+  final hasSession = Supabase.instance.client.auth.currentUser != null;
+  debugPrint('🔍 Main: Session check - hasSession: $hasSession');
 
   runApp(
     MultiProvider(
@@ -71,13 +77,31 @@ void main() async {
           create: (_) => NewStoryIndicatorProvider(),
         ),
       ],
-      child: const MyApp(),
+      child: MyApp(hasSession: hasSession),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  final bool hasSession;
+
+  const MyApp({super.key, required this.hasSession});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Initialize AuthProvider with existing session if available
+    if (widget.hasSession) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.read<AuthProvider>().initializeFromExistingSession();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +113,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      // Navigate directly to MainNavigation if session exists
+      home: widget.hasSession ? const MainNavigation() : const LoginPage(),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
