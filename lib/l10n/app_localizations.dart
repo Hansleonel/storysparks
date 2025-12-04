@@ -122,6 +122,60 @@ abstract class AppLocalizations {
   /// **'Already have an account?'**
   String get alreadyHaveAccount;
 
+  /// No description provided for @audioDownloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading...'**
+  String get audioDownloading;
+
+  /// No description provided for @audioError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get audioError;
+
+  /// No description provided for @audioErrorGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to generate audio'**
+  String get audioErrorGenerate;
+
+  /// No description provided for @audioGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating audio...'**
+  String get audioGenerating;
+
+  /// No description provided for @audioGoBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Back'**
+  String get audioGoBack;
+
+  /// No description provided for @audioLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get audioLoading;
+
+  /// No description provided for @audioPleaseWait.
+  ///
+  /// In en, this message translates to:
+  /// **'This may take a moment...'**
+  String get audioPleaseWait;
+
+  /// No description provided for @audioPlaybackSpeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Playback Speed'**
+  String get audioPlaybackSpeed;
+
+  /// No description provided for @audioTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get audioTryAgain;
+
   /// No description provided for @alreadyPremiumMessage.
   ///
   /// In en, this message translates to:

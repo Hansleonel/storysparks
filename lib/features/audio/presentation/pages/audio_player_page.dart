@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,9 +23,9 @@ class AudioPlayerPage extends StatefulWidget {
 }
 
 class _AudioPlayerPageState extends State<AudioPlayerPage>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
+    with TickerProviderStateMixin {
+  late AnimationController _vinylController;
+  late AnimationController _waveController;
 
   @override
   void initState() {
@@ -32,13 +33,16 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
     debugPrint('\n🎵 ========== AudioPlayerPage: initState ==========');
     debugPrint('📖 Story: "${widget.story.title}" (ID: ${widget.story.id})');
 
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+    // Vinyl rotation animation - 4 seconds per full rotation
+    _vinylController = AnimationController(
+      duration: const Duration(seconds: 4),
       vsync: this,
-    )..repeat(reverse: true);
+    );
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    // Wave animation controller - faster for reactive feel
+    _waveController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
     );
 
     // Initialize audio after build
@@ -54,8 +58,19 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   @override
   void dispose() {
     debugPrint('🎵 AudioPlayerPage: dispose() called');
-    _pulseController.dispose();
+    _vinylController.dispose();
+    _waveController.dispose();
     super.dispose();
+  }
+
+  void _updateVinylAnimation(bool isPlaying) {
+    if (isPlaying) {
+      _vinylController.repeat();
+      _waveController.repeat();
+    } else {
+      _vinylController.stop();
+      _waveController.stop();
+    }
   }
 
   @override
@@ -100,38 +115,37 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
               SafeArea(
                 child: Column(
                   children: [
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 8),
 
                     // Album art / Story cover
                     Expanded(
-                      flex: 5,
                       child: _buildCoverArt(provider),
                     ),
 
                     // Story info
                     _buildStoryInfo(),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 12),
 
                     // Progress bar
                     _buildProgressBar(provider),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
 
                     // Time indicators
                     _buildTimeIndicators(provider),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 12),
 
                     // Playback controls
                     _buildPlaybackControls(provider),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
 
                     // Speed control
                     _buildSpeedControl(provider),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -166,128 +180,216 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   }
 
   Widget _buildCoverArt(AudioPlayerProvider provider) {
+    // Update vinyl animation based on playing state
+    _updateVinylAnimation(provider.isPlaying);
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: AnimatedBuilder(
-        animation: _pulseAnimation,
-        builder: (context, child) {
-          final scale = provider.isPlaying ? _pulseAnimation.value : 1.0;
-          return Transform.scale(
-            scale: scale,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.goldPremium.withOpacity(0.3),
-                    blurRadius: 30,
-                    offset: const Offset(0, 15),
-                    spreadRadius: 5,
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      // Cover image
-                      widget.story.customImagePath != null
-                          ? Image.file(
-                              File(widget.story.customImagePath!),
-                              fit: BoxFit.cover,
-                            )
-                          : Image.asset(
-                              widget.story.imageUrl,
-                              fit: BoxFit.cover,
-                            ),
-
-                      // Subtle gradient overlay
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.transparent,
-                              Colors.black.withOpacity(0.1),
-                            ],
-                          ),
-                        ),
+      padding: const EdgeInsets.symmetric(horizontal: 55),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Rotating disc with full cover image
+          AspectRatio(
+            aspectRatio: 1,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Shadow
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.goldPremium.withOpacity(0.3),
+                        blurRadius: 30,
+                        offset: const Offset(0, 12),
+                        spreadRadius: 5,
                       ),
-
-                      // Playing indicator
-                      if (provider.isPlaying)
-                        Positioned(
-                          bottom: 16,
-                          right: 16,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.goldPremium,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _buildSoundWave(),
-                                const SizedBox(width: 6),
-                                const Text(
-                                  'Playing',
-                                  style: TextStyle(
-                                    fontFamily: 'Urbanist',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
                     ],
                   ),
                 ),
-              ),
+
+                // Rotating disc
+                AnimatedBuilder(
+                  animation: _vinylController,
+                  builder: (context, child) {
+                    return Transform.rotate(
+                      angle: _vinylController.value * 2 * math.pi,
+                      child: child,
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.goldPremium,
+                        width: 4,
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          // Full cover image
+                          widget.story.customImagePath != null
+                              ? Image.file(
+                                  File(widget.story.customImagePath!),
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset(
+                                  widget.story.imageUrl,
+                                  fit: BoxFit.cover,
+                                ),
+
+                          // Subtle vinyl overlay effect
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: RadialGradient(
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.1),
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.05),
+                                ],
+                                stops: const [0.0, 0.3, 0.6, 1.0],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Center hole decoration
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.background,
+                    border: Border.all(
+                      color: AppColors.goldPremium,
+                      width: 3,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          );
-        },
+          ),
+
+          const SizedBox(height: 12),
+
+          // Audio waveform visualization
+          if (provider.state.localPath != null) _buildRealWaveform(provider),
+        ],
       ),
     );
   }
 
-  Widget _buildSoundWave() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(3, (index) {
-        return AnimatedBuilder(
-          animation: _pulseController,
-          builder: (context, _) {
-            final offset = index * 0.2;
-            final value = ((_pulseController.value + offset) % 1.0);
-            final height = 4 + (value * 8);
-            return Container(
-              width: 3,
-              height: height,
-              margin: const EdgeInsets.symmetric(horizontal: 1),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            );
-          },
-        );
-      }),
+  Widget _buildRealWaveform(AudioPlayerProvider provider) {
+    return _buildReactiveEqualizer(provider.isPlaying);
+  }
+
+  /// Reactive equalizer visualization that animates when playing
+  /// Simulates audio intensity with organic wave patterns
+  Widget _buildReactiveEqualizer(bool isPlaying) {
+    return SizedBox(
+      height: 45,
+      child: AnimatedBuilder(
+        animation: _waveController,
+        builder: (context, _) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: List.generate(25, (index) {
+              // Create organic wave pattern with multiple frequencies
+              final time = _waveController.value * 2 * math.pi;
+
+              // Different frequency components for each bar
+              final freq1 = (index * 0.3 + time * 2).abs();
+              final freq2 = (index * 0.5 + time * 3).abs();
+              final freq3 = (index * 0.2 + time * 1.5).abs();
+
+              // Combine frequencies for natural look
+              final wave1 = (freq1 % (2 * math.pi)).abs();
+              final wave2 = (freq2 % (2 * math.pi)).abs();
+              final wave3 = (freq3 % (2 * math.pi)).abs();
+
+              // Create height variation pattern
+              // Middle bars tend to be taller (like a real EQ)
+              final centerFactor = 1.0 - ((index - 12).abs() / 15.0);
+
+              // Pseudo-random variation per bar based on index
+              final randomFactor = ((index * 7 + 3) % 11) / 11.0;
+
+              // Calculate dynamic height
+              double height;
+              if (isPlaying) {
+                // Sin waves with different phases create organic movement
+                final sinValue = (wave1 * 0.4 + wave2 * 0.35 + wave3 * 0.25);
+                final normalized = (sinValue / (2 * math.pi)).clamp(0.0, 1.0);
+
+                // Add randomness and center bias
+                final intensity = normalized *
+                    (0.5 + randomFactor * 0.5) *
+                    (0.6 + centerFactor * 0.4);
+
+                // Map to height range
+                height = 6 + (intensity * 35);
+              } else {
+                // Static low height when paused
+                height = 4;
+              }
+
+              return AnimatedContainer(
+                duration: Duration(milliseconds: isPlaying ? 150 : 400),
+                curve: isPlaying ? Curves.easeOut : Curves.easeInOut,
+                width: 3.5,
+                height: height,
+                margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(2),
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: isPlaying
+                        ? [
+                            AppColors.goldPremium,
+                            AppColors.goldPremium.withOpacity(0.7),
+                            AppColors.goldPremium.withOpacity(0.4),
+                          ]
+                        : [
+                            AppColors.goldPremium.withOpacity(0.4),
+                            AppColors.goldPremium.withOpacity(0.3),
+                          ],
+                  ),
+                  boxShadow: isPlaying && height > 20
+                      ? [
+                          BoxShadow(
+                            color: AppColors.goldPremium.withOpacity(0.3),
+                            blurRadius: 4,
+                            spreadRadius: 0,
+                          ),
+                        ]
+                      : null,
+                ),
+              );
+            }),
+          );
+        },
+      ),
     );
   }
 
@@ -485,13 +587,14 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
 
   Widget _buildSpeedControl(AudioPlayerProvider provider) {
     final speeds = [0.75, 1.0, 1.5];
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
           Text(
-            'Playback Speed',
+            l10n.audioPlaybackSpeed,
             style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 13,
@@ -543,16 +646,17 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   }
 
   Widget _buildLoadingOverlay(AudioPlayerProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     String message;
     switch (provider.state.status) {
       case AudioStatus.generating:
-        message = 'Generating audio...';
+        message = l10n.audioGenerating;
         break;
       case AudioStatus.downloading:
-        message = 'Downloading...';
+        message = l10n.audioDownloading;
         break;
       default:
-        message = 'Loading...';
+        message = l10n.audioLoading;
     }
 
     return Container(
@@ -598,7 +702,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'This may take a moment...',
+                  l10n.audioPleaseWait,
                   style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 14,
@@ -614,6 +718,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   }
 
   Widget _buildErrorOverlay(AudioPlayerProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       color: Colors.black.withOpacity(0.5),
       child: BackdropFilter(
@@ -642,9 +747,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Error',
-                  style: TextStyle(
+                Text(
+                  l10n.audioError,
+                  style: const TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -653,7 +758,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  provider.state.errorMessage ?? 'Failed to generate audio',
+                  provider.state.errorMessage ?? l10n.audioErrorGenerate,
                   style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 14,
@@ -668,7 +773,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: Text(
-                        'Go Back',
+                        l10n.audioGoBack,
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           color: AppColors.textSecondary,
@@ -684,8 +789,8 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text(
-                        'Try Again',
+                      child: Text(
+                        l10n.audioTryAgain,
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontWeight: FontWeight.w600,

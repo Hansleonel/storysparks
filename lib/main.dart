@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:memorysparks/features/story/domain/usecases/update_story_status_usecase.dart';
@@ -30,6 +31,13 @@ import 'package:memorysparks/core/providers/new_story_indicator_provider.dart';
 void main() async {
   await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize audio background service
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.memorysparks.audio',
+    androidNotificationChannelName: 'Story Audio',
+    androidNotificationOngoing: true,
+  );
 
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:memorysparks/features/audio/domain/entities/audio_state.dart';
 import 'package:memorysparks/features/audio/domain/usecases/generate_story_audio_usecase.dart';
 import 'package:memorysparks/features/story/domain/entities/story.dart';
@@ -34,14 +35,15 @@ class AudioPlayerProvider extends ChangeNotifier {
 
   void _initializeListeners() {
     debugPrint('🎧 AudioPlayerProvider: Initializing listeners...');
-    
+
     _positionSubscription = _audioPlayer.positionStream.listen((position) {
       _updateState(_state.copyWith(position: position));
     });
 
     _durationSubscription = _audioPlayer.durationStream.listen((duration) {
       if (duration != null) {
-        debugPrint('⏱️ AudioPlayerProvider: Duration updated: ${duration.inSeconds}s');
+        debugPrint(
+            '⏱️ AudioPlayerProvider: Duration updated: ${duration.inSeconds}s');
         _updateState(_state.copyWith(duration: duration));
       }
     });
@@ -50,7 +52,8 @@ class AudioPlayerProvider extends ChangeNotifier {
         _audioPlayer.playerStateStream.listen((playerState) {
       final processingState = playerState.processingState;
       final playing = playerState.playing;
-      debugPrint('🔄 AudioPlayerProvider: Player state changed - processing: $processingState, playing: $playing');
+      debugPrint(
+          '🔄 AudioPlayerProvider: Player state changed - processing: $processingState, playing: $playing');
 
       if (processingState == ProcessingState.completed) {
         debugPrint('✅ AudioPlayerProvider: Playback completed');
@@ -73,13 +76,14 @@ class AudioPlayerProvider extends ChangeNotifier {
         ));
       }
     });
-    
+
     debugPrint('✅ AudioPlayerProvider: Listeners initialized');
   }
 
   void _updateState(AudioState newState) {
     if (_state.status != newState.status) {
-      debugPrint('📊 AudioPlayerProvider: Status changed: ${_state.status} → ${newState.status}');
+      debugPrint(
+          '📊 AudioPlayerProvider: Status changed: ${_state.status} → ${newState.status}');
     }
     _state = newState;
     notifyListeners();
@@ -87,10 +91,11 @@ class AudioPlayerProvider extends ChangeNotifier {
 
   /// Initialize audio for a story
   Future<void> initializeForStory(Story story) async {
-    debugPrint('\n🎬 ========== AudioPlayerProvider: initializeForStory ==========');
+    debugPrint(
+        '\n🎬 ========== AudioPlayerProvider: initializeForStory ==========');
     debugPrint('📖 Story: "${story.title}" (ID: ${story.id})');
     debugPrint('📝 Content length: ${story.content.length} chars');
-    
+
     _currentStory = story;
 
     if (story.id == null) {
@@ -116,16 +121,18 @@ class AudioPlayerProvider extends ChangeNotifier {
       debugPrint('📦 AudioPlayerProvider: Loading cached audio...');
       await _loadCachedAudio(story);
     } else {
-      debugPrint('⏸️ AudioPlayerProvider: Waiting for user to press play (idle state)');
+      debugPrint(
+          '⏸️ AudioPlayerProvider: Waiting for user to press play (idle state)');
     }
-    
+
     debugPrint('🎬 ========== initializeForStory complete ==========\n');
   }
 
   /// Generate and play audio for the current story
   Future<void> generateAndPlay() async {
-    debugPrint('\n🎤 ========== AudioPlayerProvider: generateAndPlay ==========');
-    
+    debugPrint(
+        '\n🎤 ========== AudioPlayerProvider: generateAndPlay ==========');
+
     if (_currentStory == null) {
       debugPrint('❌ AudioPlayerProvider: No current story - aborting');
       return;
@@ -157,7 +164,7 @@ class AudioPlayerProvider extends ChangeNotifier {
         await _loadAndPlay(localPath);
       },
     );
-    
+
     debugPrint('🎤 ========== generateAndPlay complete ==========\n');
   }
 
@@ -167,7 +174,8 @@ class AudioPlayerProvider extends ChangeNotifier {
 
     result.fold(
       (failure) {
-        debugPrint('❌ AudioPlayerProvider: Failed to load cached audio - ${failure.message}');
+        debugPrint(
+            '❌ AudioPlayerProvider: Failed to load cached audio - ${failure.message}');
         _updateState(_state.copyWith(
           status: AudioStatus.error,
           errorMessage: failure.message,
@@ -189,9 +197,26 @@ class AudioPlayerProvider extends ChangeNotifier {
   Future<void> _loadAudio(String path) async {
     debugPrint('📂 AudioPlayerProvider: _loadAudio($path)');
     try {
-      debugPrint('🔊 AudioPlayerProvider: Setting file path on AudioPlayer...');
-      await _audioPlayer.setFilePath(path);
-      debugPrint('✅ AudioPlayerProvider: File loaded successfully');
+      debugPrint(
+          '🔊 AudioPlayerProvider: Setting audio source with metadata...');
+
+      // Create audio source with metadata for background playback notifications
+      final audioSource = AudioSource.file(
+        path,
+        tag: MediaItem(
+          id: _currentStory?.id?.toString() ?? 'story',
+          title: _currentStory?.title ?? 'Story',
+          artist: 'StorySparks',
+          album: _currentStory?.genre ?? 'Story',
+          // Use story image as artwork if available
+          artUri: _currentStory?.customImagePath != null
+              ? Uri.file(_currentStory!.customImagePath!)
+              : null,
+        ),
+      );
+
+      await _audioPlayer.setAudioSource(audioSource);
+      debugPrint('✅ AudioPlayerProvider: Audio source loaded successfully');
       _updateState(_state.copyWith(
         status: AudioStatus.ready,
         localPath: path,
@@ -208,10 +233,12 @@ class AudioPlayerProvider extends ChangeNotifier {
   /// Play audio
   Future<void> play() async {
     debugPrint('▶️ AudioPlayerProvider: play() called');
-    debugPrint('   hasAudio: ${_state.hasAudio}, currentStory: ${_currentStory != null}');
-    
+    debugPrint(
+        '   hasAudio: ${_state.hasAudio}, currentStory: ${_currentStory != null}');
+
     if (!_state.hasAudio && _currentStory != null) {
-      debugPrint('🎤 AudioPlayerProvider: No audio loaded - starting generation...');
+      debugPrint(
+          '🎤 AudioPlayerProvider: No audio loaded - starting generation...');
       await generateAndPlay();
       return;
     }
@@ -240,7 +267,8 @@ class AudioPlayerProvider extends ChangeNotifier {
 
   /// Toggle play/pause
   Future<void> togglePlayPause() async {
-    debugPrint('🔄 AudioPlayerProvider: togglePlayPause() - current: ${_state.status}');
+    debugPrint(
+        '🔄 AudioPlayerProvider: togglePlayPause() - current: ${_state.status}');
     if (_state.isPlaying) {
       await pause();
     } else {
@@ -313,7 +341,8 @@ class AudioPlayerProvider extends ChangeNotifier {
       debugPrint('⚠️ AudioPlayerProvider: No current story');
       return false;
     }
-    final result = await _generateAudioUseCase.needsRegeneration(_currentStory!);
+    final result =
+        await _generateAudioUseCase.needsRegeneration(_currentStory!);
     debugPrint('📊 AudioPlayerProvider: needsRegeneration = $result');
     return result;
   }

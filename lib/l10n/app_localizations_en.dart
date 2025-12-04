@@ -21,6 +21,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alreadyHaveAccount => 'Already have an account?';
 
   @override
+  String get audioDownloading => 'Downloading...';
+
+  @override
+  String get audioError => 'Error';
+
+  @override
+  String get audioErrorGenerate => 'Failed to generate audio';
+
+  @override
+  String get audioGenerating => 'Generating audio...';
+
+  @override
+  String get audioGoBack => 'Go Back';
+
+  @override
+  String get audioLoading => 'Loading...';
+
+  @override
+  String get audioPleaseWait => 'This may take a moment...';
+
+  @override
+  String get audioPlaybackSpeed => 'Playback Speed';
+
+  @override
+  String get audioTryAgain => 'Try Again';
+
+  @override
   String get alreadyPremiumMessage =>
       'Enjoy all the premium features of Memory Sparks';
 

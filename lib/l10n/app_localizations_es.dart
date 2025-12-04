@@ -21,6 +21,33 @@ class AppLocalizationsEs extends AppLocalizations {
   String get alreadyHaveAccount => '¿Ya tienes una cuenta?';
 
   @override
+  String get audioDownloading => 'Descargando...';
+
+  @override
+  String get audioError => 'Error';
+
+  @override
+  String get audioErrorGenerate => 'Error al generar el audio';
+
+  @override
+  String get audioGenerating => 'Generando audio...';
+
+  @override
+  String get audioGoBack => 'Volver';
+
+  @override
+  String get audioLoading => 'Cargando...';
+
+  @override
+  String get audioPleaseWait => 'Esto puede tomar un momento...';
+
+  @override
+  String get audioPlaybackSpeed => 'Velocidad de reproducción';
+
+  @override
+  String get audioTryAgain => 'Intentar de nuevo';
+
+  @override
   String get alreadyPremiumMessage =>
       'Disfruta de todas las funciones premium de Memory Sparks';
 
