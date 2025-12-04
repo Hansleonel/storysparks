@@ -48,6 +48,12 @@ import 'package:memorysparks/features/story/domain/usecases/update_story_rating_
 import 'package:memorysparks/features/story/domain/usecases/update_story_status_usecase.dart';
 import 'package:memorysparks/features/story/presentation/providers/share_provider.dart';
 
+// Audio
+import 'package:memorysparks/features/audio/data/datasources/replicate_tts_datasource.dart';
+import 'package:memorysparks/features/audio/data/repositories/audio_repository_impl.dart';
+import 'package:memorysparks/features/audio/domain/repositories/audio_repository.dart';
+import 'package:memorysparks/features/audio/domain/usecases/generate_story_audio_usecase.dart';
+
 // Subscription
 import 'package:memorysparks/features/subscription/data/datasources/revenuecat_datasource.dart';
 import 'package:memorysparks/features/subscription/data/repositories/subscription_repository_impl.dart';
@@ -92,6 +98,12 @@ void setupServiceLocator() {
 
   // Core
   getIt.registerLazySingleton<LocaleRepository>(() => LocaleRepositoryImpl());
+
+  // Audio
+  getIt.registerLazySingleton<ReplicateTTSDataSource>(
+      () => ReplicateTTSDataSourceImpl(getIt<SupabaseClient>()));
+  getIt.registerLazySingleton<AudioRepository>(
+      () => AudioRepositoryImpl(getIt<ReplicateTTSDataSource>()));
 
   // Subscription
   getIt.registerLazySingleton<RevenueCatDataSource>(
@@ -147,6 +159,10 @@ void setupServiceLocator() {
       () => UpdateStoryRatingUseCase(getIt<StoryRepository>()));
   getIt.registerLazySingleton(
       () => UpdateStoryStatusUseCase(getIt<StoryRepository>()));
+
+  // Audio
+  getIt.registerLazySingleton(
+      () => GenerateStoryAudioUseCase(getIt<AudioRepository>()));
 
   // Subscription Use Cases
   getIt.registerLazySingleton(

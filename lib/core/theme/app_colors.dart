@@ -39,4 +39,7 @@ class AppColors {
   static const Color contextRich = Color(0xFF3B82F6); // Blue for rich context
   static const Color contextExceptional =
       Color(0xFF8B5CF6); // Purple for exceptional context
+
+  // Premium gold for special actions (play button, etc.)
+  static const Color goldPremium = Color(0xFFC9A962);
 }

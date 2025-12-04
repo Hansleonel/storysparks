@@ -19,6 +19,9 @@ import '../widgets/continue_story_dialog.dart';
 import '../widgets/share_story_modal.dart';
 import 'package:memorysparks/core/widgets/confirmation_dialog.dart';
 import 'package:memorysparks/core/utils/snackbar_utils.dart';
+import 'package:memorysparks/features/audio/presentation/pages/audio_player_page.dart';
+import 'package:memorysparks/features/audio/presentation/providers/audio_player_provider.dart';
+import 'package:memorysparks/features/audio/domain/usecases/generate_story_audio_usecase.dart';
 
 class GeneratedStoryPage extends StatefulWidget {
   final Story story;
@@ -776,29 +779,57 @@ class _StoryContentState extends State<_StoryContent> {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.accent,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.accent.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+                GestureDetector(
+                  onTap: () {
+                    // Navigate to audio player
+                    debugPrint(
+                        '\n🎵 ========== Play Button Pressed ==========');
+                    debugPrint('📖 Story: "${story.title}" (ID: ${story.id})');
+                    debugPrint(
+                        '📝 Content length: ${story.content.length} chars');
+                    debugPrint('🚀 Navigating to AudioPlayerPage...');
+                    debugPrint(
+                        '🎵 =========================================\n');
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChangeNotifierProvider(
+                          create: (_) => AudioPlayerProvider(
+                            generateAudioUseCase:
+                                getIt<GenerateStoryAudioUseCase>(),
+                          ),
+                          child: AudioPlayerPage(story: story),
+                        ),
                       ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.play_arrow,
-                      color: Colors.white,
-                      size: 20,
+                    );
+                  },
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppColors.goldPremium,
+                          AppColors.goldPremium.withOpacity(0.8),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.goldPremium.withOpacity(0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    onPressed: () {
-                      // TODO: Implementar reproducción
-                    },
+                    child: const Icon(
+                      Icons.play_arrow_rounded,
+                      color: Colors.white,
+                      size: 24,
+                    ),
                   ),
                 ),
               ],
