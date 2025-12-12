@@ -176,6 +176,24 @@ abstract class AppLocalizations {
   /// **'Try Again'**
   String get audioTryAgain;
 
+  /// No description provided for @backgroundMusic.
+  ///
+  /// In en, this message translates to:
+  /// **'Background Music'**
+  String get backgroundMusic;
+
+  /// No description provided for @volume.
+  ///
+  /// In en, this message translates to:
+  /// **'Volume'**
+  String get volume;
+
+  /// No description provided for @off.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get off;
+
   /// No description provided for @alreadyPremiumMessage.
   ///
   /// In en, this message translates to:

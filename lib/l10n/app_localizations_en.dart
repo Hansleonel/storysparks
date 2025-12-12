@@ -48,6 +48,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get audioTryAgain => 'Try Again';
 
   @override
+  String get backgroundMusic => 'Background Music';
+
+  @override
+  String get volume => 'Volume';
+
+  @override
+  String get off => 'Off';
+
+  @override
   String get alreadyPremiumMessage =>
       'Enjoy all the premium features of Memory Sparks';
 

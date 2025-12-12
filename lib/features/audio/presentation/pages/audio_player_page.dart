@@ -73,6 +73,189 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
     }
   }
 
+  void _showBackgroundMusicSettings(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    // Capture the provider before showing the modal
+    // because the modal's context doesn't have access to it
+    final provider = context.read<AudioPlayerProvider>();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (modalContext) {
+        // Use ListenableBuilder to rebuild when provider changes
+        return ListenableBuilder(
+          listenable: provider,
+          builder: (context, _) {
+            return Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, -5),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle indicator
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppColors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Title
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.music_note_rounded,
+                        color: AppColors.goldPremium,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        l10n.backgroundMusic,
+                        style: const TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Volume label
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.volume,
+                        style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 14,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      Text(
+                        '${(provider.backgroundMusicVolume * 100).round()}%',
+                        style: TextStyle(
+                          fontFamily: 'Urbanist',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.goldPremium,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Volume slider
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.volume_off_rounded,
+                        color: AppColors.textSecondary,
+                        size: 20,
+                      ),
+                      Expanded(
+                        child: SliderTheme(
+                          data: SliderTheme.of(modalContext).copyWith(
+                            activeTrackColor: AppColors.goldPremium,
+                            inactiveTrackColor:
+                                AppColors.goldPremium.withOpacity(0.2),
+                            thumbColor: AppColors.goldPremium,
+                            thumbShape: const RoundSliderThumbShape(
+                                enabledThumbRadius: 8),
+                            overlayShape: const RoundSliderOverlayShape(
+                                overlayRadius: 16),
+                            overlayColor:
+                                AppColors.goldPremium.withOpacity(0.2),
+                            trackHeight: 4,
+                          ),
+                          child: Slider(
+                            value: provider.backgroundMusicVolume,
+                            min: 0.0,
+                            max: 1.0,
+                            onChanged: (value) {
+                              provider.setBackgroundMusicVolume(value);
+                            },
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        Icons.volume_up_rounded,
+                        color: AppColors.textSecondary,
+                        size: 20,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Preset buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildVolumePresetButton(provider, 0.0, l10n.off),
+                      _buildVolumePresetButton(provider, 0.15, '15%'),
+                      _buildVolumePresetButton(provider, 0.25, '25%'),
+                      _buildVolumePresetButton(provider, 0.50, '50%'),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildVolumePresetButton(
+    AudioPlayerProvider provider,
+    double volume,
+    String label,
+  ) {
+    final isSelected = (provider.backgroundMusicVolume - volume).abs() < 0.01;
+    return GestureDetector(
+      onTap: () => provider.setBackgroundMusicVolume(volume),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.goldPremium : AppColors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? AppColors.goldPremium : AppColors.border,
+            width: 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontFamily: 'Urbanist',
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: isSelected ? Colors.white : AppColors.textSecondary,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,6 +286,32 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
           ),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          // Background music settings button
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.white.withOpacity(0.9),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.music_note_rounded,
+                color: AppColors.goldPremium,
+                size: 20,
+              ),
+            ),
+            onPressed: () => _showBackgroundMusicSettings(context),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Consumer<AudioPlayerProvider>(
         builder: (context, provider, _) {

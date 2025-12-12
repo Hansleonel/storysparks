@@ -2,13 +2,21 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:audioplayers/audioplayers.dart' as ap;
 import 'package:memorysparks/features/audio/domain/entities/audio_state.dart';
 import 'package:memorysparks/features/audio/domain/usecases/generate_story_audio_usecase.dart';
 import 'package:memorysparks/features/story/domain/entities/story.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AudioPlayerProvider extends ChangeNotifier {
   final GenerateStoryAudioUseCase _generateAudioUseCase;
   final AudioPlayer _audioPlayer;
+
+  // Background music player - uses audioplayers package (separate from just_audio)
+  // This avoids the just_audio_background single instance limitation
+  ap.AudioPlayer? _backgroundMusicPlayer;
+  bool _backgroundMusicInitialized = false;
+  static const String _backgroundMusicVolumeKey = 'background_music_volume';
 
   AudioState _state = const AudioState();
   Story? _currentStory;
@@ -23,6 +31,7 @@ class AudioPlayerProvider extends ChangeNotifier {
   })  : _generateAudioUseCase = generateAudioUseCase,
         _audioPlayer = audioPlayer ?? AudioPlayer() {
     _initializeListeners();
+    _loadSavedBackgroundMusicVolume();
   }
 
   AudioState get state => _state;
@@ -32,6 +41,22 @@ class AudioPlayerProvider extends ChangeNotifier {
   bool get isLoading => _state.isLoading;
   bool get hasError => _state.hasError;
   bool get isReady => _state.isReady;
+  double get backgroundMusicVolume => _state.backgroundMusicVolume;
+
+  /// Load saved background music volume from SharedPreferences
+  Future<void> _loadSavedBackgroundMusicVolume() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final savedVolume = prefs.getDouble(_backgroundMusicVolumeKey);
+      if (savedVolume != null) {
+        _updateState(_state.copyWith(backgroundMusicVolume: savedVolume));
+        debugPrint(
+            '🎵 AudioPlayerProvider: Loaded saved background music volume: $savedVolume');
+      }
+    } catch (e) {
+      debugPrint('⚠️ AudioPlayerProvider: Error loading saved volume - $e');
+    }
+  }
 
   void _initializeListeners() {
     debugPrint('🎧 AudioPlayerProvider: Initializing listeners...');
@@ -59,6 +84,8 @@ class AudioPlayerProvider extends ChangeNotifier {
         debugPrint('✅ AudioPlayerProvider: Playback completed');
         _audioPlayer.seek(Duration.zero);
         _audioPlayer.pause();
+        // Stop background music when narration completes
+        _stopBackgroundMusic();
         _updateState(_state.copyWith(
           status: AudioStatus.paused,
           position: Duration.zero,
@@ -88,6 +115,132 @@ class AudioPlayerProvider extends ChangeNotifier {
     _state = newState;
     notifyListeners();
   }
+
+  // ============ Background Music Methods ============
+
+  /// Initialize background music from asset
+  /// Uses audioplayers package (separate from just_audio) to avoid
+  /// the just_audio_background single instance limitation
+  Future<bool> _initializeBackgroundMusic() async {
+    debugPrint('🎵🎵🎵 _initializeBackgroundMusic() called');
+    debugPrint('🎵 _backgroundMusicInitialized: $_backgroundMusicInitialized');
+    debugPrint('🎵 _backgroundMusicPlayer: $_backgroundMusicPlayer');
+
+    if (_backgroundMusicInitialized && _backgroundMusicPlayer != null) {
+      debugPrint('🎵 Already initialized, returning true');
+      return true;
+    }
+
+    try {
+      debugPrint('🎵 Creating new ap.AudioPlayer...');
+
+      // Create a new AudioPlayer using audioplayers package
+      // This is completely separate from just_audio
+      _backgroundMusicPlayer = ap.AudioPlayer();
+      debugPrint('🎵 AudioPlayer created: $_backgroundMusicPlayer');
+
+      // Set the source as an asset
+      debugPrint('🎵 Setting source asset: audio/dreamland.mp3');
+      await _backgroundMusicPlayer!.setSourceAsset('audio/dreamland.mp3');
+      debugPrint('🎵 Source asset set successfully');
+
+      // Set loop mode
+      debugPrint('🎵 Setting release mode to loop...');
+      await _backgroundMusicPlayer!.setReleaseMode(ap.ReleaseMode.loop);
+      debugPrint('🎵 Release mode set to loop');
+
+      // Set initial volume
+      debugPrint('🎵 Setting volume to: ${_state.backgroundMusicVolume}');
+      await _backgroundMusicPlayer!.setVolume(_state.backgroundMusicVolume);
+      debugPrint('🎵 Volume set successfully');
+
+      _backgroundMusicInitialized = true;
+      debugPrint(
+          '✅✅✅ Background music initialized successfully! Ready to play.');
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint('❌❌❌ Error initializing background music');
+      debugPrint('❌ Error: $e');
+      debugPrint('❌ Stack: $stackTrace');
+      debugPrint(
+          '💡 Tip: Make sure to run "flutter pub get" and rebuild the app');
+      _backgroundMusicInitialized = false;
+      _backgroundMusicPlayer?.dispose();
+      _backgroundMusicPlayer = null;
+      return false;
+    }
+  }
+
+  /// Set background music from a source (asset or URL)
+  /// Prepared for future use with server-hosted audio or genre-specific tracks
+  /// Returns true if successful, false otherwise
+  Future<bool> setBackgroundMusic(String source, {bool isAsset = true}) async {
+    try {
+      debugPrint(
+          '🎵 AudioPlayerProvider: Setting background music: $source (isAsset: $isAsset)');
+
+      // Create player if it doesn't exist
+      _backgroundMusicPlayer ??= ap.AudioPlayer();
+
+      if (isAsset) {
+        // Remove 'assets/' prefix if present for audioplayers
+        final assetPath = source.replaceFirst('assets/', '');
+        await _backgroundMusicPlayer!.setSourceAsset(assetPath);
+      } else {
+        await _backgroundMusicPlayer!.setSourceUrl(source);
+      }
+      await _backgroundMusicPlayer!.setReleaseMode(ap.ReleaseMode.loop);
+      await _backgroundMusicPlayer!.setVolume(_state.backgroundMusicVolume);
+      _backgroundMusicInitialized = true;
+      debugPrint('✅ AudioPlayerProvider: Background music source set');
+      return true;
+    } catch (e, stackTrace) {
+      debugPrint('❌ AudioPlayerProvider: Error setting background music - $e');
+      debugPrint('❌ Stack: $stackTrace');
+      _backgroundMusicInitialized = false;
+      return false;
+    }
+  }
+
+  /// Stop background music and reset position
+  Future<void> _stopBackgroundMusic() async {
+    debugPrint('🎵🎵🎵 _stopBackgroundMusic() called');
+    if (!_backgroundMusicInitialized || _backgroundMusicPlayer == null) {
+      debugPrint('🎵 Not initialized, skipping stop');
+      return;
+    }
+    try {
+      debugPrint('🎵 Calling _backgroundMusicPlayer!.stop()...');
+      await _backgroundMusicPlayer!.stop();
+      debugPrint('✅🎵 Background music stopped successfully');
+    } catch (e) {
+      debugPrint('❌🎵 Error stopping background music - $e');
+    }
+  }
+
+  /// Set background music volume (0.0 to 1.0)
+  Future<void> setBackgroundMusicVolume(double volume) async {
+    final clampedVolume = volume.clamp(0.0, 1.0);
+    debugPrint(
+        '🎵 AudioPlayerProvider: Setting background music volume: $clampedVolume');
+    try {
+      // Update player volume if it exists
+      if (_backgroundMusicPlayer != null) {
+        await _backgroundMusicPlayer!.setVolume(clampedVolume);
+      }
+      _updateState(_state.copyWith(backgroundMusicVolume: clampedVolume));
+
+      // Save to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble(_backgroundMusicVolumeKey, clampedVolume);
+      debugPrint('✅ AudioPlayerProvider: Background music volume saved');
+    } catch (e) {
+      debugPrint(
+          '❌ AudioPlayerProvider: Error setting background music volume - $e');
+    }
+  }
+
+  // ============ End Background Music Methods ============
 
   /// Initialize audio for a story
   Future<void> initializeForStory(Story story) async {
@@ -230,9 +383,10 @@ class AudioPlayerProvider extends ChangeNotifier {
     }
   }
 
-  /// Play audio
+  /// Play audio (narration + background music)
   Future<void> play() async {
-    debugPrint('▶️ AudioPlayerProvider: play() called');
+    debugPrint('');
+    debugPrint('▶️▶️▶️ ========== PLAY() CALLED ==========');
     debugPrint(
         '   hasAudio: ${_state.hasAudio}, currentStory: ${_currentStory != null}');
 
@@ -244,24 +398,79 @@ class AudioPlayerProvider extends ChangeNotifier {
     }
 
     try {
-      debugPrint('🔊 AudioPlayerProvider: Starting playback...');
-      await _audioPlayer.play();
+      // Update state FIRST to prevent race conditions
       _updateState(_state.copyWith(status: AudioStatus.playing));
-      debugPrint('✅ AudioPlayerProvider: Playback started');
+
+      // Initialize background music BEFORE starting playback (non-blocking)
+      // This ensures it's ready when we need it
+      if (!_backgroundMusicInitialized || _backgroundMusicPlayer == null) {
+        debugPrint('🎵 Pre-initializing background music...');
+        await _initializeBackgroundMusic();
+      }
+
+      debugPrint('🔊🎵 Starting BOTH narration and background music...');
+
+      // Start both players in parallel for better sync
+      await Future.wait([
+        _audioPlayer.play().then((_) {
+          debugPrint('✅ Narration play() completed');
+        }),
+        _playBackgroundMusicDirect().then((_) {
+          debugPrint('✅ Background music play() completed');
+        }),
+      ]);
+
+      debugPrint('▶️▶️▶️ ========== PLAY() COMPLETE ==========');
+      debugPrint('');
     } catch (e) {
       debugPrint('❌ AudioPlayerProvider: Error playing - $e');
     }
   }
 
-  /// Pause audio
+  /// Pause audio (narration + background music)
   Future<void> pause() async {
-    debugPrint('⏸️ AudioPlayerProvider: pause() called');
+    debugPrint('');
+    debugPrint('⏸️⏸️⏸️ ========== PAUSE() CALLED ==========');
     try {
-      await _audioPlayer.pause();
+      // Update state FIRST
       _updateState(_state.copyWith(status: AudioStatus.paused));
-      debugPrint('✅ AudioPlayerProvider: Paused');
+
+      debugPrint('🔊🎵 Pausing BOTH narration and background music...');
+
+      // Pause both players in parallel
+      await Future.wait([
+        _audioPlayer.pause().then((_) {
+          debugPrint('✅ Narration pause() completed');
+        }),
+        _pauseBackgroundMusicDirect().then((_) {
+          debugPrint('✅ Background music pause() completed');
+        }),
+      ]);
+
+      debugPrint('⏸️⏸️⏸️ ========== PAUSE() COMPLETE ==========');
+      debugPrint('');
     } catch (e) {
       debugPrint('❌ AudioPlayerProvider: Error pausing - $e');
+    }
+  }
+
+  /// Direct play for background music (no initialization check, used in parallel)
+  Future<void> _playBackgroundMusicDirect() async {
+    if (_backgroundMusicPlayer == null) return;
+    try {
+      await _backgroundMusicPlayer!.resume();
+    } catch (e) {
+      debugPrint('❌🎵 Error in _playBackgroundMusicDirect - $e');
+    }
+  }
+
+  /// Direct pause for background music (used in parallel)
+  Future<void> _pauseBackgroundMusicDirect() async {
+    if (_backgroundMusicPlayer == null) return;
+    try {
+      await _backgroundMusicPlayer!.pause();
+    } catch (e) {
+      debugPrint('❌🎵 Error in _pauseBackgroundMusicDirect - $e');
     }
   }
 
@@ -326,6 +535,7 @@ class AudioPlayerProvider extends ChangeNotifier {
 
     debugPrint('⏹️ AudioPlayerProvider: Stopping current playback...');
     await _audioPlayer.stop();
+    await _stopBackgroundMusic();
 
     debugPrint('🔄 AudioPlayerProvider: Resetting state to GENERATING');
     _updateState(const AudioState(status: AudioStatus.generating));
@@ -353,6 +563,7 @@ class AudioPlayerProvider extends ChangeNotifier {
     _durationSubscription?.cancel();
     _playerStateSubscription?.cancel();
     _audioPlayer.dispose();
+    _backgroundMusicPlayer?.dispose();
     super.dispose();
   }
 }

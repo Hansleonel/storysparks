@@ -18,6 +18,7 @@ class AudioState extends Equatable {
   final Duration duration;
   final Duration position;
   final double playbackSpeed;
+  final double backgroundMusicVolume;
   final String? errorMessage;
   final int? storyId;
   final String? contentHash; // To detect if story content changed
@@ -29,6 +30,7 @@ class AudioState extends Equatable {
     this.duration = Duration.zero,
     this.position = Duration.zero,
     this.playbackSpeed = 1.0,
+    this.backgroundMusicVolume = 0.25,
     this.errorMessage,
     this.storyId,
     this.contentHash,
@@ -72,6 +74,7 @@ class AudioState extends Equatable {
     Duration? duration,
     Duration? position,
     double? playbackSpeed,
+    double? backgroundMusicVolume,
     String? errorMessage,
     int? storyId,
     String? contentHash,
@@ -83,6 +86,8 @@ class AudioState extends Equatable {
       duration: duration ?? this.duration,
       position: position ?? this.position,
       playbackSpeed: playbackSpeed ?? this.playbackSpeed,
+      backgroundMusicVolume:
+          backgroundMusicVolume ?? this.backgroundMusicVolume,
       errorMessage: errorMessage ?? this.errorMessage,
       storyId: storyId ?? this.storyId,
       contentHash: contentHash ?? this.contentHash,
@@ -97,6 +102,7 @@ class AudioState extends Equatable {
         duration,
         position,
         playbackSpeed,
+        backgroundMusicVolume,
         errorMessage,
         storyId,
         contentHash,

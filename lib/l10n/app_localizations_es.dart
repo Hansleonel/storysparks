@@ -48,6 +48,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get audioTryAgain => 'Intentar de nuevo';
 
   @override
+  String get backgroundMusic => 'Música de Fondo';
+
+  @override
+  String get volume => 'Volumen';
+
+  @override
+  String get off => 'Off';
+
+  @override
   String get alreadyPremiumMessage =>
       'Disfruta de todas las funciones premium de Memory Sparks';
 
