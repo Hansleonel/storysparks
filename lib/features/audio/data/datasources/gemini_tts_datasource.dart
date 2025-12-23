@@ -2,53 +2,59 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:memorysparks/features/audio/data/datasources/tts_datasource.dart';
 
-abstract class ReplicateTTSDataSource implements TTSDataSource {
-  /// Calls the Supabase Edge Function to generate audio
-  /// Returns the URL of the generated audio
+/// Datasource for Gemini TTS (Text-to-Speech) using Google's Gemini API.
+/// Returns audio as base64 encoded data with "base64:" prefix.
+abstract class GeminiTTSDataSource implements TTSDataSource {
+  /// Calls the Supabase Edge Function to generate audio using Gemini TTS.
+  /// Returns base64 encoded audio data with "base64:" prefix.
+  ///
+  /// [text] - The story content to convert to speech
+  /// [storyId] - The story ID for logging purposes
+  /// [genre] - Optional genre for styled narration (e.g., "Romántico", "Aventura")
   @override
   Future<String> generateAudio({
     required String text,
     required int storyId,
-    String? genre, // Not used by Replicate, but required by interface
+    String? genre,
   });
 }
 
-class ReplicateTTSDataSourceImpl implements ReplicateTTSDataSource {
+class GeminiTTSDataSourceImpl implements GeminiTTSDataSource {
   final SupabaseClient _supabaseClient;
 
-  ReplicateTTSDataSourceImpl(this._supabaseClient);
+  GeminiTTSDataSourceImpl(this._supabaseClient);
 
   @override
   Future<String> generateAudio({
     required String text,
     required int storyId,
-    String? genre, // Not used by Replicate
+    String? genre,
   }) async {
     try {
-      debugPrint('\n🎤 ========== ReplicateTTS: generateAudio ==========');
+      debugPrint('\n🔷 ========== GeminiTTS: generateAudio ==========');
       debugPrint('📌 Story ID: $storyId');
       debugPrint('📝 Text length: ${text.length} characters');
-      debugPrint(
-          '💰 Estimated cost: \$${(text.length / 1000 * 0.06).toStringAsFixed(4)}');
+      debugPrint('🎭 Genre: ${genre ?? 'not specified'}');
 
       debugPrint('🔐 Checking authentication...');
       final session = _supabaseClient.auth.currentSession;
       if (session == null) {
-        debugPrint('❌ ReplicateTTS: No active session!');
+        debugPrint('❌ GeminiTTS: No active session!');
         throw Exception('User not authenticated');
       }
       debugPrint('✅ User authenticated: ${session.user.id}');
 
-      debugPrint('🌐 Calling Supabase Edge Function: generate-audio');
-      debugPrint('⏳ This may take 30-120 seconds depending on text length...');
+      debugPrint('🌐 Calling Supabase Edge Function: generate-audio-gemini');
+      debugPrint('⏳ This may take 30-60 seconds depending on text length...');
 
       final stopwatch = Stopwatch()..start();
 
       final response = await _supabaseClient.functions.invoke(
-        'generate-audio',
+        'generate-audio-gemini',
         body: {
           'text': text,
           'storyId': storyId,
+          'genre': genre,
         },
         headers: {
           'Authorization': 'Bearer ${session.accessToken}',
@@ -64,23 +70,25 @@ class ReplicateTTSDataSourceImpl implements ReplicateTTSDataSource {
         final errorData = response.data;
         final errorMessage =
             errorData is Map ? errorData['error'] : 'Unknown error';
-        debugPrint('❌ ReplicateTTS: Error response - $errorMessage');
+        debugPrint('❌ GeminiTTS: Error response - $errorMessage');
         debugPrint('📄 Full response: ${response.data}');
         throw Exception(errorMessage);
       }
 
       final data = response.data as Map<String, dynamic>;
-      debugPrint('📄 Response data: $data');
+      debugPrint('📄 Response keys: ${data.keys.toList()}');
 
-      final audioUrl = data['audioUrl'] as String;
+      // Gemini returns "base64:{data}" format
+      final audioData = data['audioData'] as String;
 
-      debugPrint('✅ ReplicateTTS: Audio generated successfully!');
-      debugPrint('🔗 Audio URL: $audioUrl');
-      debugPrint('🎤 ========== generateAudio complete ==========\n');
+      debugPrint('✅ GeminiTTS: Audio generated successfully!');
+      debugPrint(
+          '📦 Audio data length: ${audioData.length} characters (base64)');
+      debugPrint('🔷 ========== generateAudio complete ==========\n');
 
-      return audioUrl;
+      return audioData;
     } catch (e, stackTrace) {
-      debugPrint('❌ ReplicateTTS: Exception occurred!');
+      debugPrint('❌ GeminiTTS: Exception occurred!');
       debugPrint('   Error: $e');
       debugPrint('   Stack: $stackTrace');
       rethrow;

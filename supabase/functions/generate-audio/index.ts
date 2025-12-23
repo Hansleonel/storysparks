@@ -62,8 +62,8 @@ serve(async (req) => {
       });
     }
 
-    // Call Replicate API - Create prediction
-    const createResponse = await fetch('https://api.replicate.com/v1/predictions', {
+    // Call Replicate API - MiniMax Speech 2.6 Turbo
+    const createResponse = await fetch('https://api.replicate.com/v1/models/minimax/speech-2.6-turbo/predictions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${replicateToken}`,
@@ -71,11 +71,10 @@ serve(async (req) => {
         'Prefer': 'wait',
       },
       body: JSON.stringify({
-        version: 'latest',
         input: {
           text: text,
           voice_id: 'R8_9MNYL3NX',
-          speed: 1.0,
+          speed: 0.9, // Slightly slower for more enjoyable narration
           emotion: 'auto',
           audio_format: 'mp3',
           channel: 'stereo',

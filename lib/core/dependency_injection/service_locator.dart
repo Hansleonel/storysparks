@@ -49,7 +49,9 @@ import 'package:memorysparks/features/story/domain/usecases/update_story_status_
 import 'package:memorysparks/features/story/presentation/providers/share_provider.dart';
 
 // Audio
+import 'package:memorysparks/features/audio/data/datasources/tts_datasource.dart';
 import 'package:memorysparks/features/audio/data/datasources/replicate_tts_datasource.dart';
+import 'package:memorysparks/features/audio/data/datasources/gemini_tts_datasource.dart';
 import 'package:memorysparks/features/audio/data/repositories/audio_repository_impl.dart';
 import 'package:memorysparks/features/audio/domain/repositories/audio_repository.dart';
 import 'package:memorysparks/features/audio/domain/usecases/generate_story_audio_usecase.dart';
@@ -99,11 +101,34 @@ void setupServiceLocator() {
   // Core
   getIt.registerLazySingleton<LocaleRepository>(() => LocaleRepositoryImpl());
 
-  // Audio
-  getIt.registerLazySingleton<ReplicateTTSDataSource>(
+  // ═══════════════════════════════════════════════════════════════════════════
+  // TTS PROVIDER CONFIGURATION
+  // ═══════════════════════════════════════════════════════════════════════════
+  // To switch between TTS providers, comment/uncomment the appropriate line:
+  //
+  // OPTION 1: Replicate TTS (default)
+  //   - Returns audio URL, Flutter downloads it
+  //   - Requires REPLICATE_API_TOKEN in Supabase secrets
+  //
+  // OPTION 2: Gemini TTS
+  //   - Returns base64 audio data, Flutter decodes it locally
+  //   - Requires GEMINI_API_KEY in Supabase secrets
+  //   - Supports genre-based narration styling (voice: Algieba)
+  //
+  // Both providers produce identical local audio files.
+  // The AudioRepository automatically detects the format and handles it.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // OPTION 1: Replicate TTS (ACTIVE) - Comment this line to disable
+  getIt.registerLazySingleton<TTSDataSource>(
       () => ReplicateTTSDataSourceImpl(getIt<SupabaseClient>()));
+
+  // OPTION 2: Gemini TTS - Uncomment this line to use Gemini instead
+  // getIt.registerLazySingleton<TTSDataSource>(
+  //     () => GeminiTTSDataSourceImpl(getIt<SupabaseClient>()));
+
   getIt.registerLazySingleton<AudioRepository>(
-      () => AudioRepositoryImpl(getIt<ReplicateTTSDataSource>()));
+      () => AudioRepositoryImpl(getIt<TTSDataSource>()));
 
   // Subscription
   getIt.registerLazySingleton<RevenueCatDataSource>(
