@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:memorysparks/core/dependency_injection/service_locator.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_theme.dart';
+import 'package:memorysparks/core/providers/theme_provider.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:memorysparks/core/widgets/confirmation_dialog.dart';
 import '../providers/settings_provider.dart';
@@ -24,22 +26,23 @@ class SettingsPage extends StatelessWidget {
 class _SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: colors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back, color: colors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           AppLocalizations.of(context)?.settings ?? 'Settings',
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
           ),
         ),
       ),
@@ -204,12 +207,9 @@ class _SettingsView extends StatelessWidget {
                       // TODO: Navigate to language page
                     },
                   ),
-                  _SettingsItem(
+                  _SettingsItemWithSwitch(
                     icon: Icons.dark_mode_outlined,
-                    title: AppLocalizations.of(context)?.theme ?? 'Theme',
-                    onTap: () {
-                      // TODO: Navigate to theme page
-                    },
+                    title: AppLocalizations.of(context)?.darkMode ?? 'Dark Mode',
                   ),
                 ],
               ),
@@ -299,11 +299,12 @@ class _SettingsView extends StatelessWidget {
   }
 
   Widget _buildSearchBar(BuildContext context) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -314,16 +315,19 @@ class _SettingsView extends StatelessWidget {
           ],
         ),
         child: TextField(
+          style: TextStyle(
+            fontFamily: 'Urbanist',
+            color: colors.textPrimary,
+          ),
           decoration: InputDecoration(
             hintText: AppLocalizations.of(context)?.searchSettings ??
                 'Search settings',
             hintStyle: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 16,
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
-            prefixIcon:
-                const Icon(Icons.search, color: AppColors.textSecondary),
+            prefixIcon: Icon(Icons.search, color: colors.textSecondary),
             border: InputBorder.none,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -337,6 +341,7 @@ class _SettingsView extends StatelessWidget {
   }
 
   Widget _buildSection(BuildContext context, String title, List<Widget> items) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -344,11 +349,11 @@ class _SettingsView extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
           child: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
             ),
           ),
         ),
@@ -363,26 +368,24 @@ class _SettingsItem extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
   final Color? textColor;
-  // If you want to add a trailing icon, uncomment the following line
-  // final Widget? trailing;
 
   const _SettingsItem({
     required this.icon,
     required this.title,
     required this.onTap,
     this.textColor,
-    // this.trailing,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return InkWell(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            Icon(icon, color: textColor ?? AppColors.textPrimary),
+            Icon(icon, color: textColor ?? colors.textPrimary),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
@@ -390,18 +393,65 @@ class _SettingsItem extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 16,
-                  color: textColor ?? AppColors.textPrimary,
+                  color: textColor ?? colors.textPrimary,
                 ),
               ),
             ),
-            // trailing ??
             Icon(
               Icons.chevron_right,
-              color: textColor ?? AppColors.textSecondary,
+              color: textColor ?? colors.textSecondary,
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _SettingsItemWithSwitch extends StatelessWidget {
+  final IconData icon;
+  final String title;
+
+  const _SettingsItemWithSwitch({
+    required this.icon,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            children: [
+              Icon(
+                themeProvider.isDarkMode
+                    ? Icons.dark_mode
+                    : Icons.dark_mode_outlined,
+                color: colors.textPrimary,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontFamily: 'Urbanist',
+                    fontSize: 16,
+                    color: colors.textPrimary,
+                  ),
+                ),
+              ),
+              Switch(
+                value: themeProvider.isDarkMode,
+                onChanged: (value) => themeProvider.setDarkMode(value),
+                activeColor: AppColors.primary,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

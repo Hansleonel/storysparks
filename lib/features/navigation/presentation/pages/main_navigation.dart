@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:memorysparks/core/dependency_injection/service_locator.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_theme.dart';
 import 'package:memorysparks/features/home/presentation/pages/home_page.dart';
 import 'package:memorysparks/features/home/presentation/providers/home_provider.dart';
 import 'package:memorysparks/features/library/presentation/pages/library_page.dart';
@@ -60,12 +61,13 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final libraryProvider =
         Provider.of<LibraryProvider>(context, listen: false);
     final notificationProvider =
         Provider.of<NewStoryIndicatorProvider>(context, listen: false);
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: IndexedStack(
         index: _selectedIndex,
         children: _screens,
@@ -108,6 +110,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.appColors;
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -120,9 +123,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
       ),
       child: BottomNavigationBar(
         selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textSecondary,
+        unselectedItemColor: colors.textSecondary,
         elevation: _navigationBarElevation,
-        backgroundColor: AppColors.white,
+        backgroundColor: colors.surface,
         currentIndex: currentIndex,
         onTap: onTap,
         type: BottomNavigationBarType.fixed,
