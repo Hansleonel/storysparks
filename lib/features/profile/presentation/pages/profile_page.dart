@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_theme.dart';
 import 'package:memorysparks/features/library/presentation/providers/library_provider.dart';
 import 'package:memorysparks/features/profile/presentation/providers/profile_provider.dart';
 import 'package:memorysparks/features/profile/presentation/widgets/review_card.dart';
@@ -14,10 +15,11 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: colors.background,
         body: SafeArea(
           child: Consumer<ProfileProvider>(
             builder: (context, provider, child) {
@@ -35,7 +37,7 @@ class ProfilePage extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 16,
-                          color: AppColors.textSecondary,
+                          color: colors.textSecondary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -53,10 +55,10 @@ class ProfilePage extends StatelessWidget {
                 return Center(
                   child: Text(
                     AppLocalizations.of(context)!.noProfileFound,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 16,
-                      color: AppColors.textSecondary,
+                      color: colors.textSecondary,
                     ),
                   ),
                 );
@@ -75,9 +77,9 @@ class ProfilePage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 IconButton(
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.settings_outlined,
-                                    color: AppColors.textPrimary,
+                                    color: colors.textPrimary,
                                   ),
                                   onPressed: () {
                                     Navigator.pushNamed(
@@ -134,7 +136,7 @@ class ProfilePage extends StatelessWidget {
                                 fontFamily: 'Playfair',
                                 fontSize: 32,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textPrimary,
+                                color: colors.textPrimary,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -142,7 +144,7 @@ class ProfilePage extends StatelessWidget {
                             // Username
                             Text(
                               '@${profile.username}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontFamily: 'Urbanist',
                                 fontSize: 18,
                                 color: AppColors.accent,
@@ -159,7 +161,7 @@ class ProfilePage extends StatelessWidget {
                                 style: TextStyle(
                                   fontFamily: 'Urbanist',
                                   fontSize: 16,
-                                  color: AppColors.textSecondary,
+                                  color: colors.textSecondary,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -244,6 +246,7 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Column(
       children: [
         Text(
@@ -252,7 +255,7 @@ class _StatItem extends StatelessWidget {
             fontFamily: 'Urbanist',
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
           ),
         ),
         Text(
@@ -260,7 +263,7 @@ class _StatItem extends StatelessWidget {
           style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 14,
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
         ),
       ],
@@ -281,8 +284,9 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final colors = context.appColors;
     return Container(
-      color: AppColors.background,
+      color: colors.background,
       child: _tabBar,
     );
   }
@@ -310,6 +314,7 @@ class _StoriesTabState extends State<_StoriesTab> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Consumer<LibraryProvider>(
       builder: (context, provider, child) {
         if (provider.isLoading) {
@@ -320,10 +325,10 @@ class _StoriesTabState extends State<_StoriesTab> {
           return Center(
             child: Text(
               AppLocalizations.of(context)!.noStoriesYet,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 16,
-                color: AppColors.textSecondary,
+                color: colors.textSecondary,
               ),
             ),
           );
