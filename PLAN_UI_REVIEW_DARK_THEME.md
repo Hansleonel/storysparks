@@ -1,5 +1,34 @@
 # Plan de Revisión de UI y Tema Dark para StorySparks
 
+## Estado de Implementación
+
+### COMPLETADO:
+- [x] Sistema de temas (`lib/core/theme/app_theme.dart`)
+- [x] ThemeProvider con persistencia (`lib/core/providers/theme_provider.dart`)
+- [x] AppColorsExtension para acceso dinámico a colores
+- [x] Toggle de Dark Mode en Settings
+- [x] HomePage - dark theme + botón paywall temporal eliminado
+- [x] LibraryPage - dark theme
+- [x] ProfilePage - dark theme
+- [x] SettingsPage - dark theme
+- [x] MainNavigation - dark theme
+- [x] LoginPage - dark theme
+- [x] EmptyState widget - dark theme
+- [x] ConfirmationDialog widget - dark theme
+
+### PENDIENTE (Páginas secundarias - opcional):
+- [ ] GeneratedStoryPage - dark theme
+- [ ] AudioPlayerPage - dark theme
+- [ ] RegisterPage - dark theme (parcial)
+- [ ] PaywallScreen - mantiene diseño de marketing (intencionalmente)
+
+### CÓMO USAR EL DARK MODE:
+1. Ir a Settings (icono de engranaje en ProfilePage)
+2. En la sección "Preferences", activar el toggle "Dark Mode"
+3. El tema se aplica inmediatamente y persiste entre sesiones
+
+---
+
 ## Resumen Ejecutivo
 
 Este plan detalla las mejoras de interfaz propuestas (estructura y orden de elementos) para cada página de la aplicación StorySparks, además de la implementación completa del tema dark.
