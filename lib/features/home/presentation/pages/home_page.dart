@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_theme.dart';
 import '../providers/home_provider.dart';
 import 'package:memorysparks/core/constants/genre_constants.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
@@ -18,11 +19,12 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return GestureDetector(
       onTap: () => context.read<HomeProvider>().unfocusMemoryInput(),
-      child: const Scaffold(
-        backgroundColor: AppColors.background,
-        body: SafeArea(
+      child: Scaffold(
+        backgroundColor: colors.background,
+        body: const SafeArea(
           child: SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.all(24.0),
@@ -35,11 +37,7 @@ class HomePage extends StatelessWidget {
                   SizedBox(height: 32),
                   _GenreSection(),
                   SizedBox(height: 32),
-                  // _ProtagonistSection(),
-                  //SizedBox(height: 40),
                   _GenerateButton(),
-                  SizedBox(height: 16),
-                  _TemporaryPaywallButton(),
                 ],
               ),
             ),
@@ -57,6 +55,7 @@ class _MemoryInput extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.read<HomeProvider>();
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -65,27 +64,27 @@ class _MemoryInput extends StatelessWidget {
           focusNode: provider.memoryFocusNode,
           autofocus: false,
           maxLines: 5,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 16,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
           ),
           decoration: InputDecoration(
             hintText: l10n.shareMemoryHint,
             hintStyle: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 16,
-              color: AppColors.textSecondary.withOpacity(0.7),
+              color: colors.textSecondary.withOpacity(0.7),
             ),
             filled: true,
-            fillColor: AppColors.white,
+            fillColor: colors.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: colors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: colors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -101,6 +100,7 @@ class _MemoryInput extends StatelessWidget {
         const SizedBox(height: 16),
         Consumer<HomeProvider>(
           builder: (context, provider, child) {
+            final colors = context.appColors;
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -111,9 +111,9 @@ class _MemoryInput extends StatelessWidget {
                     child: Container(
                       height: 56,
                       decoration: BoxDecoration(
-                        color: AppColors.white,
+                        color: colors.surface,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: colors.border),
                       ),
                       child: Row(
                         children: [
@@ -143,10 +143,10 @@ class _MemoryInput extends StatelessWidget {
                                         return Container(
                                           width: 56,
                                           height: 56,
-                                          color: AppColors.border,
-                                          child: const Icon(
+                                          color: colors.border,
+                                          child: Icon(
                                             Icons.error_outline,
-                                            color: AppColors.textSecondary,
+                                            color: colors.textSecondary,
                                           ),
                                         );
                                       },
@@ -166,7 +166,7 @@ class _MemoryInput extends StatelessWidget {
                                           strokeWidth: 2,
                                           valueColor:
                                               AlwaysStoppedAnimation<Color>(
-                                                  AppColors.white),
+                                                  Colors.white),
                                         ),
                                       ),
                                     ),
@@ -182,10 +182,10 @@ class _MemoryInput extends StatelessWidget {
                               children: [
                                 Text(
                                   l10n.memoryImage,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontFamily: 'Urbanist',
                                     fontSize: 14,
-                                    color: AppColors.textSecondary,
+                                    color: colors.textSecondary,
                                   ),
                                 ),
                                 if (provider.isProcessingImage)
@@ -194,12 +194,12 @@ class _MemoryInput extends StatelessWidget {
                                     style: TextStyle(
                                       fontFamily: 'Urbanist',
                                       fontSize: 12,
-                                      color: AppColors.textSecondary
+                                      color: colors.textSecondary
                                           .withOpacity(0.7),
                                     ),
                                   ),
                                 if (provider.imageDescription != null)
-                                  Icon(
+                                  const Icon(
                                     Icons.check_circle,
                                     size: 14,
                                     color: Colors.green,
@@ -210,7 +210,7 @@ class _MemoryInput extends StatelessWidget {
                           IconButton(
                             icon: const Icon(Icons.close, size: 20),
                             onPressed: () => provider.removeSelectedImage(),
-                            color: AppColors.textSecondary,
+                            color: colors.textSecondary,
                           ),
                         ],
                       ),
@@ -225,7 +225,7 @@ class _MemoryInput extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 14,
-                          color: AppColors.textSecondary.withOpacity(0.7),
+                          color: colors.textSecondary.withOpacity(0.7),
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -245,13 +245,14 @@ class _ImagePickerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.appColors;
     return Container(
       width: 56,
       height: 56,
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colors.border),
       ),
       child: IconButton(
         icon: const Icon(Icons.add_photo_alternate_outlined),
@@ -262,9 +263,9 @@ class _ImagePickerButton extends StatelessWidget {
             context: context,
             backgroundColor: Colors.transparent,
             builder: (_) => Container(
-              decoration: const BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.vertical(
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(20),
                 ),
               ),
@@ -277,19 +278,20 @@ class _ImagePickerButton extends StatelessWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: AppColors.border,
+                        color: colors.border,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                     const SizedBox(height: 24),
                     ListTile(
-                      leading: const Icon(Icons.photo_library_outlined),
+                      leading: Icon(Icons.photo_library_outlined, color: colors.textPrimary),
                       title: Text(
                         l10n.selectFromGallery,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
+                          color: colors.textPrimary,
                         ),
                       ),
                       onTap: () async {
@@ -310,13 +312,14 @@ class _ImagePickerButton extends StatelessWidget {
                       },
                     ),
                     ListTile(
-                      leading: const Icon(Icons.camera_alt_outlined),
+                      leading: Icon(Icons.camera_alt_outlined, color: colors.textPrimary),
                       title: Text(
                         l10n.takePhoto,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
+                          color: colors.textPrimary,
                         ),
                       ),
                       onTap: () async {
@@ -351,22 +354,23 @@ class _GenreSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           AppLocalizations.of(context)!.genreTitle,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 18,
             fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
           ),
         ),
-        SizedBox(height: 16),
-        _GenreChips(),
-        SizedBox(height: 12),
-        _AuthorStyleOption(),
+        const SizedBox(height: 16),
+        const _GenreChips(),
+        const SizedBox(height: 12),
+        const _AuthorStyleOption(),
       ],
     );
   }
@@ -400,6 +404,7 @@ class _GenreChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.only(right: 12),
       child: Consumer<HomeProvider>(
@@ -417,10 +422,10 @@ class _GenreChip extends StatelessWidget {
               curve: Curves.easeInOut,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : AppColors.white,
+                color: isSelected ? AppColors.primary : colors.surface,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.border,
+                  color: isSelected ? AppColors.primary : colors.border,
                   width: isSelected ? 2 : 1,
                 ),
               ),
@@ -434,8 +439,8 @@ class _GenreChip extends StatelessWidget {
                       key: ValueKey('${genre.key}_${isSelected}'),
                       size: 18,
                       color: isSelected
-                          ? AppColors.white
-                          : AppColors.textSecondary,
+                          ? Colors.white
+                          : colors.textSecondary,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -444,8 +449,8 @@ class _GenreChip extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: 'Urbanist',
                       color: isSelected
-                          ? AppColors.white
-                          : AppColors.textSecondary,
+                          ? Colors.white
+                          : colors.textSecondary,
                     ),
                     child: Text(
                       genre.key == 'genreHappy'
@@ -547,6 +552,7 @@ class _GenerateButton extends StatelessWidget {
   const _GenerateButton();
 
   Future<void> _showLoadingDialog(BuildContext context) {
+    final colors = context.appColors;
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -554,7 +560,7 @@ class _GenerateButton extends StatelessWidget {
         return PopScope(
           canPop: false,
           child: Dialog(
-            backgroundColor: AppColors.white,
+            backgroundColor: colors.surface,
             surfaceTintColor: Colors.transparent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
@@ -765,6 +771,7 @@ class _AuthorStyleOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Consumer<HomeProvider>(
       builder: (context, provider, child) {
         final hasStyle = provider.authorStyle?.isNotEmpty ?? false;
@@ -801,7 +808,7 @@ class _AuthorStyleOption extends StatelessWidget {
                   size: 16,
                   color: hasStyle
                       ? AppColors.primary
-                      : AppColors.textSecondary.withOpacity(0.7),
+                      : colors.textSecondary.withOpacity(0.7),
                 ),
                 const SizedBox(width: 6),
                 Text(
@@ -813,7 +820,7 @@ class _AuthorStyleOption extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     color: hasStyle
                         ? AppColors.primary
-                        : AppColors.textSecondary.withOpacity(0.8),
+                        : colors.textSecondary.withOpacity(0.8),
                     fontSize: 14,
                   ),
                 ),
@@ -854,6 +861,7 @@ class _Header extends StatelessWidget {
       (provider) => provider.avatarUrl,
     );
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.appColors;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -878,7 +886,7 @@ class _Header extends StatelessWidget {
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: AppColors.primary.withOpacity(0.1),
-                            child: Icon(
+                            child: const Icon(
                               Icons.person,
                               size: 24,
                               color: AppColors.primary,
@@ -888,7 +896,7 @@ class _Header extends StatelessWidget {
                       )
                     : Container(
                         color: AppColors.primary.withOpacity(0.1),
-                        child: Icon(
+                        child: const Icon(
                           Icons.person,
                           size: 24,
                           color: AppColors.primary,
@@ -904,11 +912,11 @@ class _Header extends StatelessWidget {
                   constraints: const BoxConstraints(maxWidth: 200),
                   child: Text(
                     l10n.hello(userName ?? '...'),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Playfair',
                       fontSize: 24,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textPrimary,
+                      color: colors.textPrimary,
                     ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -916,11 +924,11 @@ class _Header extends StatelessWidget {
                 ),
                 Text(
                   l10n.goodMorning,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                   ),
                 ),
               ],
@@ -932,11 +940,6 @@ class _Header extends StatelessWidget {
           child: InkWell(
             onTap: () {
               debugPrint('🔔 Notifications tapped');
-              // TODO: in case we want to see the paywall using a modal
-              /* ModalUtils.showFullScreenModal(
-                context: context,
-                child: const PaywallPage(),
-              ); */
             },
             borderRadius: BorderRadius.circular(24),
             child: Container(
@@ -944,34 +947,18 @@ class _Header extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.white,
+                color: colors.surface,
                 border: Border.all(
-                  color: AppColors.border,
+                  color: colors.border,
                   width: 1,
                 ),
               ),
-              child: Stack(
-                children: [
-                  const Center(
-                    child: Icon(
-                      Icons.notifications_outlined,
-                      color: AppColors.textPrimary,
-                      size: 24,
-                    ),
-                  ),
-                  /* Positioned(
-                    top: 14,
-                    right: 14,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ), */
-                ],
+              child: Center(
+                child: Icon(
+                  Icons.notifications_outlined,
+                  color: colors.textPrimary,
+                  size: 24,
+                ),
               ),
             ),
           ),
@@ -981,49 +968,3 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _TemporaryPaywallButton extends StatelessWidget {
-  const _TemporaryPaywallButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () {
-          HapticFeedback.lightImpact();
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const PaywallScreen(
-                sourceScreen: 'home_test',
-              ),
-            ),
-          );
-        },
-        icon: const Icon(
-          Icons.star_border,
-          color: Colors.orange,
-          size: 20,
-        ),
-        label: const Text(
-          '🚀 TEST: Abrir Paywall Apple',
-          style: TextStyle(
-            fontFamily: 'Urbanist',
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Colors.orange,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.orange.withOpacity(0.1),
-          foregroundColor: Colors.orange,
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.orange.withOpacity(0.3)),
-          ),
-          elevation: 0,
-        ),
-      ),
-    );
-  }
-}
