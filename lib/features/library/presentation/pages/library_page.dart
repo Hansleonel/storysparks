@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_theme.dart';
 import 'package:memorysparks/core/utils/date_formatter.dart';
 import 'package:memorysparks/features/story/domain/entities/story.dart';
 import 'package:memorysparks/core/widgets/empty_state.dart';
@@ -47,8 +48,9 @@ class _LibraryPageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: SafeArea(
         child: Consumer<LibraryProvider>(
           builder: (context, provider, child) {
@@ -65,11 +67,11 @@ class _LibraryPageContent extends StatelessWidget {
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
                       AppLocalizations.of(context)!.library,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Playfair',
                         fontSize: 32,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                       ),
                     ),
                   ),
@@ -97,11 +99,11 @@ class _LibraryPageContent extends StatelessWidget {
                           children: [
                             Text(
                               AppLocalizations.of(context)!.library,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Playfair',
                                 fontSize: 32,
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.textPrimary,
+                                color: colors.textPrimary,
                               ),
                             ),
                             IconButton(
@@ -135,11 +137,11 @@ class _LibraryPageContent extends StatelessWidget {
                         children: [
                           Text(
                             AppLocalizations.of(context)!.timeline,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Playfair',
                               fontSize: 24,
                               fontWeight: FontWeight.w500,
-                              color: AppColors.textPrimary,
+                              color: colors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -166,6 +168,7 @@ class _PopularStoriesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return SliverToBoxAdapter(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -178,20 +181,20 @@ class _PopularStoriesSection extends StatelessWidget {
               children: [
                 Text(
                   AppLocalizations.of(context)!.popularStories,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Playfair',
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
                 TextButton(
                   onPressed: () {
                     // TODO: Implementar ver todas las historias populares
                   },
-                  child: Text(
-                    AppLocalizations.of(context)!.viewAll,
-                    style: const TextStyle(
+                  child: const Text(
+                    'View All',
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
                       color: AppColors.primary,
                     ),
@@ -258,6 +261,7 @@ class _NewStoriesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return SliverToBoxAdapter(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -270,11 +274,11 @@ class _NewStoriesSection extends StatelessWidget {
               children: [
                 Text(
                   AppLocalizations.of(context)!.newStories,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Playfair',
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
                 TextButton(
@@ -358,6 +362,7 @@ class _StoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -368,7 +373,7 @@ class _StoryCard extends StatelessWidget {
           maxHeight: MediaQuery.of(context).size.height * 0.3,
         ),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: colors.cardBackground,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -442,12 +447,12 @@ class _StoryCard extends StatelessWidget {
                   children: [
                     Text(
                       story.memory,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 14,
                         height: 1.2,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -474,18 +479,18 @@ class _StoryCard extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        const Icon(
+                        Icon(
                           Icons.remove_red_eye_outlined,
                           size: 16,
-                          color: AppColors.textSecondary,
+                          color: colors.textSecondary,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           '${story.readCount}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 12,
-                            color: AppColors.textSecondary,
+                            color: colors.textSecondary,
                           ),
                         ),
                       ],
@@ -508,6 +513,7 @@ class _TimelineView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     // Agrupar historias por fecha
     final groupedStories = <String, List<Story>>{};
 
@@ -536,7 +542,7 @@ class _TimelineView extends StatelessWidget {
                   fontFamily: 'Urbanist',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+                  color: colors.textSecondary,
                 ),
               ),
             ),
@@ -576,6 +582,7 @@ class _TimelineCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<LibraryProvider>();
+    final colors = context.appColors;
     final size = MediaQuery.of(context).size;
     final imageWidth = size.width * 0.25; // 25% del ancho de la pantalla
 
@@ -606,7 +613,7 @@ class _TimelineCard extends StatelessWidget {
               size.height * 0.2, // Máximo 20% de la altura de la pantalla
         ),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: colors.cardBackground,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -651,7 +658,7 @@ class _TimelineCard extends StatelessWidget {
                             fontFamily: 'Urbanist',
                             fontSize: size.width * 0.04, // Texto responsive
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: colors.textPrimary,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -685,7 +692,7 @@ class _TimelineCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                           child: LinearProgressIndicator(
                             value: story.readCount > 0 ? 1 : 0,
-                            backgroundColor: AppColors.border,
+                            backgroundColor: colors.border,
                             color: AppColors.primary,
                             minHeight: 4,
                           ),
@@ -704,7 +711,7 @@ class _TimelineCard extends StatelessWidget {
                                   Icon(
                                     Icons.remove_red_eye_outlined,
                                     size: size.width * 0.04,
-                                    color: AppColors.textSecondary,
+                                    color: colors.textSecondary,
                                   ),
                                   SizedBox(width: size.width * 0.01),
                                   Text(
@@ -712,7 +719,7 @@ class _TimelineCard extends StatelessWidget {
                                     style: TextStyle(
                                       fontFamily: 'Urbanist',
                                       fontSize: size.width * 0.03,
-                                      color: AppColors.textSecondary,
+                                      color: colors.textSecondary,
                                     ),
                                   ),
                                 ],
@@ -734,7 +741,7 @@ class _TimelineCard extends StatelessWidget {
                                       style: TextStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: size.width * 0.03,
-                                        color: AppColors.textSecondary,
+                                        color: colors.textSecondary,
                                       ),
                                     ),
                                   ],
@@ -748,7 +755,7 @@ class _TimelineCard extends StatelessWidget {
                                   Icon(
                                     Icons.description_outlined,
                                     size: size.width * 0.04,
-                                    color: AppColors.textSecondary,
+                                    color: colors.textSecondary,
                                   ),
                                   SizedBox(width: size.width * 0.01),
                                   Text(
@@ -759,7 +766,7 @@ class _TimelineCard extends StatelessWidget {
                                     style: TextStyle(
                                       fontFamily: 'Urbanist',
                                       fontSize: size.width * 0.03,
-                                      color: AppColors.textSecondary,
+                                      color: colors.textSecondary,
                                     ),
                                   ),
                                 ],
