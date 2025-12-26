@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_theme.dart';
 
 class EmptyState extends StatelessWidget {
   final String message;
@@ -15,6 +15,7 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -22,7 +23,7 @@ class EmptyState extends StatelessWidget {
           Icon(
             Icons.auto_stories_outlined,
             size: iconSize,
-            color: AppColors.textSecondary,
+            color: colors.textSecondary,
           ),
           const SizedBox(height: 16),
           Text(
@@ -30,7 +31,7 @@ class EmptyState extends StatelessWidget {
             style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: fontSize,
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
             textAlign: TextAlign.center,
           ),

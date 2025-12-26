@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_theme.dart';
 import 'package:memorysparks/features/auth/presentation/providers/auth_provider.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
@@ -31,11 +32,12 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.appColors;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: colors.background,
       ),
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
@@ -50,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontFamily: 'Playfair',
                       fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                      color: colors.textPrimary,
                     ),
               ),
               const SizedBox(height: 8),
@@ -58,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
                 l10n.loginDescription,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontFamily: 'Urbanist',
-                      color: AppColors.textSecondary,
+                      color: colors.textSecondary,
                       fontWeight: FontWeight.w400,
                     ),
               ),
@@ -84,6 +86,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildEmailField() {
+    final colors = context.appColors;
     return TextField(
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
@@ -93,27 +96,28 @@ class _LoginPageState extends State<LoginPage> {
       inputFormatters: [
         FilteringTextInputFormatter.deny(RegExp(r'[^a-zA-Z0-9@._-]')),
       ],
-      style: const TextStyle(
+      style: TextStyle(
         fontFamily: 'Urbanist',
         fontWeight: FontWeight.w500,
-        color: AppColors.textPrimary,
+        color: colors.textPrimary,
       ),
       decoration: InputDecoration(
         labelText: AppLocalizations.of(context)!.email,
-        labelStyle: const TextStyle(
+        labelStyle: TextStyle(
           fontFamily: 'Urbanist',
           fontWeight: FontWeight.w400,
-          color: AppColors.textSecondary,
+          color: colors.textSecondary,
         ),
-        prefixIcon:
-            const Icon(Icons.email_outlined, color: AppColors.textSecondary),
+        prefixIcon: Icon(Icons.email_outlined, color: colors.textSecondary),
+        filled: true,
+        fillColor: colors.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: colors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: colors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -129,41 +133,43 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildPasswordField() {
+    final colors = context.appColors;
     return Consumer<AuthProvider>(
       builder: (context, provider, _) {
         return TextField(
           controller: _passwordController,
           obscureText: !provider.isPasswordVisible,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
           ),
           decoration: InputDecoration(
             labelText: AppLocalizations.of(context)!.password,
-            labelStyle: const TextStyle(
+            labelStyle: TextStyle(
               fontFamily: 'Urbanist',
               fontWeight: FontWeight.w400,
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
-            prefixIcon:
-                const Icon(Icons.lock_outline, color: AppColors.textSecondary),
+            prefixIcon: Icon(Icons.lock_outline, color: colors.textSecondary),
             suffixIcon: IconButton(
               icon: Icon(
                 provider.isPasswordVisible
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
-                color: AppColors.textSecondary,
+                color: colors.textSecondary,
               ),
               onPressed: provider.togglePasswordVisibility,
             ),
+            filled: true,
+            fillColor: colors.surface,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: colors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.border),
+              borderSide: BorderSide(color: colors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -181,6 +187,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildRememberMeAndForgotPassword() {
+    final colors = context.appColors;
     return Row(
       children: [
         Checkbox(
@@ -192,9 +199,10 @@ class _LoginPageState extends State<LoginPage> {
         ),
         Text(
           AppLocalizations.of(context)!.rememberMe,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontWeight: FontWeight.w500,
+            color: colors.textPrimary,
           ),
         ),
         const Spacer(),
@@ -269,14 +277,16 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildSignUpLink() {
+    final colors = context.appColors;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           AppLocalizations.of(context)!.dontHaveAccount,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontWeight: FontWeight.w500,
+            color: colors.textPrimary,
           ),
         ),
         TextButton(

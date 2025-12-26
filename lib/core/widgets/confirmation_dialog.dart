@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_theme.dart';
 
 /// Widget reutilizable para diálogos de confirmación con diseño premium
 ///
@@ -69,13 +70,14 @@ class ConfirmationDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -108,11 +110,11 @@ class ConfirmationDialog extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Urbanist',
-                color: AppColors.textPrimary,
+                color: colors.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -121,10 +123,10 @@ class ConfirmationDialog extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontFamily: 'Urbanist',
-                color: AppColors.textSecondary,
+                color: colors.textSecondary,
                 height: 1.5,
               ),
             ),
@@ -142,9 +144,9 @@ class ConfirmationDialog extends StatelessWidget {
                           vertical: 14, horizontal: 16),
                       minimumSize:
                           const Size(0, 48), // Altura mínima, ancho flexible
-                      backgroundColor: AppColors.background,
-                      side: const BorderSide(
-                        color: AppColors.border,
+                      backgroundColor: colors.surfaceVariant,
+                      side: BorderSide(
+                        color: colors.border,
                         width: 1.5,
                       ),
                       shape: RoundedRectangleBorder(
@@ -156,11 +158,11 @@ class ConfirmationDialog extends StatelessWidget {
                       maxLines: 2, // Permite hasta 2 líneas
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Urbanist',
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: colors.textPrimary,
                         height: 1.2, // Line height consistente
                       ),
                     ),
