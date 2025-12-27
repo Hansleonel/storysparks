@@ -580,6 +580,7 @@ class _GenerateButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = context.isDarkMode;
     return SizedBox(
       width: double.infinity,
       child: Consumer<HomeProvider>(
@@ -635,19 +636,24 @@ class _GenerateButton extends StatelessWidget {
                     );
                   },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: isEnabled
+                  ? AppColors.primary
+                  : AppColors.primary.withOpacity(0.5),
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              disabledBackgroundColor: AppColors.primary.withOpacity(0.3),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   Icons.auto_stories,
-                  color: Colors.white.withOpacity(isEnabled ? 1.0 : 0.5),
+                  color: isEnabled
+                      ? Colors.white
+                      : (isDarkMode
+                          ? Colors.white.withOpacity(0.6)
+                          : Colors.white),
                   size: 20,
                 ),
                 const SizedBox(width: 8),
@@ -657,7 +663,11 @@ class _GenerateButton extends StatelessWidget {
                     fontFamily: 'Urbanist',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white.withOpacity(isEnabled ? 1.0 : 0.5),
+                    color: isEnabled
+                        ? Colors.white
+                        : (isDarkMode
+                            ? Colors.white.withOpacity(0.6)
+                            : Colors.white),
                   ),
                 ),
               ],
