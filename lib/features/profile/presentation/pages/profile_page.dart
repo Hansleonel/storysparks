@@ -109,7 +109,7 @@ class ProfilePage extends StatelessWidget {
                                           return Container(
                                             color: AppColors.primary
                                                 .withOpacity(0.1),
-                                            child: Icon(
+                                            child: const Icon(
                                               Icons.person,
                                               size: 60,
                                               color: AppColors.primary,
@@ -120,7 +120,7 @@ class ProfilePage extends StatelessWidget {
                                     : Container(
                                         color:
                                             AppColors.primary.withOpacity(0.1),
-                                        child: Icon(
+                                        child: const Icon(
                                           Icons.person,
                                           size: 60,
                                           color: AppColors.primary,
