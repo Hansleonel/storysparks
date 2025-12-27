@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:memorysparks/features/subscription/presentation/pages/paywall_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
@@ -38,6 +39,8 @@ class HomePage extends StatelessWidget {
                   _GenreSection(),
                   SizedBox(height: 32),
                   _GenerateButton(),
+                  SizedBox(height: 32),
+                  _TemporaryPaywallButton(),
                 ],
               ),
             ),
@@ -581,8 +584,9 @@ class _GenerateButton extends StatelessWidget {
       width: double.infinity,
       child: Consumer<HomeProvider>(
         builder: (context, provider, _) {
+          final isEnabled = provider.isGenerateEnabled;
           return ElevatedButton(
-            onPressed: provider.isGenerateEnabled
+            onPressed: isEnabled
                 ? () async {
                     HapticFeedback.mediumImpact();
                     FocusScope.of(context).unfocus();
@@ -620,31 +624,40 @@ class _GenerateButton extends StatelessWidget {
                       }
                     }
                   }
-                : null,
+                : () {
+                    // Show info message when button is disabled
+                    SnackBarUtils.show(
+                      context,
+                      message: AppLocalizations.of(context)
+                              ?.minimumWordsRequired ??
+                          'Please write at least 20 words to generate your story',
+                      type: SnackBarType.warning,
+                    );
+                  },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              disabledBackgroundColor: AppColors.primary.withOpacity(0.5),
+              disabledBackgroundColor: AppColors.primary.withOpacity(0.3),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.auto_stories,
-                  color: AppColors.white,
+                  color: Colors.white.withOpacity(isEnabled ? 1.0 : 0.5),
                   size: 20,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   AppLocalizations.of(context)!.generateStory,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.white,
+                    color: Colors.white.withOpacity(isEnabled ? 1.0 : 0.5),
                   ),
                 ),
               ],
@@ -979,6 +992,53 @@ class _Header extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _TemporaryPaywallButton extends StatelessWidget {
+  const _TemporaryPaywallButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const PaywallScreen(
+                sourceScreen: 'home_test',
+              ),
+            ),
+          );
+        },
+        icon: const Icon(
+          Icons.star_border,
+          color: Colors.orange,
+          size: 20,
+        ),
+        label: const Text(
+          '🚀 TEST: Abrir Paywall Apple',
+          style: TextStyle(
+            fontFamily: 'Urbanist',
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.orange,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.orange.withOpacity(0.1),
+          foregroundColor: Colors.orange,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: Colors.orange.withOpacity(0.3)),
+          ),
+          elevation: 0,
+        ),
+      ),
     );
   }
 }
