@@ -141,6 +141,7 @@
     "logout": "Logout",
     "memory": "memory",
     "memoryImage": "Memory image",
+    "minimumWordsRequired": "Please write at least 20 words to generate your story",
     "monday": "Monday",
     "newLabel": "New",
     "newStories": "New Stories 🎁",

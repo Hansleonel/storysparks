@@ -141,6 +141,7 @@
     "logout": "Cerrar sesión",
     "memory": "recuerdo",
     "memoryImage": "Imagen del recuerdo",
+    "minimumWordsRequired": "Por favor escribe al menos 20 palabras para generar tu historia",
     "monday": "Lunes",
     "newLabel": "Nuevo",
     "newStories": "Nuevas Historias 🎁",

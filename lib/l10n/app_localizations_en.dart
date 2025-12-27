@@ -345,6 +345,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get memoryImage => 'Memory image';
 
   @override
+  String get minimumWordsRequired =>
+      'Please write at least 20 words to generate your story';
+
+  @override
   String get monday => 'Monday';
 
   @override

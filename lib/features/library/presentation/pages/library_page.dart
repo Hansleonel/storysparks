@@ -192,9 +192,9 @@ class _PopularStoriesSection extends StatelessWidget {
                   onPressed: () {
                     // TODO: Implementar ver todas las historias populares
                   },
-                  child: const Text(
-                    'View All',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.viewAll,
+                    style: const TextStyle(
                       fontFamily: 'Urbanist',
                       color: AppColors.primary,
                     ),

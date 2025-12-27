@@ -346,6 +346,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get memoryImage => 'Imagen del recuerdo';
 
   @override
+  String get minimumWordsRequired =>
+      'Por favor escribe al menos 20 palabras para generar tu historia';
+
+  @override
   String get monday => 'Lunes';
 
   @override

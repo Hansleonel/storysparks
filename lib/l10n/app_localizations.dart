@@ -740,6 +740,12 @@ abstract class AppLocalizations {
   /// **'Memory image'**
   String get memoryImage;
 
+  /// No description provided for @minimumWordsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please write at least 20 words to generate your story'**
+  String get minimumWordsRequired;
+
   /// No description provided for @monday.
   ///
   /// In en, this message translates to:
