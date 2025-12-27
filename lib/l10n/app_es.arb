@@ -86,6 +86,7 @@
     "createAccount": "Crear Cuenta",
     "customContinuation": "Continuación Personalizada",
     "customContinuationDescription": "Escribe tu propia dirección para la historia",
+    "darkMode": "Modo Oscuro",
     "delete": "Eliminar",
     "deleteAccount": "Eliminar Cuenta",
     "deleteAccountConfirmation": "¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer y todos tus datos serán eliminados permanentemente.",

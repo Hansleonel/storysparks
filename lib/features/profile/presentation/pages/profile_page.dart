@@ -194,9 +194,10 @@ class ProfilePage extends StatelessWidget {
                     ),
                     SliverPersistentHeader(
                       delegate: _SliverAppBarDelegate(
+                        context,
                         TabBar(
                           labelColor: AppColors.primary,
-                          unselectedLabelColor: AppColors.textSecondary,
+                          unselectedLabelColor: colors.textSecondary,
                           indicatorColor: AppColors.primary,
                           labelStyle: const TextStyle(
                             fontFamily: 'Urbanist',
@@ -273,8 +274,9 @@ class _StatItem extends StatelessWidget {
 
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final TabBar _tabBar;
+  final BuildContext _context;
 
-  _SliverAppBarDelegate(this._tabBar);
+  _SliverAppBarDelegate(this._context, this._tabBar);
 
   @override
   double get minExtent => _tabBar.preferredSize.height;
@@ -284,7 +286,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    final colors = context.appColors;
+    final colors = _context.appColors;
     return Container(
       color: colors.background,
       child: _tabBar,
@@ -293,7 +295,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
+    return true;
   }
 }
 

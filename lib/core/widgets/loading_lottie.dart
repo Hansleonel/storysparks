@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_theme.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 
 class LoadingLottie extends StatefulWidget {
@@ -107,6 +108,7 @@ class _LoadingLottieState extends State<LoadingLottie> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -128,15 +130,15 @@ class _LoadingLottieState extends State<LoadingLottie> {
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: Center(
                 child: widget.showTypewriterEffect
-                    ? _buildTypewriterText()
+                    ? _buildTypewriterText(colors)
                     : Text(
                         widget.message!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
+                          color: colors.textPrimary,
                         ),
                       ),
               ),
@@ -147,7 +149,7 @@ class _LoadingLottieState extends State<LoadingLottie> {
     );
   }
 
-  Widget _buildTypewriterText() {
+  Widget _buildTypewriterText(AppColorsExtension colors) {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 400),
       transitionBuilder: (Widget child, Animation<double> animation) {
@@ -180,7 +182,7 @@ class _LoadingLottieState extends State<LoadingLottie> {
               fontFamily: 'Urbanist',
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: AppColors.primary,
+              color: Colors.white,
               letterSpacing: 0.3,
               height: 1.5,
             ),

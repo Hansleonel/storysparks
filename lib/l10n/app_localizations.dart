@@ -410,6 +410,12 @@ abstract class AppLocalizations {
   /// **'Write your own direction for the story'**
   String get customContinuationDescription;
 
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get darkMode;
+
   /// No description provided for @delete.
   ///
   /// In en, this message translates to:

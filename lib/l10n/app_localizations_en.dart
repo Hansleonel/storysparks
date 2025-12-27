@@ -173,6 +173,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Write your own direction for the story';
 
   @override
+  String get darkMode => 'Dark Mode';
+
+  @override
   String get delete => 'Delete';
 
   @override

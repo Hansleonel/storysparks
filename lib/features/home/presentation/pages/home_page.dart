@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:memorysparks/features/subscription/presentation/pages/paywall_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:memorysparks/core/theme/app_theme.dart';
+import 'package:memorysparks/core/providers/theme_provider.dart';
 import '../providers/home_provider.dart';
 import 'package:memorysparks/core/constants/genre_constants.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
@@ -194,8 +194,8 @@ class _MemoryInput extends StatelessWidget {
                                     style: TextStyle(
                                       fontFamily: 'Urbanist',
                                       fontSize: 12,
-                                      color: colors.textSecondary
-                                          .withOpacity(0.7),
+                                      color:
+                                          colors.textSecondary.withOpacity(0.7),
                                     ),
                                   ),
                                 if (provider.imageDescription != null)
@@ -284,7 +284,8 @@ class _ImagePickerButton extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     ListTile(
-                      leading: Icon(Icons.photo_library_outlined, color: colors.textPrimary),
+                      leading: Icon(Icons.photo_library_outlined,
+                          color: colors.textPrimary),
                       title: Text(
                         l10n.selectFromGallery,
                         style: TextStyle(
@@ -312,7 +313,8 @@ class _ImagePickerButton extends StatelessWidget {
                       },
                     ),
                     ListTile(
-                      leading: Icon(Icons.camera_alt_outlined, color: colors.textPrimary),
+                      leading: Icon(Icons.camera_alt_outlined,
+                          color: colors.textPrimary),
                       title: Text(
                         l10n.takePhoto,
                         style: TextStyle(
@@ -438,9 +440,7 @@ class _GenreChip extends StatelessWidget {
                       genre.icon,
                       key: ValueKey('${genre.key}_${isSelected}'),
                       size: 18,
-                      color: isSelected
-                          ? Colors.white
-                          : colors.textSecondary,
+                      color: isSelected ? Colors.white : colors.textSecondary,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -448,9 +448,7 @@ class _GenreChip extends StatelessWidget {
                     duration: const Duration(milliseconds: 200),
                     style: TextStyle(
                       fontFamily: 'Urbanist',
-                      color: isSelected
-                          ? Colors.white
-                          : colors.textSecondary,
+                      color: isSelected ? Colors.white : colors.textSecondary,
                     ),
                     child: Text(
                       genre.key == 'genreHappy'
@@ -939,7 +937,7 @@ class _Header extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              debugPrint('🔔 Notifications tapped');
+              context.read<ThemeProvider>().toggleTheme();
             },
             borderRadius: BorderRadius.circular(24),
             child: Container(
@@ -953,12 +951,29 @@ class _Header extends StatelessWidget {
                   width: 1,
                 ),
               ),
-              child: Center(
-                child: Icon(
-                  Icons.notifications_outlined,
-                  color: colors.textPrimary,
-                  size: 24,
-                ),
+              child: Consumer<ThemeProvider>(
+                builder: (context, themeProvider, _) {
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    transitionBuilder: (child, animation) {
+                      return RotationTransition(
+                        turns: animation,
+                        child: FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Icon(
+                      themeProvider.isDarkMode
+                          ? Icons.light_mode_outlined
+                          : Icons.dark_mode_outlined,
+                      key: ValueKey(themeProvider.isDarkMode),
+                      color: colors.textSecondary,
+                      size: 22,
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -967,4 +982,3 @@ class _Header extends StatelessWidget {
     );
   }
 }
-
