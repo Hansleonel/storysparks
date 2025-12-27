@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:memorysparks/core/dependency_injection/service_locator.dart';
 import 'package:memorysparks/core/providers/new_story_indicator_provider.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_theme.dart';
 import 'package:memorysparks/core/constants/genre_constants.dart';
 import 'package:memorysparks/features/story/domain/usecases/update_story_rating_usecase.dart';
 import 'package:memorysparks/features/story/domain/usecases/delete_story_usecase.dart';
@@ -154,6 +155,7 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return ChangeNotifierProvider.value(
       value: _storyProvider,
       child: Consumer<StoryProvider>(
@@ -161,13 +163,13 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
           debugPrint(
               '🔄 Building GeneratedStoryPage - isExpanded: ${provider.isExpanded}, isAtBottom: ${provider.isAtBottom}');
           return Scaffold(
-            backgroundColor: AppColors.background,
+            backgroundColor: colors.background,
             appBar: AppBar(
-              backgroundColor: AppColors.background,
+              backgroundColor: colors.background,
               elevation: 0,
               leading: IconButton(
                 icon:
-                    const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+                    Icon(Icons.arrow_back, color: colors.textPrimary),
                 onPressed: () {
                   if (!provider.isSaved && !widget.isFromLibrary) {
                     showDialog(
@@ -196,7 +198,7 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                 Container(
                   margin: const EdgeInsets.only(right: 8),
                   decoration: BoxDecoration(
-                    color: AppColors.white,
+                    color: colors.surface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: AppColors.primary.withOpacity(0.1),
@@ -505,16 +507,17 @@ class _StoryDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<StoryProvider>();
     final rating = provider.rating;
+    final colors = context.appColors;
 
     return Column(
       children: [
         Text(
           AppLocalizations.of(context)!.yourStory,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Playfair',
             fontSize: 28,
             fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
           ),
           textAlign: TextAlign.center,
         ),
@@ -634,6 +637,7 @@ class _StoryContentState extends State<_StoryContent> {
     final story = context.select((StoryProvider p) => p.story!);
     final isMemoryExpanded =
         context.select((StoryProvider p) => p.isMemoryExpanded);
+    final colors = context.appColors;
 
     // Solo ejecutamos el scroll cuando cambia isExpanded a true
     _handleExpand(isExpanded);
@@ -645,9 +649,9 @@ class _StoryContentState extends State<_StoryContent> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: colors.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: colors.border),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -655,13 +659,13 @@ class _StoryContentState extends State<_StoryContent> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Recuerdo Original',
                       style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                       ),
                     ),
                     GestureDetector(
@@ -698,10 +702,10 @@ class _StoryContentState extends State<_StoryContent> {
                         curve: Curves.easeInOut,
                         child: Text(
                           story.memory,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 16,
-                            color: AppColors.textPrimary,
+                            color: colors.textPrimary,
                           ),
                           maxLines: isMemoryExpanded ? null : 1,
                           overflow:
@@ -761,7 +765,7 @@ class _StoryContentState extends State<_StoryContent> {
                     fontFamily: 'Urbanist',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.white,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -772,11 +776,11 @@ class _StoryContentState extends State<_StoryContent> {
               children: [
                 Text(
                   AppLocalizations.of(context)!.generatedStory,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Playfair',
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
                 GestureDetector(
@@ -840,9 +844,9 @@ class _StoryContentState extends State<_StoryContent> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: colors.border),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -868,16 +872,17 @@ class _StoryContentText extends StatelessWidget {
     // Obtener las partes procesadas del provider
     final provider = context.watch<StoryProvider>();
     final parts = provider.storyParts;
+    final colors = context.appColors;
 
     if (parts.isEmpty) {
       // Si no hay partes procesadas (caso improbable), mostrar el texto completo
       return Text(
         content,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Urbanist',
           fontSize: 16,
           height: 1.6,
-          color: AppColors.textPrimary,
+          color: colors.textPrimary,
         ),
       );
     }
@@ -886,11 +891,11 @@ class _StoryContentText extends StatelessWidget {
     if (parts.length == 1) {
       return Text(
         parts[0],
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Urbanist',
           fontSize: 16,
           height: 1.6,
-          color: AppColors.textPrimary,
+          color: colors.textPrimary,
         ),
       );
     }
@@ -902,11 +907,11 @@ class _StoryContentText extends StatelessWidget {
         // Primera parte (historia original)
         Text(
           parts[0],
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 16,
             height: 1.6,
-            color: AppColors.textPrimary,
+            color: colors.textPrimary,
           ),
         ),
 
@@ -958,11 +963,11 @@ class _StoryContentText extends StatelessWidget {
           // Texto de la continuación
           Text(
             parts[i],
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 16,
               height: 1.6,
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
             ),
           ),
         ],

@@ -45,7 +45,7 @@ class AppTheme {
         unselectedItemColor: AppColors.textSecondary,
         elevation: 0,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.white,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -106,7 +106,7 @@ class AppTheme {
         color: AppColors.border,
         thickness: 1,
       ),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: AppColors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
@@ -118,7 +118,7 @@ class AppTheme {
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
       ),
-      tabBarTheme: const TabBarTheme(
+      tabBarTheme: const TabBarThemeData(
         labelColor: AppColors.primary,
         unselectedLabelColor: AppColors.textSecondary,
         indicatorColor: AppColors.primary,
@@ -171,7 +171,7 @@ class AppTheme {
         unselectedItemColor: AppColorsDark.textSecondary,
         elevation: 0,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColorsDark.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -232,7 +232,7 @@ class AppTheme {
         color: AppColorsDark.border,
         thickness: 1,
       ),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: AppColorsDark.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
@@ -244,7 +244,7 @@ class AppTheme {
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
       ),
-      tabBarTheme: TabBarTheme(
+      tabBarTheme: TabBarThemeData(
         labelColor: AppColors.primary,
         unselectedLabelColor: AppColorsDark.textSecondary,
         indicatorColor: AppColors.primary,
@@ -267,8 +267,10 @@ class AppTheme {
   }
 
   static TextTheme _buildTextTheme({required bool isLight}) {
-    final Color primaryColor = isLight ? AppColors.textPrimary : AppColorsDark.textPrimary;
-    final Color secondaryColor = isLight ? AppColors.textSecondary : AppColorsDark.textSecondary;
+    final Color primaryColor =
+        isLight ? AppColors.textPrimary : AppColorsDark.textPrimary;
+    final Color secondaryColor =
+        isLight ? AppColors.textSecondary : AppColorsDark.textSecondary;
 
     return TextTheme(
       headlineLarge: TextStyle(

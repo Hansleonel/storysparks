@@ -86,6 +86,7 @@
     "createAccount": "Create Account",
     "customContinuation": "Custom Continuation",
     "customContinuationDescription": "Write your own direction for the story",
+    "darkMode": "Dark Mode",
     "delete": "Delete",
     "deleteAccount": "Delete Account",
     "deleteAccountConfirmation": "Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently deleted.",

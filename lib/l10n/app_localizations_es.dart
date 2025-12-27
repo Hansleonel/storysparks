@@ -174,6 +174,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Escribe tu propia dirección para la historia';
 
   @override
+  String get darkMode => 'Modo Oscuro';
+
+  @override
   String get delete => 'Eliminar';
 
   @override

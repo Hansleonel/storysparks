@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_theme.dart';
 import 'package:memorysparks/features/audio/domain/entities/audio_state.dart';
 import 'package:memorysparks/features/audio/presentation/providers/audio_player_provider.dart';
 import 'package:memorysparks/features/story/domain/entities/story.dart';
@@ -75,6 +76,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
 
   void _showBackgroundMusicSettings(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.appColors;
     // Capture the provider before showing the modal
     // because the modal's context doesn't have access to it
     final provider = context.read<AudioPlayerProvider>();
@@ -90,7 +92,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
             return Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: colors.surface,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(24),
                 ),
@@ -110,7 +112,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: AppColors.border,
+                      color: colors.border,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -127,11 +129,11 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                       const SizedBox(width: 12),
                       Text(
                         l10n.backgroundMusic,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: colors.textPrimary,
                         ),
                       ),
                     ],
@@ -147,7 +149,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                         style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 14,
-                          color: AppColors.textSecondary,
+                          color: colors.textSecondary,
                         ),
                       ),
                       Text(
@@ -168,7 +170,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                     children: [
                       Icon(
                         Icons.volume_off_rounded,
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                         size: 20,
                       ),
                       Expanded(
@@ -198,7 +200,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                       ),
                       Icon(
                         Icons.volume_up_rounded,
-                        color: AppColors.textSecondary,
+                        color: colors.textSecondary,
                         size: 20,
                       ),
                     ],
@@ -236,7 +238,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.goldPremium : AppColors.white,
+          color: isSelected ? AppColors.goldPremium : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected ? AppColors.goldPremium : AppColors.border,
@@ -258,8 +260,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -268,7 +271,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.white.withOpacity(0.9),
+              color: colors.surface.withOpacity(0.9),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
@@ -278,9 +281,9 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.arrow_back,
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
               size: 20,
             ),
           ),
@@ -292,7 +295,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
             icon: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.white.withOpacity(0.9),
+                color: colors.surface.withOpacity(0.9),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -372,6 +375,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   }
 
   Widget _buildBackground() {
+    final colors = context.appColors;
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -379,8 +383,8 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
           end: Alignment.bottomCenter,
           colors: [
             AppColors.goldPremium.withOpacity(0.15),
-            AppColors.background,
-            AppColors.background,
+            colors.background,
+            colors.background,
           ],
           stops: const [0.0, 0.4, 1.0],
         ),
@@ -391,6 +395,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   Widget _buildCoverArt(AudioPlayerProvider provider) {
     // Update vinyl animation based on playing state
     _updateVinylAnimation(provider.isPlaying);
+    final colors = context.appColors;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 55),
@@ -481,7 +486,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                   height: 20,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.background,
+                    color: colors.background,
                     border: Border.all(
                       color: AppColors.goldPremium,
                       width: 3,
@@ -603,6 +608,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   }
 
   Widget _buildStoryInfo() {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -611,11 +617,11 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
             widget.story.title.isNotEmpty
                 ? widget.story.title
                 : AppLocalizations.of(context)!.yourStory,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Playfair',
               fontSize: 24,
               fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              color: colors.textPrimary,
             ),
             textAlign: TextAlign.center,
             maxLines: 2,
@@ -689,6 +695,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
   }
 
   Widget _buildTimeIndicators(AudioPlayerProvider provider) {
+    final colors = context.appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
@@ -696,18 +703,18 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
         children: [
           Text(
             provider.state.formattedPosition,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 13,
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
           ),
           Text(
             provider.state.formattedDuration,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 13,
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
           ),
         ],
@@ -784,19 +791,21 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
     required double size,
     VoidCallback? onPressed,
   }) {
+    final colors = context.appColors;
     return IconButton(
       onPressed: onPressed,
       icon: Icon(icon),
       iconSize: size,
       color: onPressed != null
-          ? AppColors.textPrimary
-          : AppColors.textSecondary.withOpacity(0.5),
+          ? colors.textPrimary
+          : colors.textSecondary.withOpacity(0.5),
     );
   }
 
   Widget _buildSpeedControl(AudioPlayerProvider provider) {
     final speeds = [0.75, 1.0, 1.5];
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.appColors;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -807,7 +816,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
             style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 13,
-              color: AppColors.textSecondary,
+              color: colors.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
@@ -827,11 +836,11 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.goldPremium : AppColors.white,
+                    color: isSelected ? AppColors.goldPremium : Colors.transparent,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color:
-                          isSelected ? AppColors.goldPremium : AppColors.border,
+                          isSelected ? AppColors.goldPremium : colors.border,
                       width: 1,
                     ),
                   ),
@@ -842,7 +851,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color:
-                          isSelected ? Colors.white : AppColors.textSecondary,
+                          isSelected ? Colors.white : colors.textSecondary,
                     ),
                   ),
                 ),
@@ -856,6 +865,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
 
   Widget _buildLoadingOverlay(AudioPlayerProvider provider) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.appColors;
     String message;
     switch (provider.state.status) {
       case AudioStatus.generating:
@@ -876,7 +886,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
           child: Container(
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: colors.surface,
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
@@ -902,11 +912,11 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                 const SizedBox(height: 24),
                 Text(
                   message,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -915,7 +925,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                   style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                   ),
                 ),
               ],
@@ -928,6 +938,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
 
   Widget _buildErrorOverlay(AudioPlayerProvider provider) {
     final l10n = AppLocalizations.of(context)!;
+    final colors = context.appColors;
     return Container(
       color: Colors.black.withOpacity(0.5),
       child: BackdropFilter(
@@ -937,7 +948,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
             margin: const EdgeInsets.all(32),
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: colors.surface,
               borderRadius: BorderRadius.circular(24),
             ),
             child: Column(
@@ -958,11 +969,11 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                 const SizedBox(height: 16),
                 Text(
                   l10n.audioError,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: colors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -971,7 +982,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                   style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 14,
-                    color: AppColors.textSecondary,
+                    color: colors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -985,7 +996,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                         l10n.audioGoBack,
                         style: TextStyle(
                           fontFamily: 'Urbanist',
-                          color: AppColors.textSecondary,
+                          color: colors.textSecondary,
                         ),
                       ),
                     ),
