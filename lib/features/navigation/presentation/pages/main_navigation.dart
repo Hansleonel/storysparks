@@ -129,12 +129,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
         currentIndex: currentIndex,
         onTap: onTap,
         type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: TextStyle(
+        selectedLabelStyle: const TextStyle(
           fontFamily: _fontFamily,
           fontWeight: _selectedLabelWeight,
           fontSize: _selectedLabelFontSize,
         ),
-        unselectedLabelStyle: TextStyle(
+        unselectedLabelStyle: const TextStyle(
           fontFamily: _fontFamily,
           fontWeight: _unselectedLabelWeight,
           fontSize: _unselectedLabelFontSize,
