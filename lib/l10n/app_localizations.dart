@@ -1495,6 +1495,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Story'**
   String get yourStory;
+
+  /// No description provided for @selectLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Language'**
+  String get selectLanguage;
+
+  /// No description provided for @selectLanguageDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your preferred language'**
+  String get selectLanguageDescription;
+
+  /// No description provided for @systemDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'System Default'**
+  String get systemDefault;
 }
 
 class _AppLocalizationsDelegate

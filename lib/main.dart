@@ -10,6 +10,7 @@ import 'package:memorysparks/core/dependency_injection/service_locator.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_theme.dart';
 import 'package:memorysparks/core/providers/theme_provider.dart';
+import 'package:memorysparks/core/providers/locale_provider.dart';
 import 'package:memorysparks/features/auth/domain/repositories/auth_repository.dart';
 import 'package:memorysparks/features/auth/domain/usecases/login_usecase.dart';
 import 'package:memorysparks/features/auth/domain/usecases/register_usecase.dart';
@@ -58,6 +59,9 @@ void main() async {
       providers: [
         ChangeNotifierProvider(
           create: (_) => ThemeProvider()..loadTheme(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => LocaleProvider()..loadLocale(),
         ),
         ChangeNotifierProvider(
           create: (_) => AuthProvider(
@@ -118,8 +122,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
+    return Consumer2<ThemeProvider, LocaleProvider>(
+      builder: (context, themeProvider, localeProvider, child) {
         return MaterialApp(
           title: 'MemorySparks',
           debugShowCheckedModeBanner: false,
@@ -127,6 +131,7 @@ class _MyAppState extends State<MyApp> {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeProvider.themeMode,
+          locale: localeProvider.locale,
           // Navigate directly to MainNavigation if session exists
           home: widget.hasSession ? const MainNavigation() : const LoginPage(),
           localizationsDelegates: const [

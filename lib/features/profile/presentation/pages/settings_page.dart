@@ -5,11 +5,13 @@ import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:memorysparks/core/theme/app_theme.dart';
 import 'package:memorysparks/core/providers/theme_provider.dart';
+import 'package:memorysparks/core/providers/locale_provider.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:memorysparks/core/widgets/confirmation_dialog.dart';
 import '../providers/settings_provider.dart';
 import 'package:memorysparks/features/auth/presentation/providers/auth_provider.dart';
 import 'package:memorysparks/core/utils/snackbar_utils.dart';
+import '../widgets/language_selection_modal.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -200,11 +202,22 @@ class _SettingsView extends StatelessWidget {
                       // TODO: Navigate to notifications page
                     },
                   ),
-                  _SettingsItem(
-                    icon: Icons.language_outlined,
-                    title: AppLocalizations.of(context)?.language ?? 'Language',
-                    onTap: () {
-                      // TODO: Navigate to language page
+                  Consumer<LocaleProvider>(
+                    builder: (context, localeProvider, child) {
+                      final currentLocale = localeProvider.locale ??
+                          WidgetsBinding.instance.platformDispatcher.locale;
+                      final languageName =
+                          _getLanguageDisplayName(currentLocale.languageCode);
+
+                      return _SettingsItemWithDetail(
+                        icon: Icons.language_outlined,
+                        title:
+                            AppLocalizations.of(context)?.language ?? 'Language',
+                        detail: languageName,
+                        onTap: () {
+                          LanguageSelectionModal.show(context);
+                        },
+                      );
                     },
                   ),
                   _SettingsItemWithSwitch(
@@ -361,6 +374,17 @@ class _SettingsView extends StatelessWidget {
       ],
     );
   }
+
+  String _getLanguageDisplayName(String code) {
+    switch (code) {
+      case 'en':
+        return 'English';
+      case 'es':
+        return 'Español';
+      default:
+        return 'System';
+    }
+  }
 }
 
 class _SettingsItem extends StatelessWidget {
@@ -401,6 +425,57 @@ class _SettingsItem extends StatelessWidget {
               Icons.chevron_right,
               color: textColor ?? colors.textSecondary,
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsItemWithDetail extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String detail;
+  final VoidCallback onTap;
+
+  const _SettingsItemWithDetail({
+    required this.icon,
+    required this.title,
+    required this.detail,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            Icon(icon, color: colors.textPrimary),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 16,
+                  color: colors.textPrimary,
+                ),
+              ),
+            ),
+            Text(
+              detail,
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 14,
+                color: colors.textSecondary,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(Icons.chevron_right, color: colors.textSecondary),
           ],
         ),
       ),

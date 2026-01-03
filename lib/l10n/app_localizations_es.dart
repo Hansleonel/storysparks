@@ -762,4 +762,13 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get yourStory => 'Tu Historia';
+
+  @override
+  String get selectLanguage => 'Seleccionar Idioma';
+
+  @override
+  String get selectLanguageDescription => 'Elige tu idioma preferido';
+
+  @override
+  String get systemDefault => 'Predeterminado del Sistema';
 }
