@@ -78,12 +78,15 @@ class AudioRepositoryImpl implements AudioRepository {
   Future<Either<Failure, String>> generateAudio({
     required String text,
     required int storyId,
+    String? language,
   }) async {
     try {
       debugPrint('🎵 AudioRepository: Generating audio for story $storyId');
+      debugPrint('🌍 Language: ${language ?? "not specified"}');
       final audioUrl = await _ttsDataSource.generateAudio(
         text: text,
         storyId: storyId,
+        language: language,
       );
       return Right(audioUrl);
     } catch (e) {

@@ -10,6 +10,7 @@ abstract class ReplicateTTSDataSource implements TTSDataSource {
     required String text,
     required int storyId,
     String? genre, // Not used by Replicate, but required by interface
+    String? language, // Language code for voice selection
   });
 }
 
@@ -23,11 +24,13 @@ class ReplicateTTSDataSourceImpl implements ReplicateTTSDataSource {
     required String text,
     required int storyId,
     String? genre, // Not used by Replicate
+    String? language, // Language code for voice selection
   }) async {
     try {
       debugPrint('\n🎤 ========== ReplicateTTS: generateAudio ==========');
       debugPrint('📌 Story ID: $storyId');
       debugPrint('📝 Text length: ${text.length} characters');
+      debugPrint('🌍 Language: ${language ?? "not specified (will use default)"}');
       debugPrint(
           '💰 Estimated cost: \$${(text.length / 1000 * 0.06).toStringAsFixed(4)}');
 
@@ -49,6 +52,7 @@ class ReplicateTTSDataSourceImpl implements ReplicateTTSDataSource {
         body: {
           'text': text,
           'storyId': storyId,
+          'language': language,
         },
         headers: {
           'Authorization': 'Bearer ${session.accessToken}',

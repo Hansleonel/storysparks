@@ -54,9 +54,11 @@ class GenerateStoryAudioUseCase {
 
     // Generate audio via TTS service
     debugPrint('🎤 Calling TTS service to generate audio...');
+    debugPrint('🌍 Story language: ${story.language}');
     final generateResult = await _audioRepository.generateAudio(
       text: story.content,
       storyId: storyId,
+      language: story.language,
     );
 
     return generateResult.fold(

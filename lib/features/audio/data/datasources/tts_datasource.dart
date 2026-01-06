@@ -10,9 +10,11 @@ abstract class TTSDataSource {
   /// [text] - The text content to convert to speech
   /// [storyId] - The story ID for logging/tracking purposes
   /// [genre] - Optional genre for styled narration (used by Gemini)
+  /// [language] - Language code for voice selection (e.g., 'es', 'en')
   Future<String> generateAudio({
     required String text,
     required int storyId,
     String? genre,
+    String? language,
   });
 }

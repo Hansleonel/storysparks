@@ -7,6 +7,7 @@ abstract class AudioRepository {
   Future<Either<Failure, String>> generateAudio({
     required String text,
     required int storyId,
+    String? language,
   });
 
   /// Downloads audio from URL and saves it locally

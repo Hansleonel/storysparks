@@ -11,11 +11,13 @@ abstract class GeminiTTSDataSource implements TTSDataSource {
   /// [text] - The story content to convert to speech
   /// [storyId] - The story ID for logging purposes
   /// [genre] - Optional genre for styled narration (e.g., "Romántico", "Aventura")
+  /// [language] - Language code (not used by Gemini, but required by interface)
   @override
   Future<String> generateAudio({
     required String text,
     required int storyId,
     String? genre,
+    String? language,
   });
 }
 
@@ -29,6 +31,7 @@ class GeminiTTSDataSourceImpl implements GeminiTTSDataSource {
     required String text,
     required int storyId,
     String? genre,
+    String? language, // Not used by Gemini, but required by interface
   }) async {
     try {
       debugPrint('\n🔷 ========== GeminiTTS: generateAudio ==========');

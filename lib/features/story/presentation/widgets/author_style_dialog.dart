@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
+import 'package:memorysparks/core/theme/app_theme.dart';
 
 class AuthorStyleDialog extends StatefulWidget {
   final String? currentAuthor;
@@ -46,11 +47,12 @@ class _AuthorStyleDialogState extends State<AuthorStyleDialog> {
   @override
   Widget build(BuildContext context) {
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final colors = context.appColors;
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Dialog(
-        backgroundColor: AppColors.white,
+        backgroundColor: colors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -89,11 +91,11 @@ class _AuthorStyleDialogState extends State<AuthorStyleDialog> {
                       Expanded(
                         child: Text(
                           AppLocalizations.of(context)!.authorStyleTitle,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Urbanist',
-                            color: AppColors.textPrimary,
+                            color: colors.textPrimary,
                           ),
                         ),
                       ),
@@ -102,10 +104,10 @@ class _AuthorStyleDialogState extends State<AuthorStyleDialog> {
                   const SizedBox(height: 8),
                   Text(
                     AppLocalizations.of(context)!.authorStyleDescription,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontFamily: 'Urbanist',
-                      color: AppColors.textSecondary,
+                      color: colors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -128,24 +130,25 @@ class _AuthorStyleDialogState extends State<AuthorStyleDialog> {
                           () {}, // Evita que se oculte el teclado al tocar el campo
                       child: Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: colors.border),
                           borderRadius: BorderRadius.circular(12),
+                          color: colors.surface,
                         ),
                         child: TextField(
                           controller: _authorController,
                           decoration: InputDecoration(
                             hintText: AppLocalizations.of(context)!
                                 .authorStyleAuthorHint,
-                            hintStyle: const TextStyle(
-                              color: AppColors.textSecondary,
+                            hintStyle: TextStyle(
+                              color: colors.textSecondary,
                               fontFamily: 'Urbanist',
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.all(16),
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Urbanist',
-                            color: AppColors.textPrimary,
+                            color: colors.textPrimary,
                           ),
                         ),
                       ),
@@ -172,24 +175,25 @@ class _AuthorStyleDialogState extends State<AuthorStyleDialog> {
                           () {}, // Evita que se oculte el teclado al tocar el campo
                       child: Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: colors.border),
                           borderRadius: BorderRadius.circular(12),
+                          color: colors.surface,
                         ),
                         child: TextField(
                           controller: _bookController,
                           decoration: InputDecoration(
                             hintText: AppLocalizations.of(context)!
                                 .authorStyleBookHint,
-                            hintStyle: const TextStyle(
-                              color: AppColors.textSecondary,
+                            hintStyle: TextStyle(
+                              color: colors.textSecondary,
                               fontFamily: 'Urbanist',
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.all(16),
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Urbanist',
-                            color: AppColors.textPrimary,
+                            color: colors.textPrimary,
                           ),
                         ),
                       ),
@@ -216,8 +220,9 @@ class _AuthorStyleDialogState extends State<AuthorStyleDialog> {
                           () {}, // Evita que se oculte el teclado al tocar el campo
                       child: Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(color: colors.border),
                           borderRadius: BorderRadius.circular(12),
+                          color: colors.surface,
                         ),
                         child: TextField(
                           controller: _customController,
@@ -226,16 +231,16 @@ class _AuthorStyleDialogState extends State<AuthorStyleDialog> {
                           decoration: InputDecoration(
                             hintText: AppLocalizations.of(context)!
                                 .authorStyleCustomHint,
-                            hintStyle: const TextStyle(
-                              color: AppColors.textSecondary,
+                            hintStyle: TextStyle(
+                              color: colors.textSecondary,
                               fontFamily: 'Urbanist',
                             ),
                             border: InputBorder.none,
                             contentPadding: const EdgeInsets.all(16),
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Urbanist',
-                            color: AppColors.textPrimary,
+                            color: colors.textPrimary,
                           ),
                         ),
                       ),
@@ -254,15 +259,15 @@ class _AuthorStyleDialogState extends State<AuthorStyleDialog> {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: const BorderSide(color: AppColors.border),
+                              side: BorderSide(color: colors.border),
                             ),
                           ),
                           child: Text(
                             AppLocalizations.of(context)!.cancel,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondary,
+                              color: colors.textSecondary,
                             ),
                           ),
                         ),
@@ -359,19 +364,19 @@ class _AuthorStyleDialogState extends State<AuthorStyleDialog> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final colors = context.appColors;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.border,
+            color: isSelected ? AppColors.primary : colors.border,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
-          color: isSelected
-              ? AppColors.primary.withOpacity(0.05)
-              : AppColors.white,
+          color:
+              isSelected ? AppColors.primary.withOpacity(0.05) : colors.surface,
         ),
         child: Row(
           children: [
@@ -380,12 +385,12 @@ class _AuthorStyleDialogState extends State<AuthorStyleDialog> {
               decoration: BoxDecoration(
                 color: isSelected
                     ? AppColors.primary.withOpacity(0.1)
-                    : AppColors.background,
+                    : colors.surfaceVariant,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 icon,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                color: isSelected ? AppColors.primary : colors.textSecondary,
                 size: 24,
               ),
             ),
@@ -400,18 +405,17 @@ class _AuthorStyleDialogState extends State<AuthorStyleDialog> {
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'Urbanist',
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.textPrimary,
+                      color:
+                          isSelected ? AppColors.primary : colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontFamily: 'Urbanist',
-                      color: AppColors.textSecondary,
+                      color: colors.textSecondary,
                     ),
                   ),
                 ],

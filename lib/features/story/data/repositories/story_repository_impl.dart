@@ -111,6 +111,7 @@ Para cerrar, ofrece un desenlace abierto para que el usuario pueda continuar la 
         imageUrl: CoverImageHelper.getCoverImage(params.genre),
         customImagePath: processedImagePath,
         status: 'draft',
+        language: params.targetLanguage ?? 'es',
       );
 
       debugPrint('✅ StoryRepository: Historia creada exitosamente');

@@ -13,6 +13,7 @@ class StoryModel extends Story {
     required super.userId,
     required super.title,
     required super.imageUrl,
+    super.language = 'es',
   });
 
   factory StoryModel.fromJson(Map<String, dynamic> json) {
@@ -28,6 +29,7 @@ class StoryModel extends Story {
       title: json['title'] as String? ?? 'Mi Historia',
       imageUrl: json['image_url'] as String? ??
           CoverImageHelper.getCoverImage(json['genre'] as String),
+      language: json['language'] as String? ?? 'es',
     );
   }
 
@@ -43,6 +45,7 @@ class StoryModel extends Story {
       'user_id': userId,
       'title': title,
       'image_url': imageUrl,
+      'language': language,
     };
   }
 }

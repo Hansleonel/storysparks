@@ -20,7 +20,7 @@ class StoryLocalDatasource {
 
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: (db, version) async {
         debugPrint('📦 Database: Creando base de datos versión $version');
         await _onCreate(db, version);
@@ -64,6 +64,12 @@ class StoryLocalDatasource {
               'ALTER TABLE $tableName ADD COLUMN custom_image_path TEXT');
           debugPrint('✅ Database: v5 - Agregada columna custom_image_path');
         }
+
+        if (oldVersion < 6) {
+          await db.execute(
+              'ALTER TABLE $tableName ADD COLUMN language TEXT DEFAULT "es"');
+          debugPrint('✅ Database: v6 - Agregada columna language');
+        }
       },
     );
   }
@@ -82,7 +88,8 @@ class StoryLocalDatasource {
         title TEXT NOT NULL,
         image_url TEXT NOT NULL,
         custom_image_path TEXT,
-        status TEXT DEFAULT 'draft'
+        status TEXT DEFAULT 'draft',
+        language TEXT DEFAULT 'es'
       )
     ''');
     debugPrint('✅ StoryLocalDatasource: Tabla creada exitosamente');
@@ -102,6 +109,7 @@ class StoryLocalDatasource {
       'image_url': story.imageUrl,
       'custom_image_path': story.customImagePath,
       'status': story.status,
+      'language': story.language,
     };
     debugPrint(
         '📝 StoryLocalDatasource: Guardando historia en la base de datos');
@@ -200,6 +208,7 @@ class StoryLocalDatasource {
         imageUrl: maps[i]['image_url'] as String,
         customImagePath: customImagePath,
         status: maps[i]['status'] as String? ?? 'draft',
+        language: maps[i]['language'] as String? ?? 'es',
       );
     });
   }
@@ -229,6 +238,7 @@ class StoryLocalDatasource {
         imageUrl: maps[i]['image_url'] as String,
         customImagePath: customImagePath,
         status: maps[i]['status'] as String? ?? 'draft',
+        language: maps[i]['language'] as String? ?? 'es',
       );
     });
   }
@@ -265,6 +275,7 @@ class StoryLocalDatasource {
         'title': story.title,
         'image_url': story.imageUrl,
         'custom_image_path': story.customImagePath,
+        'language': story.language,
       },
       where: 'id = ?',
       whereArgs: [story.id],
@@ -301,6 +312,7 @@ class StoryLocalDatasource {
       imageUrl: map['image_url'] as String,
       customImagePath: customImagePath,
       status: map['status'] as String,
+      language: map['language'] as String? ?? 'es',
     );
   }
 
@@ -322,6 +334,7 @@ class StoryLocalDatasource {
               imageUrl: map['image_url'] as String,
               customImagePath: map['custom_image_path'] as String?,
               status: map['status'] as String,
+              language: map['language'] as String? ?? 'es',
             ))
         .toList();
   }

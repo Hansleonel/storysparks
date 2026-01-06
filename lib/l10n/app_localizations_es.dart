@@ -562,6 +562,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get selectFromGallery => 'Seleccionar de la galería';
 
   @override
+  String get selectLanguage => 'Seleccionar Idioma';
+
+  @override
+  String get selectLanguageDescription => 'Elige tu idioma preferido';
+
+  @override
   String get settings => 'Configuración';
 
   @override
@@ -663,6 +669,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get sunday => 'Domingo';
 
   @override
+  String get systemDefault => 'Predeterminado del Sistema';
+
+  @override
   String get takePhoto => 'Tomar foto';
 
   @override
@@ -762,13 +771,4 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get yourStory => 'Tu Historia';
-
-  @override
-  String get selectLanguage => 'Seleccionar Idioma';
-
-  @override
-  String get selectLanguageDescription => 'Elige tu idioma preferido';
-
-  @override
-  String get systemDefault => 'Predeterminado del Sistema';
 }
