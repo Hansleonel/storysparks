@@ -176,6 +176,12 @@ abstract class AppLocalizations {
   /// **'Try Again'**
   String get audioTryAgain;
 
+  /// No description provided for @audioPremiumMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen to your stories narrated with natural voices with Premium.'**
+  String get audioPremiumMessage;
+
   /// No description provided for @backgroundMusic.
   ///
   /// In en, this message translates to:
@@ -374,6 +380,12 @@ abstract class AppLocalizations {
   /// **'Continue story'**
   String get continueStory;
 
+  /// No description provided for @continueStoryPremiumMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue your stories and create epic narratives with Premium.'**
+  String get continueStoryPremiumMessage;
+
   /// No description provided for @continueStoryMode.
   ///
   /// In en, this message translates to:
@@ -535,6 +547,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Forgot password?'**
   String get forgotPassword;
+
+  /// No description provided for @freemiumStoryLimitMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve reached the limit of 3 free stories. Unlock unlimited stories with Premium!'**
+  String get freemiumStoryLimitMessage;
 
   /// No description provided for @friday.
   ///
@@ -902,6 +920,12 @@ abstract class AppLocalizations {
   /// **'AI Story Narration & Voice Cloning to narrate your stories.'**
   String get paywallBenefitAiNarration;
 
+  /// No description provided for @paywallBenefitAiNarrationShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Epic narration of your stories'**
+  String get paywallBenefitAiNarrationShort;
+
   /// No description provided for @paywallBenefitEarlyAccess.
   ///
   /// In en, this message translates to:
@@ -914,11 +938,23 @@ abstract class AppLocalizations {
   /// **'No ads or interruptions'**
   String get paywallBenefitNoAds;
 
+  /// No description provided for @paywallBenefitPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Use photos to inspire your stories'**
+  String get paywallBenefitPhotos;
+
   /// No description provided for @paywallBenefitUnlimited.
   ///
   /// In en, this message translates to:
   /// **'Unlimited and personalized stories'**
   String get paywallBenefitUnlimited;
+
+  /// No description provided for @paywallBenefitContinueStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue and expand your stories'**
+  String get paywallBenefitContinueStory;
 
   /// No description provided for @paywallBestValueTag.
   ///

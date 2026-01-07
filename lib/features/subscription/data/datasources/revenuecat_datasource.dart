@@ -14,10 +14,13 @@ abstract class RevenueCatDataSource {
   Future<List<OfferingModel>> getOfferings();
   Future<CustomerInfoModel> purchasePackage(PackageModel package);
   Future<CustomerInfoModel> restorePurchases();
+  void setCustomerInfoUpdateListener(Function(CustomerInfoModel) onUpdate);
+  void removeCustomerInfoUpdateListener();
 }
 
 class RevenueCatDataSourceImpl implements RevenueCatDataSource {
   bool _isInitialized = false;
+  Function(CustomerInfo)? _currentListener;
 
   @override
   Future<void> initializeWithUser(String userId) async {
@@ -41,10 +44,51 @@ class RevenueCatDataSourceImpl implements RevenueCatDataSource {
       // Verify configuration
       final customerInfo = await Purchases.getCustomerInfo();
       log('✅ RevenueCat configured successfully. UserID: ${customerInfo.originalAppUserId}');
+      log('💎 Initial premium status: ${customerInfo.entitlements.active.containsKey(RevenueCatConstants.entitlementId)}');
     } catch (e) {
       log('❌ Error initializing RevenueCat: $e');
       rethrow;
     }
+  }
+
+  @override
+  void setCustomerInfoUpdateListener(Function(CustomerInfoModel) onUpdate) {
+    if (!_isInitialized) {
+      log('⚠️ Cannot set listener: RevenueCat not initialized');
+      return;
+    }
+
+    log('👂 Setting up CustomerInfo update listener');
+
+    // Create the listener function
+    _currentListener = (customerInfo) {
+      log('🔔 CustomerInfo updated automatically');
+      log('💎 New premium status: ${customerInfo.entitlements.active.containsKey(RevenueCatConstants.entitlementId)}');
+
+      final model = CustomerInfoModel.fromRevenueCat(
+        customerInfo,
+        RevenueCatConstants.entitlementId,
+      );
+      onUpdate(model);
+    };
+
+    // RevenueCat automatically calls this listener when:
+    // - App comes to foreground (every 5 minutes if in foreground)
+    // - After a purchase
+    // - After restore
+    // - When subscription status changes
+    Purchases.addCustomerInfoUpdateListener(_currentListener!);
+  }
+
+  @override
+  void removeCustomerInfoUpdateListener() {
+    if (!_isInitialized || _currentListener == null) {
+      return;
+    }
+
+    log('👋 Removing CustomerInfo update listener');
+    Purchases.removeCustomerInfoUpdateListener(_currentListener!);
+    _currentListener = null;
   }
 
   @override

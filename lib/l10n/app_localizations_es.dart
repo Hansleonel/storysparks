@@ -48,6 +48,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get audioTryAgain => 'Intentar de nuevo';
 
   @override
+  String get audioPremiumMessage =>
+      'Escucha tus historias narradas con voces naturales con Premium.';
+
+  @override
   String get backgroundMusic => 'Música de Fondo';
 
   @override
@@ -155,6 +159,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get continueStory => 'Continuar historia';
 
   @override
+  String get continueStoryPremiumMessage =>
+      'Continúa tus historias y crea narrativas épicas con Premium.';
+
+  @override
   String get continueStoryMode => 'Modo de Continuación';
 
   @override
@@ -239,6 +247,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get forgotPassword => '¿Olvidaste tu contraseña?';
+
+  @override
+  String get freemiumStoryLimitMessage =>
+      'Has alcanzado el límite de 3 historias gratuitas. ¡Desbloquea historias ilimitadas con Premium!';
 
   @override
   String get friday => 'Viernes';
@@ -436,6 +448,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Narración AI y Clonación de Voz para narrar tus historias.';
 
   @override
+  String get paywallBenefitAiNarrationShort =>
+      'Narración épica de tus historias';
+
+  @override
   String get paywallBenefitEarlyAccess =>
       'Acceso anticipado a nuevas funciones';
 
@@ -443,7 +459,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get paywallBenefitNoAds => 'Sin anuncios ni interrupciones';
 
   @override
+  String get paywallBenefitPhotos => 'Usa fotos para inspirar tus historias';
+
+  @override
   String get paywallBenefitUnlimited => 'Historias ilimitadas y personalizadas';
+
+  @override
+  String get paywallBenefitContinueStory => 'Continúa y expande tus historias';
 
   @override
   String get paywallBestValueTag => 'Mejor opción';

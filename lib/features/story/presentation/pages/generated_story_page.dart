@@ -11,6 +11,8 @@ import 'package:memorysparks/features/story/domain/usecases/delete_story_usecase
 import 'package:memorysparks/features/story/domain/usecases/save_story_usecase.dart';
 import 'package:memorysparks/features/story/domain/usecases/update_story_status_usecase.dart';
 import 'package:memorysparks/features/story/domain/usecases/continue_story_usecase.dart';
+import 'package:memorysparks/features/subscription/presentation/pages/paywall_screen.dart';
+import 'package:memorysparks/features/subscription/presentation/providers/freemium_provider.dart';
 import '../../domain/entities/story.dart';
 import '../providers/story_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -168,8 +170,7 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
               backgroundColor: colors.background,
               elevation: 0,
               leading: IconButton(
-                icon:
-                    Icon(Icons.arrow_back, color: colors.textPrimary),
+                icon: Icon(Icons.arrow_back, color: colors.textPrimary),
                 onPressed: () {
                   if (!provider.isSaved && !widget.isFromLibrary) {
                     showDialog(
@@ -277,6 +278,11 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                                   Navigator.pop(context); // Cerrar diálogo
                                   await provider.deleteStory();
                                   if (mounted) {
+                                    // Refresh freemium quota after deletion
+                                    context
+                                        .read<FreemiumProvider>()
+                                        .onStoryDeleted();
+
                                     Navigator.pop(context); // Volver atrás
                                     widget.onStoryStateChanged
                                         ?.call(); // Actualizar biblioteca
@@ -293,6 +299,9 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
                           } else {
                             final success = await provider.saveStory();
                             if (success && mounted) {
+                              // Refresh freemium quota after saving
+                              context.read<FreemiumProvider>().onStorySaved();
+
                               widget.onStoryStateChanged?.call();
 
                               // Marcar que hay una nueva historia guardada
@@ -396,95 +405,166 @@ class _GeneratedStoryPageState extends State<GeneratedStoryPage>
               ),
             ),
             floatingActionButton: provider.isExpanded && provider.isAtBottom
-                ? ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: FloatingActionButton.extended(
-                        backgroundColor: AppColors.primary,
-                        onPressed: provider.isContinuing
-                            ? null
-                            : () async {
-                                debugPrint(
-                                    '🔘 FAB pressed - Showing continue story dialog');
+                ? Consumer<FreemiumProvider>(
+                    builder: (context, freemiumProvider, _) {
+                      final isPremium = freemiumProvider.isPremium;
 
-                                // Mostrar el diálogo de opciones de continuación
-                                final result =
-                                    await showDialog<Map<String, dynamic>>(
-                                  context: context,
-                                  builder: (context) =>
-                                      const ContinueStoryDialog(),
-                                );
+                      return ScaleTransition(
+                        scale: _scaleAnimation,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.primary.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: FloatingActionButton.extended(
+                                backgroundColor: AppColors.primary,
+                                onPressed: provider.isContinuing
+                                    ? null
+                                    : () async {
+                                        // Check if user is premium before allowing continuation
+                                        if (!freemiumProvider
+                                            .canContinueStory()) {
+                                          HapticFeedback.mediumImpact();
 
-                                if (result != null && mounted) {
-                                  bool success = false;
+                                          // Show snackbar first
+                                          SnackBarUtils.show(
+                                            context,
+                                            message: AppLocalizations.of(
+                                                    context)!
+                                                .continueStoryPremiumMessage,
+                                            type: SnackBarType.warning,
+                                          );
 
-                                  if (result['mode'] == 'automatic') {
-                                    debugPrint(
-                                        '🤖 Continuing story automatically');
-                                    success = await provider.continueStory();
-                                  } else if (result['mode'] == 'custom') {
-                                    final direction =
-                                        result['direction'] as String;
-                                    debugPrint(
-                                        '📝 Continuing story with direction: $direction');
-                                    success = await provider
-                                        .continueStoryWithDirection(direction);
-                                  }
+                                          // Navigate to paywall immediately
+                                          final purchased =
+                                              await Navigator.of(context)
+                                                  .push<bool>(
+                                            MaterialPageRoute(
+                                              builder: (_) =>
+                                                  const PaywallScreen(
+                                                sourceScreen: 'continue_story',
+                                              ),
+                                            ),
+                                          );
 
-                                  if (success && mounted) {
-                                    // Realizar scroll automático después de la continuación
-                                    _scrollAfterContinuation();
-                                    widget.onStoryStateChanged?.call();
-                                    SnackBarUtils.show(
-                                      context,
-                                      message: AppLocalizations.of(context)!
-                                          .storyContinuedSuccess,
-                                      type: SnackBarType.success,
-                                    );
-                                  } else if (mounted) {
-                                    SnackBarUtils.show(
-                                      context,
-                                      message: provider.error ??
-                                          AppLocalizations.of(context)!
-                                              .storyContinueError,
-                                      type: SnackBarType.error,
-                                    );
-                                  }
-                                }
-                              },
-                        icon: provider.isContinuing
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white),
+                                          if (purchased != true) return;
+                                        }
+
+                                        debugPrint(
+                                            '🔘 FAB pressed - Showing continue story dialog');
+
+                                        // Mostrar el diálogo de opciones de continuación
+                                        final result = await showDialog<
+                                            Map<String, dynamic>>(
+                                          context: context,
+                                          builder: (context) =>
+                                              const ContinueStoryDialog(),
+                                        );
+
+                                        if (result != null && mounted) {
+                                          bool success = false;
+
+                                          if (result['mode'] == 'automatic') {
+                                            debugPrint(
+                                                '🤖 Continuing story automatically');
+                                            success =
+                                                await provider.continueStory();
+                                          } else if (result['mode'] ==
+                                              'custom') {
+                                            final direction =
+                                                result['direction'] as String;
+                                            debugPrint(
+                                                '📝 Continuing story with direction: $direction');
+                                            success = await provider
+                                                .continueStoryWithDirection(
+                                                    direction);
+                                          }
+
+                                          if (success && mounted) {
+                                            // Realizar scroll automático después de la continuación
+                                            _scrollAfterContinuation();
+                                            widget.onStoryStateChanged?.call();
+                                            SnackBarUtils.show(
+                                              context,
+                                              message:
+                                                  AppLocalizations.of(context)!
+                                                      .storyContinuedSuccess,
+                                              type: SnackBarType.success,
+                                            );
+                                          } else if (mounted) {
+                                            SnackBarUtils.show(
+                                              context,
+                                              message: provider.error ??
+                                                  AppLocalizations.of(context)!
+                                                      .storyContinueError,
+                                              type: SnackBarType.error,
+                                            );
+                                          }
+                                        }
+                                      },
+                                icon: provider.isContinuing
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.white),
+                                        ),
+                                      )
+                                    : const Icon(Icons.auto_stories,
+                                        color: Colors.white),
+                                label: Text(
+                                  provider.isContinuing
+                                      ? AppLocalizations.of(context)!.continuing
+                                      : AppLocalizations.of(context)!
+                                          .continueStory,
+                                  style: const TextStyle(
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                              )
-                            : const Icon(Icons.auto_stories,
-                                color: Colors.white),
-                        label: Text(
-                          provider.isContinuing
-                              ? AppLocalizations.of(context)!.continuing
-                              : AppLocalizations.of(context)!.continueStory,
-                          style: const TextStyle(
-                            fontFamily: 'Urbanist',
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
+                              ),
+                            ),
+                            // Lock badge for non-premium users
+                            if (!isPremium && !provider.isContinuing)
+                              Positioned(
+                                top: -4,
+                                right: -4,
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    Icons.lock,
+                                    size: 12,
+                                    color: AppColors.goldPremium,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   )
                 : null,
           );
@@ -783,58 +863,121 @@ class _StoryContentState extends State<_StoryContent> {
                     color: colors.textPrimary,
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    // Navigate to audio player
-                    debugPrint(
-                        '\n🎵 ========== Play Button Pressed ==========');
-                    debugPrint('📖 Story: "${story.title}" (ID: ${story.id})');
-                    debugPrint(
-                        '📝 Content length: ${story.content.length} chars');
-                    debugPrint('🚀 Navigating to AudioPlayerPage...');
-                    debugPrint(
-                        '🎵 =========================================\n');
+                Consumer<FreemiumProvider>(
+                  builder: (context, freemiumProvider, _) {
+                    final isPremium = freemiumProvider.isPremium;
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChangeNotifierProvider(
-                          create: (_) => AudioPlayerProvider(
-                            generateAudioUseCase:
-                                getIt<GenerateStoryAudioUseCase>(),
+                    return GestureDetector(
+                      onTap: () async {
+                        // Check if user is premium before allowing audio
+                        if (!freemiumProvider.canUseAudio()) {
+                          HapticFeedback.mediumImpact();
+
+                          // Show snackbar first
+                          SnackBarUtils.show(
+                            context,
+                            message: AppLocalizations.of(context)!
+                                .audioPremiumMessage,
+                            type: SnackBarType.warning,
+                          );
+
+                          // Navigate to paywall immediately
+                          final purchased =
+                              await Navigator.of(context).push<bool>(
+                            MaterialPageRoute(
+                              builder: (_) => const PaywallScreen(
+                                sourceScreen: 'audio',
+                              ),
+                            ),
+                          );
+
+                          if (purchased != true) return;
+                        }
+
+                        // Navigate to audio player
+                        debugPrint(
+                            '\n🎵 ========== Play Button Pressed ==========');
+                        debugPrint(
+                            '📖 Story: "${story.title}" (ID: ${story.id})');
+                        debugPrint(
+                            '📝 Content length: ${story.content.length} chars');
+                        debugPrint('🚀 Navigating to AudioPlayerPage...');
+                        debugPrint(
+                            '🎵 =========================================\n');
+
+                        if (context.mounted) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChangeNotifierProvider(
+                                create: (_) => AudioPlayerProvider(
+                                  generateAudioUseCase:
+                                      getIt<GenerateStoryAudioUseCase>(),
+                                ),
+                                child: AudioPlayerPage(story: story),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  AppColors.goldPremium,
+                                  AppColors.goldPremium.withOpacity(0.8),
+                                ],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.goldPremium.withOpacity(0.4),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.play_arrow_rounded,
+                              color: Colors.white,
+                              size: 24,
+                            ),
                           ),
-                          child: AudioPlayerPage(story: story),
-                        ),
+                          // Lock badge for non-premium users
+                          if (!isPremium)
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.2),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  Icons.lock,
+                                  size: 10,
+                                  color: AppColors.goldPremium,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     );
                   },
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.goldPremium,
-                          AppColors.goldPremium.withOpacity(0.8),
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.goldPremium.withOpacity(0.4),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.play_arrow_rounded,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
                 ),
               ],
             ),

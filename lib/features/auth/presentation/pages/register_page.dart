@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:memorysparks/features/auth/presentation/providers/auth_provider.dart';
+import 'package:memorysparks/features/subscription/presentation/providers/freemium_provider.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 
@@ -142,7 +143,15 @@ class _RegisterPageState extends State<RegisterPage> {
         );
 
     if (success && mounted) {
-      Navigator.pushReplacementNamed(context, AppRoutes.main);
+      // Initialize FreemiumProvider with user ID
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        await context.read<FreemiumProvider>().initialize(user.id);
+      }
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.main);
+      }
     }
   }
 

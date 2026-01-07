@@ -11,6 +11,8 @@ import 'package:memorysparks/features/subscription/domain/usecases/initialize_re
 import 'package:memorysparks/features/subscription/domain/usecases/logout_revenuecat_usecase.dart';
 import 'package:memorysparks/features/subscription/domain/usecases/purchase_package_usecase.dart';
 import 'package:memorysparks/features/subscription/domain/usecases/restore_purchases_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/set_customer_info_listener_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/remove_customer_info_listener_usecase.dart';
 
 enum SubscriptionState { initial, loading, loaded, purchasing, error }
 
@@ -21,6 +23,8 @@ class SubscriptionProvider extends ChangeNotifier {
   final GetOfferingsUseCase getOfferingsUseCase;
   final PurchasePackageUseCase purchasePackageUseCase;
   final RestorePurchasesUseCase restorePurchasesUseCase;
+  final SetCustomerInfoListenerUseCase setCustomerInfoListenerUseCase;
+  final RemoveCustomerInfoListenerUseCase removeCustomerInfoListenerUseCase;
 
   SubscriptionProvider({
     required this.initializeRevenueCatUseCase,
@@ -29,6 +33,8 @@ class SubscriptionProvider extends ChangeNotifier {
     required this.getOfferingsUseCase,
     required this.purchasePackageUseCase,
     required this.restorePurchasesUseCase,
+    required this.setCustomerInfoListenerUseCase,
+    required this.removeCustomerInfoListenerUseCase,
   });
 
   SubscriptionState _state = SubscriptionState.initial;
@@ -128,6 +134,10 @@ class SubscriptionProvider extends ChangeNotifier {
         },
         (_) async {
           log('✅ RevenueCat initialized successfully');
+
+          // Set up automatic listener for subscription changes
+          _setupCustomerInfoListener();
+
           // Load initial data
           await _loadInitialData();
         },
@@ -136,6 +146,33 @@ class SubscriptionProvider extends ChangeNotifier {
       log('💥 Exception during RevenueCat initialization: $e');
       _setError(e.toString());
     }
+  }
+
+  /// Set up listener for automatic customer info updates
+  void _setupCustomerInfoListener() {
+    log('👂 Setting up automatic subscription status listener');
+    // This will be called automatically by RevenueCat when:
+    // - App comes to foreground (every 5 minutes if in foreground)
+    // - After purchase/restore
+    // - When subscription status changes
+    setCustomerInfoListenerUseCase((customerInfo) {
+      log('🔔 Subscription status updated automatically');
+      log('💎 New premium status: ${customerInfo.isPremium}');
+
+      // Update local state
+      _customerInfo = customerInfo;
+      _isPremium = customerInfo.isPremium;
+
+      // Notify all listeners (including FreemiumProvider)
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    // Clean up listener when provider is disposed
+    removeCustomerInfoListenerUseCase();
+    super.dispose();
   }
 
   /// Logout from RevenueCat

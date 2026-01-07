@@ -30,4 +30,10 @@ abstract class SubscriptionRepository {
 
   /// Sync premium status with backend
   Future<Either<Failure, void>> syncPremiumStatusWithBackend();
+
+  /// Set listener for automatic customer info updates
+  void setCustomerInfoUpdateListener(Function(CustomerInfoEntity) onUpdate);
+
+  /// Remove customer info update listener
+  void removeCustomerInfoUpdateListener();
 }
