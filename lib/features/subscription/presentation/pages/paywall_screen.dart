@@ -112,23 +112,24 @@ class _PaywallScreenState extends State<PaywallScreen> {
                             SizedBox(height: screenHeight * 0.02),
                             _buildBenefitItem(
                               AppLocalizations.of(context)!
-                                  .unlimitedPersonalizedStories,
+                                  .paywallBenefitUnlimited,
                               Icons.auto_awesome,
                             ),
                             _buildBenefitItem(
                               AppLocalizations.of(context)!
-                                  .noAdsOrInterruptions,
-                              Icons.block,
+                                  .paywallBenefitAiNarrationShort,
+                              Icons.record_voice_over,
+                              isHighlighted: true,
                             ),
                             _buildBenefitItem(
                               AppLocalizations.of(context)!
-                                  .earlyAccessToNewFeatures,
-                              Icons.star_outline,
+                                  .paywallBenefitContinueStory,
+                              Icons.history_edu,
                             ),
                             _buildBenefitItem(
-                              AppLocalizations.of(context)!.allGenresAvailable,
-                              Icons.palette_rounded,
-                              isHighlighted: true,
+                              AppLocalizations.of(context)!
+                                  .paywallBenefitPhotos,
+                              Icons.photo_library,
                             ),
                           ],
                         ),

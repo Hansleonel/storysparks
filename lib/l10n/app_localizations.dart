@@ -920,6 +920,12 @@ abstract class AppLocalizations {
   /// **'AI Story Narration & Voice Cloning to narrate your stories.'**
   String get paywallBenefitAiNarration;
 
+  /// No description provided for @paywallBenefitAiNarrationShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Epic narration of your stories'**
+  String get paywallBenefitAiNarrationShort;
+
   /// No description provided for @paywallBenefitEarlyAccess.
   ///
   /// In en, this message translates to:
@@ -932,11 +938,23 @@ abstract class AppLocalizations {
   /// **'No ads or interruptions'**
   String get paywallBenefitNoAds;
 
+  /// No description provided for @paywallBenefitPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Use photos to inspire your stories'**
+  String get paywallBenefitPhotos;
+
   /// No description provided for @paywallBenefitUnlimited.
   ///
   /// In en, this message translates to:
   /// **'Unlimited and personalized stories'**
   String get paywallBenefitUnlimited;
+
+  /// No description provided for @paywallBenefitContinueStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue and expand your stories'**
+  String get paywallBenefitContinueStory;
 
   /// No description provided for @paywallBestValueTag.
   ///

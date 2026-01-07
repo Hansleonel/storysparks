@@ -448,6 +448,10 @@ class AppLocalizationsEs extends AppLocalizations {
       'Narración AI y Clonación de Voz para narrar tus historias.';
 
   @override
+  String get paywallBenefitAiNarrationShort =>
+      'Narración épica de tus historias';
+
+  @override
   String get paywallBenefitEarlyAccess =>
       'Acceso anticipado a nuevas funciones';
 
@@ -455,7 +459,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get paywallBenefitNoAds => 'Sin anuncios ni interrupciones';
 
   @override
+  String get paywallBenefitPhotos => 'Usa fotos para inspirar tus historias';
+
+  @override
   String get paywallBenefitUnlimited => 'Historias ilimitadas y personalizadas';
+
+  @override
+  String get paywallBenefitContinueStory => 'Continúa y expande tus historias';
 
   @override
   String get paywallBestValueTag => 'Mejor opción';

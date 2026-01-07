@@ -445,13 +445,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'AI Story Narration & Voice Cloning to narrate your stories.';
 
   @override
+  String get paywallBenefitAiNarrationShort => 'Epic narration of your stories';
+
+  @override
   String get paywallBenefitEarlyAccess => 'Early access to new features';
 
   @override
   String get paywallBenefitNoAds => 'No ads or interruptions';
 
   @override
+  String get paywallBenefitPhotos => 'Use photos to inspire your stories';
+
+  @override
   String get paywallBenefitUnlimited => 'Unlimited and personalized stories';
+
+  @override
+  String get paywallBenefitContinueStory => 'Continue and expand your stories';
 
   @override
   String get paywallBestValueTag => 'Best value';
