@@ -155,4 +155,14 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
           ServerFailure('Failed to sync premium status: ${e.toString()}'));
     }
   }
+
+  @override
+  void setCustomerInfoUpdateListener(Function(CustomerInfoEntity) onUpdate) {
+    revenueCatDataSource.setCustomerInfoUpdateListener(onUpdate);
+  }
+
+  @override
+  void removeCustomerInfoUpdateListener() {
+    revenueCatDataSource.removeCustomerInfoUpdateListener();
+  }
 }

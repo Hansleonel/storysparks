@@ -58,14 +58,18 @@ import 'package:memorysparks/features/audio/domain/usecases/generate_story_audio
 
 // Subscription
 import 'package:memorysparks/features/subscription/data/datasources/revenuecat_datasource.dart';
+import 'package:memorysparks/features/subscription/data/datasources/freemium_local_datasource.dart';
 import 'package:memorysparks/features/subscription/data/repositories/subscription_repository_impl.dart';
 import 'package:memorysparks/features/subscription/domain/repositories/subscription_repository.dart';
 import 'package:memorysparks/features/subscription/domain/usecases/check_premium_status_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/check_story_quota_usecase.dart';
 import 'package:memorysparks/features/subscription/domain/usecases/get_offerings_usecase.dart';
 import 'package:memorysparks/features/subscription/domain/usecases/initialize_revenuecat_usecase.dart';
 import 'package:memorysparks/features/subscription/domain/usecases/logout_revenuecat_usecase.dart';
 import 'package:memorysparks/features/subscription/domain/usecases/purchase_package_usecase.dart';
 import 'package:memorysparks/features/subscription/domain/usecases/restore_purchases_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/set_customer_info_listener_usecase.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/remove_customer_info_listener_usecase.dart';
 import 'package:memorysparks/features/subscription/presentation/providers/subscription_provider.dart';
 
 final getIt = GetIt.instance;
@@ -133,6 +137,8 @@ void setupServiceLocator() {
   // Subscription
   getIt.registerLazySingleton<RevenueCatDataSource>(
       () => RevenueCatDataSourceImpl());
+  getIt.registerLazySingleton<FreemiumLocalDatasource>(
+      () => FreemiumLocalDatasource());
   getIt.registerLazySingleton<SubscriptionRepository>(
     () => SubscriptionRepositoryImpl(
       revenueCatDataSource: getIt<RevenueCatDataSource>(),
@@ -202,6 +208,14 @@ void setupServiceLocator() {
       () => PurchasePackageUseCase(getIt<SubscriptionRepository>()));
   getIt.registerLazySingleton(
       () => RestorePurchasesUseCase(getIt<SubscriptionRepository>()));
+  getIt.registerLazySingleton(
+      () => SetCustomerInfoListenerUseCase(getIt<SubscriptionRepository>()));
+  getIt.registerLazySingleton(
+      () => RemoveCustomerInfoListenerUseCase(getIt<SubscriptionRepository>()));
+
+  // Freemium Use Cases
+  getIt.registerLazySingleton(
+      () => CheckStoryQuotaUseCase(getIt<FreemiumLocalDatasource>()));
 
   // Presentation Layer - Page Providers (Factory ✅)
   getIt.registerFactory(() => ProfileProvider(
@@ -222,6 +236,10 @@ void setupServiceLocator() {
         getOfferingsUseCase: getIt<GetOfferingsUseCase>(),
         purchasePackageUseCase: getIt<PurchasePackageUseCase>(),
         restorePurchasesUseCase: getIt<RestorePurchasesUseCase>(),
+        setCustomerInfoListenerUseCase:
+            getIt<SetCustomerInfoListenerUseCase>(),
+        removeCustomerInfoListenerUseCase:
+            getIt<RemoveCustomerInfoListenerUseCase>(),
       ));
   getIt.registerFactory(() => ShareProvider(
         shareStoryUseCase: getIt<ShareStoryUseCase>(),

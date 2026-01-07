@@ -6,6 +6,7 @@ import 'package:memorysparks/core/routes/app_routes.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
 import 'package:memorysparks/core/theme/app_theme.dart';
 import 'package:memorysparks/features/auth/presentation/providers/auth_provider.dart';
+import 'package:memorysparks/features/subscription/presentation/providers/freemium_provider.dart';
 import 'package:memorysparks/l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:memorysparks/core/utils/snackbar_utils.dart';
@@ -247,9 +248,16 @@ class _LoginPageState extends State<LoginPage> {
                     }
 
                     if (user != null && mounted) {
+                      // Initialize FreemiumProvider with user ID
+                      await context
+                          .read<FreemiumProvider>()
+                          .initialize(user.id);
+
                       // ✅ Reset loading state immediately before navigation
                       authProvider.resetLoadingState();
-                      Navigator.pushReplacementNamed(context, AppRoutes.main);
+                      if (mounted) {
+                        Navigator.pushReplacementNamed(context, AppRoutes.main);
+                      }
                     }
                   },
             style: ElevatedButton.styleFrom(
@@ -337,9 +345,17 @@ class _LoginPageState extends State<LoginPage> {
             }
 
             if (success && mounted) {
+              // Initialize FreemiumProvider with user ID
+              final user = provider.currentUser;
+              if (user != null) {
+                await context.read<FreemiumProvider>().initialize(user.id);
+              }
+
               // ✅ Reset loading state immediately before navigation
               provider.resetLoadingState();
-              Navigator.pushReplacementNamed(context, AppRoutes.main);
+              if (mounted) {
+                Navigator.pushReplacementNamed(context, AppRoutes.main);
+              }
             } else if (mounted) {
               // 🚨 Debug: Authentication failed but no error
               debugPrint(
@@ -395,9 +411,17 @@ class _LoginPageState extends State<LoginPage> {
               }
 
               if (success && mounted) {
+                // Initialize FreemiumProvider with user ID
+                final user = provider.currentUser;
+                if (user != null) {
+                  await context.read<FreemiumProvider>().initialize(user.id);
+                }
+
                 // ✅ Reset loading state immediately before navigation
                 provider.resetLoadingState();
-                Navigator.pushReplacementNamed(context, AppRoutes.main);
+                if (mounted) {
+                  Navigator.pushReplacementNamed(context, AppRoutes.main);
+                }
               }
             },
             style: ElevatedButton.styleFrom(

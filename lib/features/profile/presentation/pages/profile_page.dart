@@ -8,6 +8,7 @@ import 'package:memorysparks/features/library/presentation/providers/library_pro
 import 'package:memorysparks/features/profile/presentation/providers/profile_provider.dart';
 import 'package:memorysparks/features/profile/presentation/widgets/review_card.dart';
 import 'package:memorysparks/features/story/domain/entities/story.dart';
+import 'package:memorysparks/features/subscription/presentation/providers/subscription_provider.dart';
 import 'dart:io';
 
 class ProfilePage extends StatelessWidget {
@@ -151,8 +152,13 @@ class ProfilePage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            // Premium Status Badge
-                            _PremiumStatusBadge(isPremium: profile.isPremium),
+                            // Premium Status Badge - use SubscriptionProvider as source of truth
+                            Consumer<SubscriptionProvider>(
+                              builder: (context, subscriptionProvider, child) {
+                                return _PremiumStatusBadge(
+                                    isPremium: subscriptionProvider.isPremium);
+                              },
+                            ),
                             if (profile.bio != null) ...[
                               const SizedBox(height: 8),
                               // Biography
@@ -473,20 +479,25 @@ class _PremiumStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
+
     if (isPremium) {
       // Premium user badge - elegant golden design
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+          gradient: LinearGradient(
+            colors: isDark
+                ? [const Color(0xFFD4AF37), const Color(0xFFB8860B)]
+                : [const Color(0xFFFFD700), const Color(0xFFFFA500)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFFD700).withOpacity(0.3),
+              color: (isDark ? const Color(0xFFD4AF37) : const Color(0xFFFFD700))
+                  .withOpacity(isDark ? 0.2 : 0.3),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -502,7 +513,7 @@ class _PremiumStatusBadge extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              AppLocalizations.of(context)!.premium,
+              AppLocalizations.of(context)!.alreadyPremiumTitle,
               style: const TextStyle(
                 fontFamily: 'Urbanist',
                 color: Colors.white,
@@ -530,7 +541,7 @@ class _PremiumStatusBadge extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF6B4BFF).withOpacity(0.3),
+                color: const Color(0xFF6B4BFF).withOpacity(isDark ? 0.2 : 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),

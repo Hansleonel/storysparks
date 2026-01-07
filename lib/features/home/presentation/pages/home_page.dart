@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:memorysparks/features/subscription/presentation/pages/paywall_screen.dart';
+import 'package:memorysparks/features/subscription/presentation/providers/freemium_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memorysparks/core/routes/app_routes.dart';
@@ -581,100 +582,153 @@ class _GenerateButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.isDarkMode;
-    return SizedBox(
-      width: double.infinity,
-      child: Consumer<HomeProvider>(
-        builder: (context, provider, _) {
-          final isEnabled = provider.isGenerateEnabled;
-          return ElevatedButton(
-            onPressed: isEnabled
-                ? () async {
-                    HapticFeedback.mediumImpact();
-                    FocusScope.of(context).unfocus();
+    final l10n = AppLocalizations.of(context)!;
 
-                    // Show modal
-                    _showLoadingDialog(context);
+    return Consumer2<HomeProvider, FreemiumProvider>(
+      builder: (context, provider, freemiumProvider, _) {
+        final isEnabled = provider.isGenerateEnabled;
+        final canGenerateStory = freemiumProvider.canGenerateStory();
+        final isPremium = freemiumProvider.isPremium;
 
-                    try {
-                      final story = await provider.generateStory();
+        return SizedBox(
+          width: double.infinity,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              ElevatedButton(
+                onPressed: isEnabled
+                    ? () async {
+                        HapticFeedback.mediumImpact();
+                        FocusScope.of(context).unfocus();
 
-                      if (context.mounted) {
-                        // Close modal
-                        Navigator.of(context, rootNavigator: true).pop();
+                        // Check if user can generate more stories
+                        if (!freemiumProvider.canGenerateStory()) {
+                          // Show snackbar first
+                          SnackBarUtils.show(
+                            context,
+                            message: l10n.freemiumStoryLimitMessage,
+                            type: SnackBarType.warning,
+                          );
 
-                        provider.resetState();
-                        Navigator.pushNamed(
-                          context,
-                          AppRoutes.generatedStory,
-                          arguments: {
-                            'story': story,
-                            'isFromLibrary': false,
-                          },
-                        );
+                          // Navigate to paywall immediately
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const PaywallScreen(
+                                sourceScreen: 'story_limit',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+
+                        // Show modal
+                        _showLoadingDialog(context);
+
+                        try {
+                          final story = await provider.generateStory();
+
+                          if (context.mounted) {
+                            // Close modal
+                            Navigator.of(context, rootNavigator: true).pop();
+
+                            provider.resetState();
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.generatedStory,
+                              arguments: {
+                                'story': story,
+                                'isFromLibrary': false,
+                              },
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            // Close modal
+                            Navigator.of(context, rootNavigator: true).pop();
+
+                            SnackBarUtils.show(
+                              context,
+                              message: e.toString(),
+                              type: SnackBarType.error,
+                            );
+                          }
+                        }
                       }
-                    } catch (e) {
-                      if (context.mounted) {
-                        // Close modal
-                        Navigator.of(context, rootNavigator: true).pop();
-
+                    : () {
+                        // Show info message when button is disabled
                         SnackBarUtils.show(
                           context,
-                          message: e.toString(),
-                          type: SnackBarType.error,
+                          message: l10n.minimumWordsRequired,
+                          type: SnackBarType.warning,
                         );
-                      }
-                    }
-                  }
-                : () {
-                    // Show info message when button is disabled
-                    SnackBarUtils.show(
-                      context,
-                      message: AppLocalizations.of(context)
-                              ?.minimumWordsRequired ??
-                          'Please write at least 20 words to generate your story',
-                      type: SnackBarType.warning,
-                    );
-                  },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: isEnabled
-                  ? AppColors.primary
-                  : AppColors.primary.withOpacity(0.5),
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.auto_stories,
-                  color: isEnabled
-                      ? Colors.white
-                      : (isDarkMode
-                          ? Colors.white.withOpacity(0.6)
-                          : Colors.white),
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  AppLocalizations.of(context)!.generateStory,
-                  style: TextStyle(
-                    fontFamily: 'Urbanist',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: isEnabled
-                        ? Colors.white
-                        : (isDarkMode
-                            ? Colors.white.withOpacity(0.6)
-                            : Colors.white),
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isEnabled
+                      ? AppColors.primary
+                      : AppColors.primary.withOpacity(0.5),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.auto_stories,
+                      color: isEnabled
+                          ? Colors.white
+                          : (isDarkMode
+                              ? Colors.white.withOpacity(0.6)
+                              : Colors.white),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.generateStory,
+                      style: TextStyle(
+                        fontFamily: 'Urbanist',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isEnabled
+                            ? Colors.white
+                            : (isDarkMode
+                                ? Colors.white.withOpacity(0.6)
+                                : Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Lock badge when user reached free story limit
+              if (!isPremium && !canGenerateStory && isEnabled)
+                Positioned(
+                  top: -8,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.lock,
+                      size: 12,
+                      color: AppColors.goldPremium,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -1002,53 +1056,6 @@ class _Header extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _TemporaryPaywallButton extends StatelessWidget {
-  const _TemporaryPaywallButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        onPressed: () {
-          HapticFeedback.lightImpact();
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const PaywallScreen(
-                sourceScreen: 'home_test',
-              ),
-            ),
-          );
-        },
-        icon: const Icon(
-          Icons.star_border,
-          color: Colors.orange,
-          size: 20,
-        ),
-        label: const Text(
-          '🚀 TEST: Abrir Paywall Apple',
-          style: TextStyle(
-            fontFamily: 'Urbanist',
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Colors.orange,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.orange.withOpacity(0.1),
-          foregroundColor: Colors.orange,
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.orange.withOpacity(0.3)),
-          ),
-          elevation: 0,
-        ),
-      ),
     );
   }
 }

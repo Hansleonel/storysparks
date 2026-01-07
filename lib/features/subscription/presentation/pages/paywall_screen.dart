@@ -547,6 +547,7 @@ class _PaywallScreenState extends State<PaywallScreen> {
               style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
               textAlign: TextAlign.center,
             ),

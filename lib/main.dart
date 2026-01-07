@@ -27,6 +27,8 @@ import 'package:memorysparks/features/story/domain/usecases/update_story_rating_
 import 'package:memorysparks/features/story/domain/usecases/continue_story_usecase.dart';
 import 'package:memorysparks/features/story/presentation/providers/story_provider.dart';
 import 'package:memorysparks/features/subscription/presentation/providers/subscription_provider.dart';
+import 'package:memorysparks/features/subscription/presentation/providers/freemium_provider.dart';
+import 'package:memorysparks/features/subscription/domain/usecases/check_story_quota_usecase.dart';
 import 'package:memorysparks/features/auth/domain/usecases/delete_account_usecase.dart';
 import 'package:memorysparks/features/story/domain/usecases/delete_all_stories_for_user_usecase.dart';
 import 'package:memorysparks/core/providers/new_story_indicator_provider.dart';
@@ -90,6 +92,18 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => getIt<SubscriptionProvider>(),
         ),
+        ChangeNotifierProxyProvider<SubscriptionProvider, FreemiumProvider>(
+          create: (context) => FreemiumProvider(
+            subscriptionProvider: context.read<SubscriptionProvider>(),
+            checkStoryQuotaUseCase: getIt<CheckStoryQuotaUseCase>(),
+          ),
+          update: (context, subscriptionProvider, freemiumProvider) =>
+              freemiumProvider ??
+              FreemiumProvider(
+                subscriptionProvider: subscriptionProvider,
+                checkStoryQuotaUseCase: getIt<CheckStoryQuotaUseCase>(),
+              ),
+        ),
         ChangeNotifierProvider(
           create: (_) => NewStoryIndicatorProvider(),
         ),
@@ -114,8 +128,14 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     // Initialize AuthProvider with existing session if available
     if (widget.hasSession) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<AuthProvider>().initializeFromExistingSession();
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await context.read<AuthProvider>().initializeFromExistingSession();
+
+        // Initialize FreemiumProvider with user ID
+        final user = Supabase.instance.client.auth.currentUser;
+        if (user != null && mounted) {
+          await context.read<FreemiumProvider>().initialize(user.id);
+        }
       });
     }
   }

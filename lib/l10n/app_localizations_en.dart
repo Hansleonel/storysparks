@@ -48,6 +48,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get audioTryAgain => 'Try Again';
 
   @override
+  String get audioPremiumMessage =>
+      'Listen to your stories narrated with natural voices with Premium.';
+
+  @override
   String get backgroundMusic => 'Background Music';
 
   @override
@@ -154,6 +158,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get continueStory => 'Continue story';
 
   @override
+  String get continueStoryPremiumMessage =>
+      'Continue your stories and create epic narratives with Premium.';
+
+  @override
   String get continueStoryMode => 'Continue Story Mode';
 
   @override
@@ -238,6 +246,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get freemiumStoryLimitMessage =>
+      'You\'ve reached the limit of 3 free stories. Unlock unlimited stories with Premium!';
 
   @override
   String get friday => 'Friday';
