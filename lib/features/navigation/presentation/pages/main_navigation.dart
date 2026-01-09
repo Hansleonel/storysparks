@@ -23,7 +23,7 @@ class _MainNavigationState extends State<MainNavigation> {
   // Navigation constants
   static const int _homeIndex = 0;
   static const int _libraryIndex = 1;
-  static const int _profileIndex = 2;
+  // static const int _profileIndex = 2;
   static const Duration _notificationClearDelay = Duration(seconds: 3);
 
   int _selectedIndex = _homeIndex;

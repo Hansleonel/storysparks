@@ -526,65 +526,100 @@ class _PaywallScreenState extends State<PaywallScreen> {
   Widget _buildCloseButton() {
     return IconButton(
       icon: const Icon(Icons.close, color: Colors.white),
-      onPressed: () => Navigator.pop(context),
+      onPressed: _handleClosePress,
+    );
+  }
+
+  void _handleClosePress() {
+    // Show confirmation modal when user tries to close
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (modalContext) => _ExitConfirmationModal(
+        onConfirmExit: () {
+          Navigator.pop(modalContext); // Close modal
+          _navigateToMain(); // Smart navigation (popUntil or push)
+        },
+        onCancel: () => Navigator.pop(modalContext),
+        onGetPremium: () {
+          Navigator.pop(modalContext); // Close modal, stay on paywall
+        },
+      ),
     );
   }
 
   Widget _buildPremiumContent(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.star,
-              size: 100,
-              color: Colors.amber,
+    return SafeArea(
+      child: Stack(
+        children: [
+          // Close button at top right
+          Positioned(
+            top: 16,
+            right: 16,
+            child: IconButton(
+              icon: const Icon(Icons.close, color: Colors.white),
+              onPressed: () => _handleContinuePress(context),
             ),
-            const SizedBox(height: 24),
-            Text(
-              AppLocalizations.of(context)!.alreadyPremiumTitle,
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              AppLocalizations.of(context)!.alreadyPremiumMessage,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => _handleContinuePress(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+          ),
+          // Main content
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.star,
+                    size: 100,
+                    color: Colors.amber,
                   ),
-                ),
-                child: Text(
-                  AppLocalizations.of(context)!.continueButton,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                  const SizedBox(height: 24),
+                  Text(
+                    AppLocalizations.of(context)!.alreadyPremiumTitle,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  Text(
+                    AppLocalizations.of(context)!.alreadyPremiumMessage,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => _handleContinuePress(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context)!.continueButton,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -599,8 +634,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
 
       if (mounted && success && subscriptionProvider.isPremium) {
         log('🎉 Purchase successful!');
-        Navigator.of(context).pop();
-        _showSuccessDialog();
+
+        // Show success dialog first, then navigate
+        await _showSuccessDialogAndNavigate();
 
         // Call success callback
         widget.onPurchaseSuccess?.call();
@@ -628,8 +664,8 @@ class _PaywallScreenState extends State<PaywallScreen> {
       if (mounted) {
         if (subscriptionProvider.isPremium) {
           log('✅ Restore successful with premium!');
-          Navigator.of(context).pop();
-          _showSuccessDialog();
+          // Show success dialog and navigate to main
+          await _showSuccessDialogAndNavigate();
         } else {
           log('ℹ️ Restore completed but no premium found');
           _showInfoDialog('No purchases found to restore.');
@@ -645,32 +681,37 @@ class _PaywallScreenState extends State<PaywallScreen> {
 
   void _handleContinuePress(BuildContext context) {
     if (widget.sourceScreen != null) {
-      // Handle specific navigation based on source
+      // Handle specific navigation based on source (e.g., from story generation)
       Navigator.of(context).pop(true);
     } else {
-      Navigator.of(context).pop();
+      // Use smart navigation for all other cases
+      _navigateToMain();
     }
   }
 
-  void _showSuccessDialog() {
-    showDialog(
+  /// Shows success dialog and navigates to main after user dismisses it.
+  /// Uses popUntil when coming from within the app (natural animation),
+  /// and pushNamedAndRemoveUntil when coming from onboarding (no stack).
+  Future<void> _showSuccessDialogAndNavigate() async {
+    await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A2E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
-          AppLocalizations.of(context)!.welcomeToPremium,
+          AppLocalizations.of(dialogContext)!.welcomeToPremium,
           style: const TextStyle(color: Colors.white, fontFamily: 'Urbanist'),
         ),
         content: Text(
-          AppLocalizations.of(context)!.premiumAccessMessage,
+          AppLocalizations.of(dialogContext)!.premiumAccessMessage,
           style: const TextStyle(color: Colors.white70, fontFamily: 'Urbanist'),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
-              AppLocalizations.of(context)!.continueButton,
+              AppLocalizations.of(dialogContext)!.continueButton,
               style: const TextStyle(
                   color: Color(0xFF6366F1), fontFamily: 'Urbanist'),
             ),
@@ -678,6 +719,27 @@ class _PaywallScreenState extends State<PaywallScreen> {
         ],
       ),
     );
+
+    // After dialog is closed, navigate appropriately
+    if (mounted) {
+      _navigateToMain();
+    }
+  }
+
+  /// Smart navigation: uses popUntil if MainNavigation is in the stack,
+  /// otherwise pushes to main (for onboarding flow).
+  void _navigateToMain() {
+    // Check if there's a route to pop to (meaning we came from within the app)
+    if (Navigator.of(context).canPop()) {
+      // Pop all the way back to the first route (MainNavigation)
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } else {
+      // No route to pop to (onboarding flow) - push to main
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/main',
+        (route) => false,
+      );
+    }
   }
 
   void _showErrorMessage(String message) {
@@ -741,5 +803,212 @@ class _PaywallScreenState extends State<PaywallScreen> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.inAppWebView);
     }
+  }
+}
+
+/// Modal de confirmación al cerrar el paywall.
+class _ExitConfirmationModal extends StatelessWidget {
+  final VoidCallback onConfirmExit;
+  final VoidCallback onCancel;
+  final VoidCallback? onGetPremium;
+
+  const _ExitConfirmationModal({
+    required this.onConfirmExit,
+    required this.onCancel,
+    this.onGetPremium,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        24,
+        24,
+        24,
+        MediaQuery.of(context).padding.bottom + 24,
+      ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(24),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle bar
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Icono de advertencia
+          Container(
+            width: 72,
+            height: 72,
+            decoration: const BoxDecoration(
+              color: Color(0xFFFEF3C7),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.auto_stories_rounded,
+              size: 36,
+              color: Color(0xFFF59E0B),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Título
+          const Text(
+            '¿Te perderás de la continuación?',
+            style: TextStyle(
+              fontFamily: 'Playfair',
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1F2937),
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          const SizedBox(height: 12),
+
+          // Descripción con beneficios
+          const Text(
+            'Con Premium también puedes:',
+            style: TextStyle(
+              fontFamily: 'Urbanist',
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF6B7280),
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          const SizedBox(height: 16),
+
+          // Lista de beneficios
+          const _BenefitItem(
+            icon: Icons.record_voice_over_rounded,
+            text: 'Generar 1 audio diario de tus historias',
+          ),
+          const SizedBox(height: 10),
+          const _BenefitItem(
+            icon: Icons.history_edu_rounded,
+            text: 'Continuar donde lo dejaste',
+          ),
+          const SizedBox(height: 10),
+          const _BenefitItem(
+            icon: Icons.all_inclusive_rounded,
+            text: 'Historias ilimitadas',
+          ),
+
+          const SizedBox(height: 28),
+
+          // Botón primario - Obtener Premium
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                HapticFeedback.mediumImpact();
+                onGetPremium?.call();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'Obtener Premium',
+                style: TextStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Botón secundario - Salir
+          SizedBox(
+            width: double.infinity,
+            child: TextButton(
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                onConfirmExit();
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF6B7280),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+              child: const Text(
+                'Salir de todas formas',
+                style: TextStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF6B7280),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BenefitItem extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _BenefitItem({
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            size: 18,
+            color: AppColors.primary,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontFamily: 'Urbanist',
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF1F2937),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

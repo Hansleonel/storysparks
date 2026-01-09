@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 import 'dart:math' as math;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:memorysparks/core/theme/app_colors.dart';
@@ -836,11 +835,11 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.goldPremium : Colors.transparent,
+                    color:
+                        isSelected ? AppColors.goldPremium : Colors.transparent,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color:
-                          isSelected ? AppColors.goldPremium : colors.border,
+                      color: isSelected ? AppColors.goldPremium : colors.border,
                       width: 1,
                     ),
                   ),
@@ -850,8 +849,7 @@ class _AudioPlayerPageState extends State<AudioPlayerPage>
                       fontFamily: 'Urbanist',
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color:
-                          isSelected ? Colors.white : colors.textSecondary,
+                      color: isSelected ? Colors.white : colors.textSecondary,
                     ),
                   ),
                 ),

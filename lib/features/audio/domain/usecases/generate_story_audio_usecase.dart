@@ -15,10 +15,12 @@ class GenerateStoryAudioUseCase {
     debugPrint('🎯 GenerateStoryAudioUseCase: Starting execute()');
     debugPrint('📖 Story ID: ${story.id}, Title: ${story.title}');
     debugPrint('📝 Content length: ${story.content.length} characters');
-    
+
     if (story.id == null) {
-      debugPrint('❌ GenerateStoryAudioUseCase: Story ID is null - cannot generate audio');
-      return Left(ServerFailure('Story must be saved before generating audio'));
+      debugPrint(
+          '❌ GenerateStoryAudioUseCase: Story ID is null - cannot generate audio');
+      return const Left(
+          ServerFailure('Story must be saved before generating audio'));
     }
 
     final storyId = story.id!;
@@ -44,7 +46,7 @@ class GenerateStoryAudioUseCase {
     }
 
     debugPrint('🔄 Cache MISS - Need to generate new audio');
-    
+
     // Need to generate new audio
     // First, clean up old audio if exists
     if (hasLocalAudio) {
@@ -63,13 +65,14 @@ class GenerateStoryAudioUseCase {
 
     return generateResult.fold(
       (failure) {
-        debugPrint('❌ GenerateStoryAudioUseCase: TTS generation failed - ${failure.message}');
+        debugPrint(
+            '❌ GenerateStoryAudioUseCase: TTS generation failed - ${failure.message}');
         return Left(failure);
       },
       (audioUrl) async {
         debugPrint('✅ TTS generation successful!');
         debugPrint('🔗 Audio URL: $audioUrl');
-        
+
         // Download and save locally
         debugPrint('📥 Downloading audio to local storage...');
         final downloadResult = await _audioRepository.downloadAndSaveAudio(
@@ -79,13 +82,14 @@ class GenerateStoryAudioUseCase {
 
         return downloadResult.fold(
           (failure) {
-            debugPrint('❌ GenerateStoryAudioUseCase: Download failed - ${failure.message}');
+            debugPrint(
+                '❌ GenerateStoryAudioUseCase: Download failed - ${failure.message}');
             return Left(failure);
           },
           (localPath) async {
             debugPrint('✅ Audio downloaded successfully!');
             debugPrint('📂 Local path: $localPath');
-            
+
             // Save content hash for future cache validation
             debugPrint('💾 Saving content hash for cache...');
             await _audioRepository.saveAudioContentHash(storyId, contentHash);
@@ -100,7 +104,7 @@ class GenerateStoryAudioUseCase {
   /// Checks if audio needs to be regenerated (content changed)
   Future<bool> needsRegeneration(Story story) async {
     debugPrint('🔍 needsRegeneration: Checking if audio needs regeneration...');
-    
+
     if (story.id == null) {
       debugPrint('⚠️ Story ID is null - needs generation');
       return true;
@@ -115,7 +119,7 @@ class GenerateStoryAudioUseCase {
     debugPrint('📊 needsRegeneration result: $needsRegen');
     debugPrint('   - hasLocalAudio: $hasLocalAudio');
     debugPrint('   - hashesMatch: ${existingHash == contentHash}');
-    
+
     return needsRegen;
   }
 
