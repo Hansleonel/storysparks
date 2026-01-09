@@ -283,7 +283,6 @@
     "writeYourDirection": "Escribe cómo quieres que continúe la historia...",
     "yesterday": "Ayer",
     "yourStory": "Tu Historia",
-
     "onboardingHookMessage1": "La mente humana olvida el 50% de los recuerdos en menos de 24 horas.",
     "onboardingHookMessage2": "En 5 años, tus 10,000 recuerdos serán solo ecos sin historia.",
     "onboardingHookMessage3": "A menos que los conviertas en historias... hoy.",
@@ -301,12 +300,10 @@
     "onboardingContinueWithApple": "Continuar con Apple",
     "onboardingContinueWithGoogle": "Continuar con Google",
     "onboardingTerms": "Al continuar, aceptas nuestros Términos de Servicio y Política de Privacidad.",
-
     "presetMemory1": "La conocí por casualidad en la escuela. No buscaba nada, pero cuando nuestras miradas se cruzaron en el pasillo, algo cambió. Todavía recuerdo el color de su suéter ese día.",
     "presetMemory2": "La primera vez que me sonrió fue en la cafetería. Estaba lloviendo afuera y ella llegó empapada, pero su sonrisa iluminó todo el lugar. No pude dejar de pensar en ella el resto del día.",
     "presetMemory3": "La tarde que me prestó su paraguas porque estaba lloviendo y yo no tenía. Me dijo 'mañana me lo devuelves' con una sonrisa, y esa fue la excusa perfecta para verla de nuevo.",
     "presetMemory4": "El mensaje de las 3am que cambió todo. Solo decía 'no puedo dormir pensando en ti'. Tardé 42 minutos en responder porque no sabía si era un sueño.",
-
     "onboardingMagicTitle": "Vamos a probar la magia, {userName}. ✨",
     "onboardingMagicSubtitle": "Sube una foto o escribe un recuerdo breve.",
     "onboardingPhotoLabel": "Foto",
