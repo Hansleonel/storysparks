@@ -1549,6 +1549,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Story'**
   String get yourStory;
+
+  /// No description provided for @onboardingHookMessage1.
+  ///
+  /// In en, this message translates to:
+  /// **'The human mind forgets 50% of memories in less than 24 hours.'**
+  String get onboardingHookMessage1;
+
+  /// No description provided for @onboardingHookMessage2.
+  ///
+  /// In en, this message translates to:
+  /// **'In 5 years, your 10,000 memories will be just echoes without a story.'**
+  String get onboardingHookMessage2;
+
+  /// No description provided for @onboardingHookMessage3.
+  ///
+  /// In en, this message translates to:
+  /// **'Unless you turn them into stories... today.'**
+  String get onboardingHookMessage3;
+
+  /// No description provided for @onboardingNameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s your name?'**
+  String get onboardingNameTitle;
+
+  /// No description provided for @onboardingNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get onboardingNameHint;
+
+  /// No description provided for @onboardingNameSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'To personalize your story'**
+  String get onboardingNameSubtitle;
+
+  /// No description provided for @onboardingMemoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your memory'**
+  String get onboardingMemoryTitle;
+
+  /// No description provided for @onboardingMemoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe that special moment...'**
+  String get onboardingMemoryHint;
+
+  /// No description provided for @onboardingRandomMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Random memory'**
+  String get onboardingRandomMemory;
+
+  /// No description provided for @onboardingGenerateStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Story'**
+  String get onboardingGenerateStory;
+
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingContinueReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue reading'**
+  String get onboardingContinueReading;
+
+  /// No description provided for @onboardingSaveStory.
+  ///
+  /// In en, this message translates to:
+  /// **'Save your story'**
+  String get onboardingSaveStory;
+
+  /// No description provided for @onboardingSaveStorySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account to keep your story and continue reading.'**
+  String get onboardingSaveStorySubtitle;
+
+  /// No description provided for @onboardingContinueWithApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
+  String get onboardingContinueWithApple;
+
+  /// No description provided for @onboardingContinueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get onboardingContinueWithGoogle;
+
+  /// No description provided for @onboardingTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing, you accept our Terms of Service and Privacy Policy.'**
+  String get onboardingTerms;
+
+  /// No description provided for @presetMemory1.
+  ///
+  /// In en, this message translates to:
+  /// **'I met her by chance at school. I wasn\'t looking for anything, but when our eyes met in the hallway, something changed. I still remember the color of her sweater that day.'**
+  String get presetMemory1;
+
+  /// No description provided for @presetMemory2.
+  ///
+  /// In en, this message translates to:
+  /// **'The first time she smiled at me was in the cafeteria. It was raining outside and she arrived soaking wet, but her smile lit up the whole place. I couldn\'t stop thinking about her the rest of the day.'**
+  String get presetMemory2;
+
+  /// No description provided for @presetMemory3.
+  ///
+  /// In en, this message translates to:
+  /// **'The afternoon she lent me her umbrella because it was raining and I didn\'t have one. She said \'give it back tomorrow\' with a smile, and that was the perfect excuse to see her again.'**
+  String get presetMemory3;
+
+  /// No description provided for @presetMemory4.
+  ///
+  /// In en, this message translates to:
+  /// **'The 3am text that changed everything. It just said \'I can\'t sleep thinking about you\'. I took 42 minutes to respond because I didn\'t know if it was a dream.'**
+  String get presetMemory4;
+
+  /// No description provided for @onboardingMagicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s test the magic, {userName}. ✨'**
+  String onboardingMagicTitle(String userName);
+
+  /// No description provided for @onboardingMagicSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload a photo or write a brief memory.'**
+  String get onboardingMagicSubtitle;
+
+  /// No description provided for @onboardingPhotoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get onboardingPhotoLabel;
+
+  /// No description provided for @onboardingSelectFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Select from gallery'**
+  String get onboardingSelectFromGallery;
+
+  /// No description provided for @onboardingTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get onboardingTakePhoto;
+
+  /// No description provided for @onboardingPhotoMemory.
+  ///
+  /// In en, this message translates to:
+  /// **'Memory photo'**
+  String get onboardingPhotoMemory;
+
+  /// No description provided for @onboardingAnalyzingImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing image...'**
+  String get onboardingAnalyzingImage;
+
+  /// No description provided for @onboardingReadyToUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to use'**
+  String get onboardingReadyToUse;
+
+  /// No description provided for @onboardingGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating...'**
+  String get onboardingGenerating;
+
+  /// No description provided for @onboardingEmptyMemoryError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please write a memory or use a random one'**
+  String get onboardingEmptyMemoryError;
+
+  /// No description provided for @onboardingNoStory.
+  ///
+  /// In en, this message translates to:
+  /// **'No story available'**
+  String get onboardingNoStory;
+
+  /// No description provided for @onboardingNamePersonalize.
+  ///
+  /// In en, this message translates to:
+  /// **'We want to personalize your experience'**
+  String get onboardingNamePersonalize;
 }
 
 class _AppLocalizationsDelegate

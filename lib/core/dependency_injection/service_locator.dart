@@ -72,6 +72,14 @@ import 'package:memorysparks/features/subscription/domain/usecases/set_customer_
 import 'package:memorysparks/features/subscription/domain/usecases/remove_customer_info_listener_usecase.dart';
 import 'package:memorysparks/features/subscription/presentation/providers/subscription_provider.dart';
 
+// Onboarding
+import 'package:memorysparks/features/onboarding/data/repositories/onboarding_repository_impl.dart';
+import 'package:memorysparks/features/onboarding/domain/repositories/onboarding_repository.dart';
+import 'package:memorysparks/features/onboarding/domain/usecases/check_first_time_user_usecase.dart';
+import 'package:memorysparks/features/onboarding/domain/usecases/mark_onboarding_complete_usecase.dart';
+import 'package:memorysparks/features/onboarding/domain/usecases/transfer_story_to_user_usecase.dart';
+import 'package:memorysparks/features/onboarding/presentation/providers/onboarding_provider.dart';
+
 final getIt = GetIt.instance;
 
 void setupServiceLocator() {
@@ -153,6 +161,11 @@ void setupServiceLocator() {
   getIt.registerLazySingleton<ShareService>(() => ShareService());
   getIt.registerLazySingleton<PDFLetterService>(() => PDFLetterService());
 
+  // Onboarding
+  getIt.registerLazySingleton<OnboardingRepository>(
+    () => OnboardingRepositoryImpl(storyRepository: getIt<StoryRepository>()),
+  );
+
   // Domain Layer - Use Cases (Singleton ✅)
   // Auth
   getIt.registerLazySingleton(() => LoginUseCase(getIt<AuthRepository>()));
@@ -217,6 +230,14 @@ void setupServiceLocator() {
   getIt.registerLazySingleton(
       () => CheckStoryQuotaUseCase(getIt<FreemiumLocalDatasource>()));
 
+  // Onboarding Use Cases
+  getIt.registerLazySingleton(
+      () => CheckFirstTimeUserUseCase(getIt<OnboardingRepository>()));
+  getIt.registerLazySingleton(
+      () => MarkOnboardingCompleteUseCase(getIt<OnboardingRepository>()));
+  getIt.registerLazySingleton(
+      () => TransferStoryToUserUseCase(getIt<OnboardingRepository>()));
+
   // Presentation Layer - Page Providers (Factory ✅)
   getIt.registerFactory(() => ProfileProvider(
         getProfileUseCase: getIt<GetProfileUseCase>(),
@@ -236,8 +257,7 @@ void setupServiceLocator() {
         getOfferingsUseCase: getIt<GetOfferingsUseCase>(),
         purchasePackageUseCase: getIt<PurchasePackageUseCase>(),
         restorePurchasesUseCase: getIt<RestorePurchasesUseCase>(),
-        setCustomerInfoListenerUseCase:
-            getIt<SetCustomerInfoListenerUseCase>(),
+        setCustomerInfoListenerUseCase: getIt<SetCustomerInfoListenerUseCase>(),
         removeCustomerInfoListenerUseCase:
             getIt<RemoveCustomerInfoListenerUseCase>(),
       ));
@@ -246,9 +266,17 @@ void setupServiceLocator() {
         shareService: getIt<ShareService>(),
         pdfLetterService: getIt<PDFLetterService>(),
       ));
+  getIt.registerFactory(() => OnboardingProvider(
+        checkFirstTimeUserUseCase: getIt<CheckFirstTimeUserUseCase>(),
+        markOnboardingCompleteUseCase: getIt<MarkOnboardingCompleteUseCase>(),
+        transferStoryToUserUseCase: getIt<TransferStoryToUserUseCase>(),
+        generateStoryUseCase: getIt<GenerateStoryUseCase>(),
+        getImageDescriptionUseCase: getIt<GetImageDescriptionUseCase>(),
+      ));
 
   // Nota: Los providers globales están en main.dart ℹ️
   // - AuthProvider
   // - LibraryProvider
   // - StoryProvider
+  // - OnboardingProvider (global para mantener estado durante el flujo)
 }

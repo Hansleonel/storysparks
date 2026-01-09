@@ -6,6 +6,11 @@ import 'package:memorysparks/features/profile/presentation/pages/settings_page.d
 import 'package:memorysparks/features/story/domain/entities/story.dart';
 import 'package:memorysparks/features/story/presentation/pages/generated_story_page.dart';
 import 'package:memorysparks/features/subscription/presentation/pages/paywall_screen.dart';
+import 'package:memorysparks/features/onboarding/presentation/pages/hook_messages_page.dart';
+import 'package:memorysparks/features/onboarding/presentation/pages/name_input_page.dart';
+import 'package:memorysparks/features/onboarding/presentation/pages/memory_input_page.dart';
+import 'package:memorysparks/features/onboarding/presentation/pages/story_preview_page.dart';
+import 'package:memorysparks/features/onboarding/presentation/pages/quick_sign_in_page.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -14,6 +19,13 @@ class AppRoutes {
   static const String settingsProfile = '/settings-profile';
   static const String generatedStory = '/generated-story';
   static const String paywall = '/paywall';
+
+  // Onboarding routes
+  static const String onboardingHook = '/onboarding/hook';
+  static const String onboardingName = '/onboarding/name';
+  static const String onboardingMemory = '/onboarding/memory';
+  static const String onboardingPreview = '/onboarding/preview';
+  static const String onboardingSignIn = '/onboarding/sign-in';
 
   static Route<dynamic> onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -36,6 +48,27 @@ class AppRoutes {
       case paywall:
         return MaterialPageRoute(
           builder: (_) => const PaywallScreen(),
+        );
+      // Onboarding routes
+      case onboardingHook:
+        return MaterialPageRoute(
+          builder: (_) => const HookMessagesPage(),
+        );
+      case onboardingName:
+        return MaterialPageRoute(
+          builder: (_) => const NameInputPage(),
+        );
+      case onboardingMemory:
+        return MaterialPageRoute(
+          builder: (_) => const MemoryInputPage(),
+        );
+      case onboardingPreview:
+        return MaterialPageRoute(
+          builder: (_) => const StoryPreviewPage(),
+        );
+      case onboardingSignIn:
+        return MaterialPageRoute(
+          builder: (_) => const QuickSignInPage(),
         );
       case generatedStory:
         if (routeSettings.arguments is! Map<String, dynamic>) {

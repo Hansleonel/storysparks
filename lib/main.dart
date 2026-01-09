@@ -32,6 +32,14 @@ import 'package:memorysparks/features/subscription/domain/usecases/check_story_q
 import 'package:memorysparks/features/auth/domain/usecases/delete_account_usecase.dart';
 import 'package:memorysparks/features/story/domain/usecases/delete_all_stories_for_user_usecase.dart';
 import 'package:memorysparks/core/providers/new_story_indicator_provider.dart';
+import 'package:memorysparks/features/onboarding/presentation/providers/onboarding_provider.dart';
+import 'package:memorysparks/features/onboarding/presentation/pages/hook_messages_page.dart';
+import 'package:memorysparks/features/onboarding/domain/usecases/check_first_time_user_usecase.dart';
+import 'package:memorysparks/features/onboarding/domain/usecases/mark_onboarding_complete_usecase.dart';
+import 'package:memorysparks/features/onboarding/domain/usecases/transfer_story_to_user_usecase.dart';
+import 'package:memorysparks/features/story/domain/usecases/generate_story_usecase.dart';
+import 'package:memorysparks/features/story/domain/usecases/get_image_description_usecase.dart';
+import 'package:memorysparks/core/usecases/usecase.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
@@ -55,6 +63,15 @@ void main() async {
   // This is instant since Supabase already loaded tokens from local storage
   final hasSession = Supabase.instance.client.auth.currentUser != null;
   debugPrint('🔍 Main: Session check - hasSession: $hasSession');
+
+  // Check if this is first time user (for onboarding)
+  bool isFirstTimeUser = false;
+  if (!hasSession) {
+    final checkFirstTimeUseCase = getIt<CheckFirstTimeUserUseCase>();
+    final result = await checkFirstTimeUseCase(NoParams());
+    isFirstTimeUser = result.fold((_) => true, (value) => value);
+    debugPrint('🎯 Main: isFirstTimeUser = $isFirstTimeUser');
+  }
 
   runApp(
     MultiProvider(
@@ -107,16 +124,32 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => NewStoryIndicatorProvider(),
         ),
+        // Onboarding Provider - Global para mantener estado durante el flujo
+        ChangeNotifierProvider(
+          create: (_) => OnboardingProvider(
+            checkFirstTimeUserUseCase: getIt<CheckFirstTimeUserUseCase>(),
+            markOnboardingCompleteUseCase:
+                getIt<MarkOnboardingCompleteUseCase>(),
+            transferStoryToUserUseCase: getIt<TransferStoryToUserUseCase>(),
+            generateStoryUseCase: getIt<GenerateStoryUseCase>(),
+            getImageDescriptionUseCase: getIt<GetImageDescriptionUseCase>(),
+          ),
+        ),
       ],
-      child: MyApp(hasSession: hasSession),
+      child: MyApp(hasSession: hasSession, isFirstTimeUser: isFirstTimeUser),
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
   final bool hasSession;
+  final bool isFirstTimeUser;
 
-  const MyApp({super.key, required this.hasSession});
+  const MyApp({
+    super.key,
+    required this.hasSession,
+    required this.isFirstTimeUser,
+  });
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -140,6 +173,16 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  Widget _getInitialPage() {
+    if (widget.hasSession) {
+      return const MainNavigation();
+    } else if (widget.isFirstTimeUser) {
+      return const HookMessagesPage();
+    } else {
+      return const LoginPage();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<ThemeProvider, LocaleProvider>(
@@ -152,8 +195,7 @@ class _MyAppState extends State<MyApp> {
           darkTheme: AppTheme.darkTheme,
           themeMode: themeProvider.themeMode,
           locale: localeProvider.locale,
-          // Navigate directly to MainNavigation if session exists
-          home: widget.hasSession ? const MainNavigation() : const LoginPage(),
+          home: _getInitialPage(),
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,

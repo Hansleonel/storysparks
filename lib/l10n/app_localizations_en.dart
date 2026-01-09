@@ -784,4 +784,117 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yourStory => 'Your Story';
+
+  @override
+  String get onboardingHookMessage1 =>
+      'The human mind forgets 50% of memories in less than 24 hours.';
+
+  @override
+  String get onboardingHookMessage2 =>
+      'In 5 years, your 10,000 memories will be just echoes without a story.';
+
+  @override
+  String get onboardingHookMessage3 =>
+      'Unless you turn them into stories... today.';
+
+  @override
+  String get onboardingNameTitle => 'What\'s your name?';
+
+  @override
+  String get onboardingNameHint => 'Your name';
+
+  @override
+  String get onboardingNameSubtitle => 'To personalize your story';
+
+  @override
+  String get onboardingMemoryTitle => 'Write your memory';
+
+  @override
+  String get onboardingMemoryHint => 'Describe that special moment...';
+
+  @override
+  String get onboardingRandomMemory => 'Random memory';
+
+  @override
+  String get onboardingGenerateStory => 'Generate Story';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get onboardingContinueReading => 'Continue reading';
+
+  @override
+  String get onboardingSaveStory => 'Save your story';
+
+  @override
+  String get onboardingSaveStorySubtitle =>
+      'Create an account to keep your story and continue reading.';
+
+  @override
+  String get onboardingContinueWithApple => 'Continue with Apple';
+
+  @override
+  String get onboardingContinueWithGoogle => 'Continue with Google';
+
+  @override
+  String get onboardingTerms =>
+      'By continuing, you accept our Terms of Service and Privacy Policy.';
+
+  @override
+  String get presetMemory1 =>
+      'I met her by chance at school. I wasn\'t looking for anything, but when our eyes met in the hallway, something changed. I still remember the color of her sweater that day.';
+
+  @override
+  String get presetMemory2 =>
+      'The first time she smiled at me was in the cafeteria. It was raining outside and she arrived soaking wet, but her smile lit up the whole place. I couldn\'t stop thinking about her the rest of the day.';
+
+  @override
+  String get presetMemory3 =>
+      'The afternoon she lent me her umbrella because it was raining and I didn\'t have one. She said \'give it back tomorrow\' with a smile, and that was the perfect excuse to see her again.';
+
+  @override
+  String get presetMemory4 =>
+      'The 3am text that changed everything. It just said \'I can\'t sleep thinking about you\'. I took 42 minutes to respond because I didn\'t know if it was a dream.';
+
+  @override
+  String onboardingMagicTitle(String userName) {
+    return 'Let\'s test the magic, $userName. ✨';
+  }
+
+  @override
+  String get onboardingMagicSubtitle =>
+      'Upload a photo or write a brief memory.';
+
+  @override
+  String get onboardingPhotoLabel => 'Photo';
+
+  @override
+  String get onboardingSelectFromGallery => 'Select from gallery';
+
+  @override
+  String get onboardingTakePhoto => 'Take photo';
+
+  @override
+  String get onboardingPhotoMemory => 'Memory photo';
+
+  @override
+  String get onboardingAnalyzingImage => 'Analyzing image...';
+
+  @override
+  String get onboardingReadyToUse => 'Ready to use';
+
+  @override
+  String get onboardingGenerating => 'Generating...';
+
+  @override
+  String get onboardingEmptyMemoryError =>
+      'Please write a memory or use a random one';
+
+  @override
+  String get onboardingNoStory => 'No story available';
+
+  @override
+  String get onboardingNamePersonalize =>
+      'We want to personalize your experience';
 }
