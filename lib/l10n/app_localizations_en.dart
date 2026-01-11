@@ -245,6 +245,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get following => 'Following';
 
   @override
+  String get streak => 'Streak';
+
+  @override
+  String get averageRating => 'Rating';
+
+  @override
+  String get totalReads => 'Reads';
+
+  @override
+  String get days => 'days';
+
+  @override
   String get forgotPassword => 'Forgot password?';
 
   @override

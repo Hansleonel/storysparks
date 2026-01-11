@@ -542,6 +542,30 @@ abstract class AppLocalizations {
   /// **'Following'**
   String get following;
 
+  /// No description provided for @streak.
+  ///
+  /// In en, this message translates to:
+  /// **'Streak'**
+  String get streak;
+
+  /// No description provided for @averageRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get averageRating;
+
+  /// No description provided for @totalReads.
+  ///
+  /// In en, this message translates to:
+  /// **'Reads'**
+  String get totalReads;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get days;
+
   /// No description provided for @forgotPassword.
   ///
   /// In en, this message translates to:

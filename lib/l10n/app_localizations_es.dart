@@ -246,6 +246,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get following => 'Siguiendo';
 
   @override
+  String get streak => 'Racha';
+
+  @override
+  String get averageRating => 'Rating';
+
+  @override
+  String get totalReads => 'Lecturas';
+
+  @override
+  String get days => 'días';
+
+  @override
   String get forgotPassword => '¿Olvidaste tu contraseña?';
 
   @override

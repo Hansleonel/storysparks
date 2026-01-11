@@ -174,22 +174,29 @@ class ProfilePage extends StatelessWidget {
                             ],
                             const SizedBox(height: 24),
                             // Stats Row
+                            // TODO: Add stats from database
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 _StatItem(
-                                  label: AppLocalizations.of(context)!.stories,
-                                  value: '${profile.storiesGenerated}',
+                                  icon: Icons.local_fire_department_outlined,
+                                  label: AppLocalizations.of(context)!.streak,
+                                  value: '1',
+                                  colors: colors,
                                 ),
                                 _StatItem(
-                                  label:
-                                      AppLocalizations.of(context)!.followers,
-                                  value: '${profile.followersCount}',
+                                  icon: Icons.star_outline,
+                                  label: AppLocalizations.of(context)!
+                                      .averageRating,
+                                  value: '4.8',
+                                  colors: colors,
                                 ),
                                 _StatItem(
+                                  icon: Icons.visibility_outlined,
                                   label:
-                                      AppLocalizations.of(context)!.following,
-                                  value: '${profile.followingCount}',
+                                      AppLocalizations.of(context)!.totalReads,
+                                  value: '99',
+                                  colors: colors,
                                 ),
                               ],
                             ),
@@ -243,19 +250,35 @@ class ProfilePage extends StatelessWidget {
 }
 
 class _StatItem extends StatelessWidget {
+  final IconData icon;
   final String label;
   final String value;
+  final AppColorsExtension colors;
 
   const _StatItem({
+    required this.icon,
     required this.label,
     required this.value,
+    required this.colors,
   });
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.appColors;
     return Column(
       children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            size: 24,
+            color: AppColors.primary.withOpacity(0.8),
+          ),
+        ),
+        const SizedBox(height: 8),
         Text(
           value,
           style: TextStyle(
@@ -265,11 +288,12 @@ class _StatItem extends StatelessWidget {
             color: colors.textPrimary,
           ),
         ),
+        const SizedBox(height: 2),
         Text(
           label,
           style: TextStyle(
             fontFamily: 'Urbanist',
-            fontSize: 14,
+            fontSize: 13,
             color: colors.textSecondary,
           ),
         ),
@@ -496,8 +520,9 @@ class _PremiumStatusBadge extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: (isDark ? const Color(0xFFD4AF37) : const Color(0xFFFFD700))
-                  .withOpacity(isDark ? 0.2 : 0.3),
+              color:
+                  (isDark ? const Color(0xFFD4AF37) : const Color(0xFFFFD700))
+                      .withOpacity(isDark ? 0.2 : 0.3),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
